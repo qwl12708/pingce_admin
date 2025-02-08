@@ -253,6 +253,125 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
       }
     ]
   },
+  // 产品管理
+  {
+    path: '/product',
+    name: 'product',
+    component: Layout,
+    meta: {
+      title: '产品管理',
+      icon: 'menu-nest',
+      roles: ['admin', 'visitor'],
+      isKeepAlive: true
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/product/index.vue'),
+        meta: {
+          title: '产品套餐设置',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'evaluation',
+        component: () => import('@/views/product/evaluation.vue'),
+        meta: {
+          title: '测评问卷',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'answer-guide',
+        component: () => import('@/views/product/answer-guide.vue'),
+        meta: {
+          title: '作答指引模版',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'invite-guide',
+        component: () => import('@/views/product/invite-guide.vue'),
+        meta: {
+          title: '邀请函模版',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'evaluation-report',
+        component: () => import('@/views/product/evaluation-report.vue'),
+        meta: {
+          title: '测评报告',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'add',
+        component: () => import('@/views/product/add.vue'),
+        meta: {
+          title: '新增产品套餐',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      },
+      {
+        path: 'evaluation-add',
+        component: () => import('@/views/product/evaluation-add.vue'),
+        meta: {
+          title: '新增测评问卷',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      },
+      {
+        path: 'answer-guide-add',
+        component: () => import('@/views/product/answer-guide-add.vue'),
+        meta: {
+          title: '新增/编辑作答指引模版',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      },
+      {
+        path: 'invite-guide-add',
+        component: () => import('@/views/product/invite-guide-add.vue'),
+        meta: {
+          title: '新增/编辑邀请函模版',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      },
+      {
+        path: 'evaluation-questions',
+        component: () => import('@/views/product/evaluation-questions.vue'),
+        meta: {
+          title: '问卷题目设置',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      }
+    ]
+  },
 
   // 表单
   {
