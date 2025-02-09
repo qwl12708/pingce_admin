@@ -272,6 +272,7 @@ const onAdd = () => {
 
 const onTabClick = (key: string) => {
   activeTab.value = key
+  // TODO: 根据key切换不同的表格数据
   tableData.value =
     key === 'pending' ? pendingTableData.value : key === 'waiting' ? waitingTableData.value : uploadedTableData.value
 }

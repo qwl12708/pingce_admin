@@ -373,6 +373,186 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
     ]
   },
 
+  // 系统管理
+  {
+    path: '/system',
+    name: 'system',
+    component: Layout,
+    meta: {
+      title: '系统管理',
+      icon: 'menu-nest',
+      roles: ['admin', 'visitor'],
+      isKeepAlive: true
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/system/user.vue'),
+        meta: {
+          title: '用户列表',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'department-management',
+        component: () => import('@/views/system/department-management.vue'),
+        meta: {
+          title: '部门管理',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'approval-process',
+        component: () => import('@/views/system/approval-process.vue'),
+        meta: {
+          title: '自定义审批流设置',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'permission',
+        component: () => import('@/views/system/permission.vue'),
+        meta: {
+          title: '角色授权设置',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'log',
+        component: () => import('@/views/system/log.vue'),
+        meta: {
+          title: '操作日志',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+
+      {
+        path: 'answer-guide',
+        component: () => import('@/views/system/answer-guide.vue'),
+        meta: {
+          title: '系统配置',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+
+      {
+        path: 'website-config',
+        component: () => import('@/views/system/website-config.vue'),
+        meta: {
+          title: '网站配置',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'other-config',
+        component: () => import('@/views/system/other-config.vue'),
+        meta: {
+          title: '其他配置',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'product-config',
+        component: () => import('@/views/system/product-config.vue'),
+        meta: {
+          title: '产品配置',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'stats',
+        component: () => import('@/views/system/stats.vue'),
+        meta: {
+          title: '数据统计',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'notice',
+        component: () => import('@/views/system/notice.vue'),
+        meta: {
+          title: '通知公告',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'data-backup',
+        component: () => import('@/views/system/data-backup.vue'),
+        meta: {
+          title: '数据备份',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'visitor-message',
+        component: () => import('@/views/system/visitor-message.vue'),
+        meta: {
+          title: '访客留言',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'cooperation-message',
+        component: () => import('@/views/system/cooperation-message.vue'),
+        meta: {
+          title: '代理合作留言',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true
+        }
+      },
+      {
+        path: 'profile',
+        component: () => import('@/views/system/notice.vue'),
+        meta: {
+          title: '个人信息',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      },
+
+      {
+        path: 'approval-process-update',
+        component: () => import('@/views/system/approval-process-update.vue'),
+        meta: {
+          title: '自定义审批流编辑',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      }
+    ]
+  },
+
   // 表单
   {
     path: '/form',
