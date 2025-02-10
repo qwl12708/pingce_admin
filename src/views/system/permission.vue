@@ -1,5 +1,3 @@
-<!-- 代码已包含 CSS：使用 TailwindCSS , 安装 TailwindCSS 后方可看到布局样式效果 -->
-
 <template>
   <div class="main-content min-h-screen bg-white p-6">
     <div class="flex justify-between items-center mb-6">

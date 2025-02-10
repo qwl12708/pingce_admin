@@ -437,8 +437,8 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
       },
 
       {
-        path: 'answer-guide',
-        component: () => import('@/views/system/answer-guide.vue'),
+        path: 'config',
+        component: () => import('@/views/system/config.vue'),
         meta: {
           title: '系统配置',
           icon: 'menu-nest',
@@ -446,7 +446,6 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           isKeepAlive: true
         }
       },
-
       {
         path: 'website-config',
         component: () => import('@/views/system/website-config.vue'),
@@ -534,8 +533,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '个人信息',
           icon: 'menu-nest',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          hidden: true
+          isKeepAlive: true
         }
       },
 
@@ -544,6 +542,50 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
         component: () => import('@/views/system/approval-process-update.vue'),
         meta: {
           title: '自定义审批流编辑',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      },
+      {
+        path: 'banner-add',
+        component: () => import('@/views/system/banner-add.vue'),
+        meta: {
+          title: '新增banner',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      },
+      {
+        path: 'logo-add',
+        component: () => import('@/views/system/logo-add.vue'),
+        meta: {
+          title: '新增LOGO',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      },
+      {
+        path: 'whychoose-update',
+        component: () => import('@/views/system/whychoose-update.vue'),
+        meta: {
+          title: '为什么选择科验',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      },
+      {
+        path: 'solution-add',
+        component: () => import('@/views/system/solution-add.vue'),
+        meta: {
+          title: '新增解决方案',
           icon: 'menu-nest',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
