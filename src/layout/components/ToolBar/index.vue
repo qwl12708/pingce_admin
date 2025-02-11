@@ -1,15 +1,10 @@
 <!--
  * @Author: zanjiahao
- * @LastEditors: zanjiahao
+ * @LastEditors: qwl qwl12708@163.com
  * @Description: 工具栏
 -->
 <template>
   <div class="right-menu" :class="{ 'ver-style': isShowVerticalStyle }">
-    <Guide class="right-menu-item hover-effect ver-clr" />
-    <Language class="right-menu-item hover-effect ver-clr" />
-    <div class="right-menu-item hover-effect ver-clr" @click="openSettingsDrawer">
-      <svg-icon id="guide-settings" name="settings" />
-    </div>
     <Fullscreen class="right-menu-item hover-effect ver-clr" />
     <div class="user-name ver-clr">
       {{ userStore.name }}
@@ -30,25 +25,6 @@
               <span style="margin-left: 5px">{{ $t('header.home') }}</span>
             </el-dropdown-item>
           </router-link>
-          <!-- Github -->
-          <a target="_blank" href="https://github.com/zanjiahao/Vue-ElPlus-Admin.git">
-            <el-dropdown-item>
-              <svg-icon name="github" />
-              <span style="margin-left: 5px">{{ $t('header.github') }}</span>
-            </el-dropdown-item>
-          </a>
-          <!-- Gitee -->
-          <a target="_blank" href="https://gitee.com/zjh-sir/vue-el-plus-admin.git">
-            <el-dropdown-item>
-              <svg-icon name="gitee" />
-              <span style="margin-left: 5px">{{ $t('header.gitee') }}</span>
-            </el-dropdown-item>
-          </a>
-          <!-- 页面设置 -->
-          <el-dropdown-item @click="openSettingsDrawer">
-            <svg-icon name="settings" />
-            <span style="margin-left: 5px">{{ $t('header.pageSet') }}</span>
-          </el-dropdown-item>
           <!-- 退出登录 -->
           <el-dropdown-item divided @click="logout">
             <svg-icon name="logout" />

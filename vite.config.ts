@@ -6,6 +6,7 @@ import autoprefixer from 'autoprefixer'
 import tailwindcss from 'tailwindcss'
 
 export default defineConfig({
+  base: '/admin/',
   plugins: [
     vue(),
     createSvgIconsPlugin({

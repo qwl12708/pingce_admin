@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 登录页面
--->
 <template>
   <div class="login-container">
     <el-form
@@ -14,7 +9,7 @@
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">Login</h3>
+        <h3 class="title">xx总后台系统</h3>
       </div>
 
       <el-form-item prop="username">
@@ -63,10 +58,10 @@
         style="width: 100%; margin-bottom: 30px"
         @click.prevent="handleLogin"
       >
-        Login
+        登录
       </el-button>
 
-      <div style="position: relative">
+      <!-- <div style="position: relative">
         <div class="tips">
           <span>Username : admin</span>
           <span>Password : any</span>
@@ -75,7 +70,7 @@
           <span style="margin-right: 18px">Username : editor</span>
           <span>Password : any</span>
         </div>
-      </div>
+      </div> -->
     </el-form>
   </div>
 </template>
@@ -105,8 +100,8 @@ const validatePassword = (rule: unknown, value: string | undefined, callback: (m
 }
 const initData = reactive({
   loginForm: {
-    username: '',
-    password: ''
+    username: 'admin',
+    password: '123456'
   },
   rules: {
     username: [{ required: true, trigger: 'blur', validator: validateUsername }],

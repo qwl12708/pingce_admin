@@ -8,17 +8,6 @@
         <!-- 顶部导航 -->
         <div class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6">
           <div class="text-lg">欢迎回来，今天又是充满希望的一天</div>
-          <div class="flex items-center">
-            <div class="relative mr-6 cursor-pointer">
-              <el-badge :value="3" class="item">
-                <el-icon><Bell /></el-icon>
-              </el-badge>
-            </div>
-            <div class="flex items-center cursor-pointer">
-              <el-avatar :size="32" :src="avatar" />
-              <span class="ml-2">管理员</span>
-            </div>
-          </div>
         </div>
 
         <!-- 待办事项 -->
