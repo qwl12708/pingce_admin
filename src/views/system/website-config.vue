@@ -81,7 +81,6 @@ import { computed, ref } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
 import Home from './components/Home.vue'
 import Solution from './components/Solution.vue'
-import router from '@/router'
 import Evaluation from './components/Evaluation.vue'
 import Channel from './components/Channel.vue'
 import About from './components/About.vue'
@@ -181,7 +180,7 @@ const handleCurrentChange = (page: number) => {
 }
 
 const handleTabChange = (tab: string) => {
-  currentTab.value = tab;
+  currentTab.value = tab
 }
 </script>
 

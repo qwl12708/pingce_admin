@@ -1,6 +1,6 @@
 <!--
  * @Author: zanjiahao
- * @LastEditors: zanjiahao
+ * @LastEditors: qwl qwl12708@163.com
  * @Description: Mian 渲染入口文件
 -->
 <template>
@@ -32,7 +32,7 @@ provide('refresh', refreshCurrentPage)
   position: relative;
   box-sizing: border-box;
   width: 100%;
-  height: 100%;
+  // height: 100%;
   padding: 10px 12px;
   background-color: var(--el-bg-color-page);
 }

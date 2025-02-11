@@ -528,7 +528,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
       },
       {
         path: 'profile',
-        component: () => import('@/views/system/notice.vue'),
+        component: () => import('@/views/system/profile.vue'),
         meta: {
           title: '个人信息',
           icon: 'menu-nest',
@@ -586,6 +586,17 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
         component: () => import('@/views/system/solution-add.vue'),
         meta: {
           title: '新增解决方案',
+          icon: 'menu-nest',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      },
+      {
+        path: 'notice-add',
+        component: () => import('@/views/system/notice-add.vue'),
+        meta: {
+          title: '新增公告',
           icon: 'menu-nest',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
