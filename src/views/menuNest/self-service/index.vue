@@ -136,7 +136,7 @@ const toggleFreeze = (row: TableItem) => {
 }
 
 const onAddCustomer = () => {
-  router.push('/menu-nest/menu-nest0')
+  router.push('/menu-nest/add')
 }
 </script>
 

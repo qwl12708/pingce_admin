@@ -2,7 +2,7 @@ const Layout = () => import('@/layout/index.vue')
 
 export const asyncRoutes: MenuType.MenuOptions[] = [
   {
-    path: '/menu-nest',
+    path: '/customer',
     name: 'menuNest',
     component: Layout,
     meta: {
@@ -13,8 +13,8 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
     },
     children: [
       {
-        path: 'menu-nest0',
-        component: () => import('@/views/menuNest/Nest1/add.vue'),
+        path: 'add',
+        component: () => import('@/views/menuNest/self-service/add.vue'),
         meta: {
           title: '新增客户',
           icon: 'menu-nest',
@@ -24,8 +24,8 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
         }
       },
       {
-        path: 'menu-nest1',
-        component: () => import('@/views/menuNest/Nest1/index.vue'),
+        path: 'self-service',
+        component: () => import('@/views/menuNest/self-service/index.vue'),
         meta: {
           title: '自助客户',
           icon: 'menu-nest',
@@ -34,8 +34,8 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
         }
       },
       {
-        path: 'menu-nest2',
-        component: () => import('@/views/menuNest/Nest2/index.vue'),
+        path: 'evaluate',
+        component: () => import('@/views/menuNest/evaluate/index.vue'),
         meta: {
           title: '测评客户',
           icon: 'menu-nest',
@@ -44,8 +44,8 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
         }
       },
       {
-        path: 'menu-nest3',
-        component: () => import('@/views/menuNest/Nest3/index.vue'),
+        path: 'segmente',
+        component: () => import('@/views/menuNest/segmente/index.vue'),
         meta: {
           title: '客户划分',
           icon: 'menu-nest',
@@ -54,8 +54,8 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
         }
       },
       {
-        path: 'menu-nest4',
-        component: () => import('@/views/menuNest/Nest2/use-record.vue'),
+        path: 'customer-use-history',
+        component: () => import('@/views/menuNest/evaluate/use-record.vue'),
         meta: {
           title: '查看客户使用记录',
           icon: 'menu-nest',
@@ -66,7 +66,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
       },
       {
         path: 'admin-area-update',
-        component: () => import('@/views/menuNest/Nest3/update.vue'),
+        component: () => import('@/views/menuNest/segmente/update.vue'),
         meta: {
           title: '测评人负责区域更新',
           icon: 'menu-nest',
