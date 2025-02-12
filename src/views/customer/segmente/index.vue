@@ -121,7 +121,7 @@ const handleSearch = () => {
 
 const onUpdate = () => {
   console.log('Update...')
-  router.push('/menu-nest/admin-area-update')
+  router.push('/customer/admin-area-update')
 }
 </script>
 

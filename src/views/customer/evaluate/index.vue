@@ -114,7 +114,7 @@ const tableData = ref([
 
 const onSeeRecord = () => {
   console.log('查看客户使用记录')
-  router.push('/menu-nest/customer-use-history')
+  router.push('/customer/customer-use-history')
 }
 </script>
 <style scoped>

@@ -19,7 +19,12 @@
                 <span class="ml-2 font-medium">待处理任务</span>
               </div>
               <div class="grid grid-cols-3 gap-4">
-                <div v-for="(item, index) in todoTasks" :key="index" class="bg-blue-50 p-4 rounded-lg">
+                <div
+                  v-for="(item, index) in todoTasks"
+                  :key="index"
+                  class="bg-blue-50 p-4 rounded-lg"
+                  @click="handleCustomerTaskClick(item)"
+                >
                   <div class="text-2xl font-bold text-blue-500">{{ item.count }}</div>
                   <div class="text-sm text-gray-600 mt-1">{{ item.label }}</div>
                 </div>
@@ -32,7 +37,12 @@
                 <span class="ml-2 font-medium">待处理合同</span>
               </div>
               <div class="grid grid-cols-3 gap-4">
-                <div v-for="(item, index) in todoContracts" :key="index" class="bg-red-50 p-4 rounded-lg">
+                <div
+                  v-for="(item, index) in todoContracts"
+                  :key="index"
+                  class="bg-red-50 p-4 rounded-lg"
+                  @click="handleCustomerContractsClick(item)"
+                >
                   <div class="text-2xl font-bold text-red-500">{{ item.count }}</div>
                   <div class="text-sm text-gray-600 mt-1">{{ item.label }}</div>
                 </div>
@@ -93,7 +103,9 @@
 
 <script lang="ts" setup>
 // import { ref } from 'vue'
-import { User, Document, Box, Bell, Star, TrendCharts } from '@element-plus/icons-vue'
+import { User, Document, Box, Star, TrendCharts } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const todoTasks = [
   { count: 54, label: '本月待审核客户' },
@@ -138,6 +150,16 @@ const productSections = [
     items: ['职业倾向分析问卷', '领导力潜质评估', '团队协作能力测评', '岗位胜任力评估']
   }
 ]
+
+const handleCustomerTaskClick = (item: any) => {
+  console.log(item)
+  router.push({ path: '/customer/evaluate' })
+}
+
+const handleCustomerContractsClick = (item: any) => {
+  console.log(item)
+  router.push({ path: '/hetong/list' })
+}
 </script>
 
 <style scoped>
