@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @Description: logo
--->
 <template>
   <div class="header-logo flx-center">
     <img v-if="logo" :src="logo" class="sidebar-logo" />
@@ -15,10 +10,12 @@
 <script lang="ts" setup name="Logo">
 import { reactive, toRefs, computed } from 'vue'
 import { useGlobalStore } from '@/store/modules/global'
+import LOGO from '../../../assets/image/logo.png'
+console.log('LOGO', LOGO)
 const globalStore = useGlobalStore()
 const initData = reactive({
-  title: 'LOGO'
-  // logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+  // title: 'LOGO',
+  logo: LOGO
 })
 const { title, logo } = toRefs(initData)
 const isShowTitle = computed(() => {
@@ -37,8 +34,6 @@ const isShowTitle = computed(() => {
   height: 100%;
   padding: 0 16px;
   .sidebar-logo {
-    width: 26px;
-    height: 26px;
     margin: 12px 0;
     vertical-align: middle;
   }

@@ -15,7 +15,9 @@
           <div class="grid grid-cols-2 gap-6">
             <el-card>
               <div class="flex items-center mb-4">
-                <el-icon class="text-blue-500"><Document /></el-icon>
+                <el-icon class="text-red-500">
+                  <img class="" src="../../assets/image/icons/icon-task.png" />
+                </el-icon>
                 <span class="ml-2 font-medium">待处理任务</span>
               </div>
               <div class="grid grid-cols-3 gap-4">
@@ -25,7 +27,9 @@
                   class="bg-blue-50 p-4 rounded-lg"
                   @click="handleCustomerTaskClick(item)"
                 >
-                  <div class="text-2xl font-bold text-blue-500">{{ item.count }}</div>
+                  <div class="text-2xl font-bold text-green-500">
+                    {{ item.count }}<span class="ml-1 text-sm text-black">个</span>
+                  </div>
                   <div class="text-sm text-gray-600 mt-1">{{ item.label }}</div>
                 </div>
               </div>
@@ -33,7 +37,9 @@
 
             <el-card>
               <div class="flex items-center mb-4">
-                <el-icon class="text-red-500"><Document /></el-icon>
+                <el-icon class="text-red-500">
+                  <img class="" src="../../assets/image/icons/icon-hetong.png" />
+                </el-icon>
                 <span class="ml-2 font-medium">待处理合同</span>
               </div>
               <div class="grid grid-cols-3 gap-4">
@@ -43,7 +49,9 @@
                   class="bg-red-50 p-4 rounded-lg"
                   @click="handleCustomerContractsClick(item)"
                 >
-                  <div class="text-2xl font-bold text-red-500">{{ item.count }}</div>
+                  <div class="text-2xl font-bold text-red-500">
+                    {{ item.count }}<span class="ml-1 text-sm text-black">个</span>
+                  </div>
                   <div class="text-sm text-gray-600 mt-1">{{ item.label }}</div>
                 </div>
               </div>
@@ -54,12 +62,16 @@
           <div class="grid grid-cols-2 gap-6 mt-6">
             <el-card>
               <div class="flex items-center mb-4">
-                <el-icon class="text-blue-500"><User /></el-icon>
+                <el-icon class="text-orange-500">
+                  <img class="" src="../../assets/image/icons/icon-kehu.png" />
+                </el-icon>
                 <span class="ml-2 font-medium">客户统计</span>
               </div>
               <div class="grid grid-cols-4 gap-4">
                 <div v-for="(item, index) in customerStats" :key="index" class="text-center">
-                  <div class="text-xl font-bold">{{ item.count }}</div>
+                  <div class="text-xl text-orange-500 font-bold">
+                    {{ item.count }}<span class="ml-1 text-sm text-black">个</span>
+                  </div>
                   <div class="text-sm text-gray-600 mt-1">{{ item.label }}</div>
                 </div>
               </div>
@@ -67,12 +79,17 @@
 
             <el-card>
               <div class="flex items-center mb-4">
-                <el-icon class="text-blue-500"><TrendCharts /></el-icon>
+                <el-icon class="text-blue-500">
+                  <img class="" src="../../assets/image/icons/icon-wenjuan.png" />
+                </el-icon>
                 <span class="ml-2 font-medium">问卷统计</span>
               </div>
               <div class="grid grid-cols-4 gap-4">
                 <div v-for="(item, index) in surveyStats" :key="index" class="text-center">
-                  <div class="text-xl font-bold" :class="{ 'text-blue-500': item.highlight }">{{ item.count }}</div>
+                  <div class="text-xl font-bold text-blue-500">
+                    {{ item.count }}<span class="ml-1 text-sm text-black">{{ item.danwei }}</span>
+                  </div>
+                  <div class="text-sm mt-1 text-orange-400 font-bold">{{ item.papelName }}</div>
                   <div class="text-sm text-gray-600 mt-1">{{ item.label }}</div>
                 </div>
               </div>
@@ -84,7 +101,9 @@
             <el-card v-for="(section, index) in productSections" :key="index">
               <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center">
-                  <el-icon class="text-blue-500"><component :is="section.icon" /></el-icon>
+                  <el-icon class="text-blue-500">
+                    <img :src="section.icon" />
+                  </el-icon>
                   <span class="ml-2 font-medium">{{ section.title }}</span>
                 </div>
               </div>
@@ -103,50 +122,64 @@
 
 <script lang="ts" setup>
 // import { ref } from 'vue'
-import { User, Document, Box, Star, TrendCharts } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const todoTasks = [
-  { count: 54, label: '本月待审核客户' },
-  { count: 415, label: '待确认项目' },
-  { count: 12, label: '待处理报告' }
+  { count: 54, label: '三个月内服务期满客户' },
+  { count: 415, label: '新客户一周内首次建立测评项目' },
+  { count: 12, label: '待人工编制报告数' }
 ]
 
 const todoContracts = [
-  { count: 54, label: '待审核合同' },
+  { count: 54, label: '合同被退回数量' },
   { count: 415, label: '合同待审批' },
-  { count: 415, label: '即将过期合同' }
+  { count: 415, label: '审批通过未查阅' }
 ]
 
 const customerStats = [
   { count: 54, label: '自助客户' },
-  { count: 54, label: '活跃客户' },
+  { count: 54, label: '一周内新注册自助客户' },
   { count: 54, label: '测评客户' },
   { count: 415, label: '历史客户' }
 ]
 
 const surveyStats = [
-  { count: 54, label: '测评份数', highlight: false },
-  { count: 54, label: '测评人数', highlight: false },
-  { count: 545341, label: '累计测评次数', highlight: true },
-  { count: 545341, label: '累计问卷数量', highlight: true }
+  { count: 54, label: '测评问卷', highlight: false, danwei: '份' },
+  { count: 54, label: '累计测评人数', highlight: false, danwei: '人' },
+  { count: 545341, label: '累计使用人次最多的测评问卷', highlight: true, papelName: '问卷名称', danwei: '人次' },
+  { count: 545341, label: '近15天使用人次最多的测评问卷', highlight: true, papelName: '问卷名称', danwei: '人次' }
 ]
 
 const productSections = [
   {
-    title: '最近上线产品套餐',
-    icon: Box,
+    title: '最近15天新上线产品套餐',
+    icon: '/src/assets/image/icons/icon-taocan1.png',
     items: ['企业人才测评基础套餐', '领导力发展评估套餐', '团队效能提升方案', '职业发展规划套餐']
   },
   {
-    title: '热门产品套餐',
-    icon: Star,
+    title: '最近15天新屏蔽产品套餐',
+    icon: '/src/assets/image/icons/icon-taocan2.png',
     items: ['组织文化诊断套餐', '人才甄选与发展套餐', '员工敬业度调研套餐', '管理者能力评估套餐']
   },
   {
-    title: '最新问卷模板',
-    icon: Document,
+    title: '最近15天新解除屏蔽产品套餐',
+    icon: '/src/assets/image/icons/icon-taocan3.png',
+    items: ['职业倾向分析问卷', '领导力潜质评估', '团队协作能力测评', '岗位胜任力评估']
+  },
+  {
+    title: '客户购买数量最多的产品套餐',
+    icon: '/src/assets/image/icons/icon-taocan4.png',
+    items: ['企业人才测评基础套餐', '领导力发展评估套餐', '团队效能提升方案', '职业发展规划套餐']
+  },
+  {
+    title: '最近30天客户购买数量最多的产品套餐',
+    icon: '/src/assets/image/icons/icon-taocan5.png',
+    items: ['组织文化诊断套餐', '人才甄选与发展套餐', '员工敬业度调研套餐', '管理者能力评估套餐']
+  },
+  {
+    title: '最近15天新交付问卷',
+    icon: '/src/assets/image/icons/icon-taocan6.png',
     items: ['职业倾向分析问卷', '领导力潜质评估', '团队协作能力测评', '岗位胜任力评估']
   }
 ]

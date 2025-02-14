@@ -3,21 +3,36 @@
   <div class="main-content min-h-screen bg-white p-6">
     <!-- 顶部提示区域 -->
     <div class="flex items-center justify-between py-4 mb-6">
-      <div class="flex items-center gap-8">
-        <div class="flex items-center gap-2">
-          <el-icon class="text-blue-500 text-xl"><Bell /></el-icon>
-          <span>您有 3 个客户三个月内服务期满</span>
+      <div class="flex gap-8">
+        <div
+          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'three' }]"
+          @click="activeTab = 'three'"
+        >
+          <el-icon class="mr-2 text-blue-500">
+            <img src="../../../assets/image/icons/three.png" />
+          </el-icon>
+          <span>您有 <span class="text-blue-500 font-medium">*</span> 个客户三个月内服务期满</span>
         </div>
-        <div class="flex items-center gap-2">
-          <el-icon class="text-blue-500 text-xl"><Document /></el-icon>
-          <span>您有 2 个新客户一周内首次建立测评项目</span>
+        <div
+          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'one' }]"
+          @click="activeTab = 'one'"
+        >
+          <el-icon class="mr-2 text-blue-500">
+            <img src="../../../assets/image/icons/one.png" />
+          </el-icon>
+          <span>您有 <span class="text-blue-500 font-medium">*</span> 个新客户一周内首次建立测评项目</span>
         </div>
-        <div class="flex items-center gap-2">
-          <el-icon class="text-blue-500 text-xl"><User /></el-icon>
-          <span>您共为 126 个客户提供专业服务</span>
+        <div
+          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'all' }]"
+          @click="activeTab = 'all'"
+        >
+          <el-icon class="mr-2 text-blue-500">
+            <img src="../../../assets/image/icons/all.png" />
+          </el-icon>
+          <span>您共为 <span class="text-blue-500 font-medium">*</span> 个客户提供专业服务</span>
         </div>
       </div>
-      <el-button type="primary" class="!rounded-button whitespace-nowrap">
+      <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="onAddCustomer">
         <el-icon class="mr-1"><Plus /></el-icon>新增客户
       </el-button>
     </div>
@@ -57,8 +72,10 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { Bell, Document, User, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import router from '@/router'
+
+const activeTab = ref('three') // one: 一周内, three: 三个月内, all: 全部
 const currentPage = ref(1)
 const pageSize = ref(10)
 const tableData = ref([
@@ -115,6 +132,10 @@ const tableData = ref([
 const onSeeRecord = () => {
   console.log('查看客户使用记录')
   router.push('/customer/customer-use-history')
+}
+
+const onAddCustomer = () => {
+  router.push({ path: '/customer/add', query: { type: 'evaluate' } })
 }
 </script>
 <style scoped>

@@ -1,4 +1,3 @@
-<!-- 代码已包含 CSS：使用 TailwindCSS , 安装 TailwindCSS 后方可看到布局样式效果 -->
 <template>
   <div class="main-content min-h-screen bg-white p-6">
     <h1 class="text-2xl font-medium mb-8">新增合同</h1>
@@ -10,7 +9,7 @@
           <el-input v-model="form.contractNo" placeholder="请输入" class="w-full" />
         </div>
         <div class="form-item">
-          <label class="required-label">客户编号</label>
+          <label class="required-label">客户名称</label>
           <el-select v-model="form.customerId" placeholder="请输入或选择" class="w-full">
             <el-option v-for="item in customerOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
@@ -31,7 +30,7 @@
     </div>
     <!-- 套餐按钮组 -->
     <div class="flex gap-4 mb-6">
-      <el-button type="primary" class="!rounded-button" @click="addPackage">选择套餐</el-button>
+      <el-button type="primary" class="!rounded-button" @click="showPackageDialog = true">选择套餐</el-button>
       <el-button class="!rounded-button" @click="deletePackage">删除套餐</el-button>
     </div>
     <!-- 金额统计 -->
@@ -48,7 +47,7 @@
       <el-table-column type="selection" width="55" />
       <el-table-column label="类别" prop="type" width="120" />
       <el-table-column label="产品套餐" prop="package" width="180" />
-      <el-table-column label="可使用词条" prop="terms" />
+      <el-table-column label="可使用问卷" prop="terms" />
       <el-table-column label="金额(元)" prop="amount" width="120" />
       <el-table-column label="使用期限" prop="period" width="120" />
       <el-table-column label="限售地区" prop="region" width="120" />
@@ -76,8 +75,26 @@
       <el-button type="primary" class="!rounded-button w-32" @click="submitForm">提交审批</el-button>
       <el-button class="!rounded-button w-32" @click="cancelForm">不保存</el-button>
     </div>
+    <!-- 选择套餐弹窗 -->
+    <el-dialog title="选择套餐" v-model.value:visible="showPackageDialog" style="width: 1000px">
+      <el-table :data="packageData" @selection-change="handlePackageSelectionChange">
+        <el-table-column type="selection" width="55" />
+        <el-table-column label="类别" prop="type" width="120" />
+        <el-table-column label="产品套餐" prop="package" width="180" />
+        <el-table-column label="可使用问卷" prop="terms" />
+        <el-table-column label="金额(元)" prop="amount" width="120" />
+        <el-table-column label="使用期限" prop="period" width="120" />
+        <el-table-column label="限售地区" prop="region" width="120" />
+        <el-table-column label="备注" prop="remark" />
+      </el-table>
+      <div class="flex justify-center pt-4">
+        <el-button @click="showPackageDialog = false">取消</el-button>
+        <el-button type="primary" @click="handlePackageConfirm">确认</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
+
 <script lang="ts" setup>
 import { ref } from 'vue'
 const form = ref({
@@ -105,7 +122,7 @@ const tableData = ref([
   {
     type: '点数',
     package: '8000',
-    terms: '所有词条',
+    terms: '所有问卷',
     amount: 8000.0,
     period: '365天',
     region: '杭州',
@@ -115,8 +132,8 @@ const tableData = ref([
   },
   {
     type: '包年/月',
-    package: '不限词条包年',
-    terms: '所有词条',
+    package: '不限问卷包年',
+    terms: '所有问卷',
     amount: 8000.0,
     period: '365天',
     region: '杭州',
@@ -142,7 +159,39 @@ const submitForm = () => {
 const cancelForm = () => {
   console.log('cancel form')
 }
+
+const showPackageDialog = ref(false)
+const packageData = ref([
+  {
+    type: '点数',
+    package: '8000',
+    terms: '所有问卷',
+    amount: 8000.0,
+    period: '365天',
+    region: '杭州',
+    remark: ''
+  },
+  {
+    type: '包年/月',
+    package: '不限问卷包年',
+    terms: '所有问卷',
+    amount: 8000.0,
+    period: '365天',
+    region: '杭州',
+    remark: ''
+  }
+])
+
+const handlePackageSelectionChange = (val: any) => {
+  console.log('package selection', val)
+}
+
+const handlePackageConfirm = () => {
+  console.log('确认选择套餐')
+  showPackageDialog.value = false
+}
 </script>
+
 <style scoped>
 .form-item {
   display: flex;

@@ -8,30 +8,36 @@
             <span class="text-gray-600">客户类别</span>
             <el-radio-group v-model="customerType">
               <el-radio label="auto">自助客户</el-radio>
-              <el-radio label="test">测评客户</el-radio>
+              <el-radio label="evaluate">测评客户</el-radio>
             </el-radio-group>
           </div>
         </div>
-        <el-form :model="form" label-width="160px">
-          <div class="grid grid-cols-2 gap-x-8 gap-y-6">
-            <el-form-item label="单位名称" required>
+        <el-form :model="form" label-width="170px" label-position="right">
+          <div class="grid grid-cols-2 gap-x-8 gap-y-6 text-left">
+            <el-form-item label="单位名称" required class="flex items-center">
               <el-input v-model="form.companyName" placeholder="请输入" />
             </el-form-item>
 
-            <el-form-item label="上传加盖公章的用户承诺或营业执照" required>
+            <el-form-item class="relative" label="上传加盖公章的用户承诺或营业执照" required>
+              <a class="text-blue-500" style="position: absolute; bottom: -10px; left: -160px; cursor: pointer">
+                下载《用户承诺》模版
+              </a>
               <el-upload
                 class="border border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500"
                 action="#"
                 :auto-upload="false"
-                tip="只能上传jpg/png文件，且不超过500kb"
+                tip="要求：png、jpeg、pdf格式，大小在10M以内"
                 extra="(要求：png、jpeg、pdf格式，大小在10M以内)"
               >
                 <el-icon class="text-gray-400 text-xl mb-2"><Plus /></el-icon>
                 <div class="text-gray-500">点击上传</div>
+                <template #tip>
+                  <div class="text-gray-400 text-sm mt-1">要求：png、jpeg、pdf格式，大小在10M以内</div>
+                </template>
               </el-upload>
             </el-form-item>
 
-            <el-form-item label="员工人数">
+            <el-form-item label="员工人数" class="flex items-center">
               <el-select v-model="form.employeeCount" placeholder="请选择">
                 <el-option label="50人以下" value="lt50" />
                 <el-option label="50-200人" value="50-200" />
@@ -39,7 +45,7 @@
               </el-select>
             </el-form-item>
 
-            <el-form-item label="上传单位LOGO" required>
+            <el-form-item label="上传单位LOGO" required class="flex items-center">
               <el-upload
                 class="border border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500"
                 action="#"
@@ -77,7 +83,7 @@
             <el-form-item label="管理员（联系人）" required>
               <el-input v-model="form.adminName" placeholder="请输入" />
             </el-form-item>
-            <el-form-item label="预留其他使用手机号码">
+            <el-form-item label="预留其他者使用手机号码">
               <el-input v-model="form.backupPhone" placeholder="请输入" />
             </el-form-item>
             <el-form-item label="管理员手机号码" required>
@@ -87,7 +93,7 @@
                 </template>
               </el-input>
             </el-form-item>
-            <el-form-item label="预留其他使用手机号码">
+            <el-form-item label="预留其他使用者手机号码">
               <el-input v-model="form.otherPhone" placeholder="请输入" />
             </el-form-item>
             <el-form-item label="验证码" required>
@@ -110,9 +116,20 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-const customerType = ref('auto')
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const customerType = ref('auto') // auto: 自助客户, evaluate: 测评客户
+
+onMounted(() => {
+  console.log('页面初始化', router)
+  const type = router.currentRoute.value.query?.type
+  if (type === 'evaluate') {
+    customerType.value = type
+  }
+})
+
 const form = ref({
   companyName: '',
   employeeCount: '',

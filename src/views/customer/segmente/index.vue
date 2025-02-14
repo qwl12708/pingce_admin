@@ -14,7 +14,7 @@
         <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleSearch">查询</el-button>
       </div>
       <div class="flex gap-4">
-        <el-button type="primary" class="!rounded-button whitespace-nowrap">
+        <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="showDialog = true">
           <el-icon class="mr-1"><UserFilled /></el-icon>
           分配/变更测评顾问
         </el-button>
@@ -40,13 +40,12 @@
         <el-table-column prop="amount" label="累计合同金额（元）" sortable />
         <el-table-column prop="type" label="类别" sortable />
         <el-table-column prop="consultant" label="联系人" sortable />
-        <el-table-column prop="employeeCount" label="员工人数" />
-        <el-table-column prop="department" label="所属部门" />
-        <el-table-column label="操作" fixed="right">
-          <template #default>
-            <el-button link type="primary">编辑</el-button>
-          </template>
-        </el-table-column>
+        <el-table-column prop="tel" label="联系人手机号码" sortable />
+        <el-table-column prop="consultant" label="联系人" sortable />
+        <el-table-column prop="employeeCount" label="员工人数" sortable />
+        <el-table-column prop="department" label="所属行业" />
+        <el-table-column prop="email" label="预留电子邮箱" sortable />
+        <el-table-column prop="evaluator" label="测评顾问" sortable />
       </el-table>
 
       <!-- 分页 -->
@@ -61,6 +60,22 @@
         />
       </div>
     </div>
+
+    <!-- 弹窗 -->
+    <el-dialog title="分配/变更测评顾问" v-model.value:visible="showDialog">
+      <el-form :model="dialogForm" label-width="120px">
+        <el-form-item label="分配测评顾问">
+          <el-select v-model="dialogForm.consultant" placeholder="请选择">
+            <el-option label="顾问A" value="a" />
+            <el-option label="顾问B" value="b" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div class="flex justify-end pt-4">
+        <el-button class="ml-4" @click="showDialog = false">取消</el-button>
+        <el-button type="primary" @click="handleDialogSubmit">确认</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -68,6 +83,11 @@
 import { ref } from 'vue'
 import { UserFilled, Setting } from '@element-plus/icons-vue'
 import router from '@/router'
+
+const showDialog = ref(false)
+const dialogForm = ref({
+  consultant: ''
+})
 
 const province = ref('')
 const customer = ref('')
@@ -97,8 +117,11 @@ const tableData = [
     amount: 30000.0,
     type: '自动',
     consultant: '张三',
+    tel: '13888888888',
     employeeCount: 12,
-    department: '技术部'
+    department: '技术部',
+    email: '1@2.com',
+    evaluator: '李四'
   },
   {
     code: 'KH002',
@@ -110,8 +133,11 @@ const tableData = [
     amount: 45000.0,
     type: '自动',
     consultant: '李四',
+    tel: '13888888888',
     employeeCount: 15,
-    department: '技术部'
+    department: '技术部',
+    email: '2@1.com',
+    evaluator: '张三'
   }
 ]
 
@@ -122,6 +148,11 @@ const handleSearch = () => {
 const onUpdate = () => {
   console.log('Update...')
   router.push('/customer/admin-area-update')
+}
+
+const handleDialogSubmit = () => {
+  console.log('分配测评顾问', dialogForm.value)
+  showDialog.value = false
 }
 </script>
 

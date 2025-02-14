@@ -3,12 +3,22 @@
     <!-- 数据概览区 -->
     <div class="flex justify-between items-center mb-6">
       <div class="flex gap-8">
-        <div class="flex items-center">
-          <el-icon class="mr-2 text-blue-500"><DataLine /></el-icon>
+        <div
+          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'all' }]"
+          @click="activeTab = 'all'"
+        >
+          <el-icon class="mr-2 text-blue-500">
+            <img src="../../../assets/image/icons/all.png" />
+          </el-icon>
           <span>您共为 <span class="text-blue-500 font-medium">6</span> 个自助客户提供专业服务</span>
         </div>
-        <div class="flex items-center">
-          <el-icon class="mr-2 text-blue-500"><Timer /></el-icon>
+        <div
+          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'one' }]"
+          @click="activeTab = 'one'"
+        >
+          <el-icon class="mr-2 text-blue-500">
+            <img src="../../../assets/image/icons/one.png" />
+          </el-icon>
           <span>您有 <span class="text-blue-500 font-medium">2</span> 个自助客户一周内新注册</span>
         </div>
       </div>
@@ -19,15 +29,15 @@
     <!-- 表格区域 -->
     <div class="bg-white rounded-lg shadow">
       <el-table :data="tableData" style="width: 100%" class="custom-table">
-        <el-table-column type="selection" width="50" />
-        <el-table-column label="序号" type="index" width="60" />
-        <el-table-column prop="customerCode" label="客户编号" width="120" sortable />
-        <el-table-column prop="customerName" label="客户名称" width="200" sortable />
-        <el-table-column prop="registerDate" label="注册日期" width="180" sortable />
-        <el-table-column prop="projectCount" label="累计项目数" width="120" sortable />
-        <el-table-column prop="evaluationCount" label="累计评估人次" width="120" sortable />
-        <el-table-column prop="contact" label="联系人" width="120" sortable />
-        <el-table-column label="操作" fixed="right" width="400">
+        <el-table-column type="selection" />
+        <el-table-column label="序号" type="index" />
+        <el-table-column prop="customerCode" label="客户编号" sortable />
+        <el-table-column prop="customerName" label="客户名称" sortable />
+        <el-table-column prop="registerDate" label="注册日期" sortable />
+        <el-table-column prop="projectCount" label="累计项目数" sortable />
+        <el-table-column prop="evaluationCount" label="累计评估人次" sortable />
+        <el-table-column prop="contact" label="联系人" sortable />
+        <el-table-column label="操作" fixed="right" width="300" align="center">
           <template #default="scope">
             <div class="flex gap-2">
               <el-button type="primary" link class="!rounded-button whitespace-nowrap"> 查询 </el-button>
@@ -62,7 +72,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { DataLine, Timer, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import router from '@/router'
 interface TableItem {
   customerCode: string
@@ -73,6 +83,7 @@ interface TableItem {
   contact: string
   isFreezed: boolean
 }
+const activeTab = ref('all')
 const currentPage = ref(1)
 const pageSize = ref(10)
 const tableData = ref<TableItem[]>([
