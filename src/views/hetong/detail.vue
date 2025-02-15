@@ -140,20 +140,21 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { Document, Tickets, Check, Close } from '@element-plus/icons-vue';
+import { ref } from 'vue'
+import { Document, Tickets } from '@element-plus/icons-vue'
+import router from '@/router'
 
 interface TableItem {
-  type: string;
-  package: string;
-  usableQuestionnaire: string;
-  amount: number;
-  period: string;
-  area: string;
-  remark: string;
-  dealAmount: number;
-  startTime: string;
-  endTime: string;
+  type: string
+  package: string
+  usableQuestionnaire: string
+  amount: number
+  period: string
+  area: string
+  remark: string
+  dealAmount: number
+  startTime: string
+  endTime: string
 }
 const tableData = ref<TableItem[]>([
   {
@@ -192,28 +193,28 @@ const tableData = ref<TableItem[]>([
     startTime: '2024-04-12 13:00',
     endTime: '2024-04-12 13:00'
   }
-]);
+])
 
-const showApprovalRecordDialog = ref(false);
+const showApprovalRecordDialog = ref(false)
 const approvalRecords = ref([
   { approver: '张三15246372929（发起人）', time: '2024-04-12 13:00', result: '发起' },
   { approver: '李四17817817888（审批人）', time: '2024-04-13 14:00', result: '驳回' }
-]);
+])
 
-const showApprovalDialog = ref(false);
+const showApprovalDialog = ref(false)
 const approvalForm = ref({
   result: '',
   comment: ''
-});
+})
 
 const handleApprovalSubmit = () => {
-  console.log('审批结果', approvalForm.value);
-  showApprovalDialog.value = false;
-};
+  console.log('审批结果', approvalForm.value)
+  showApprovalDialog.value = false
+}
 
 const goBack = () => {
-  router.push('/hetong/list');
-};
+  router.push('/hetong/list')
+}
 </script>
 
 <style scoped>
