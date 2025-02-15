@@ -1,11 +1,10 @@
-<!-- 代码已包含 CSS：使用 TailwindCSS , 安装 TailwindCSS 后方可看到布局样式效果 -->
 <template>
   <div class="main-content min-h-screen bg-white p-6">
     <!-- 合同详情头部 -->
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-medium">HTBH-001</h1>
       <div class="flex items-center gap-4">
-        <el-button type="default" class="!rounded-button whitespace-nowrap">返回</el-button>
+        <el-button @click="goBack" type="default" class="!rounded-button whitespace-nowrap">返回</el-button>
       </div>
     </div>
     <!-- 合同基本信息 -->
@@ -24,8 +23,10 @@
           <span class="text-blue-500">待审核</span>
         </div>
         <div class="flex items-center">
-          <el-button type="primary">审批记录</el-button>
-          <el-button type="primary" class="!rounded-button whitespace-nowrap">审批合同</el-button>
+          <el-button type="primary" @click="showApprovalRecordDialog = true">审批记录</el-button>
+          <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="showApprovalDialog = true"
+            >审批合同</el-button
+          >
         </div>
       </div>
       <el-steps :active="1" finish-status="success" class="mt-4 border-t border-gray-100 pt-4">
@@ -91,22 +92,68 @@
         <el-table-column label="截止日期" prop="endTime" />
       </el-table>
     </div>
+
+    <!-- 审批记录弹窗 -->
+    <el-dialog title="审批记录" v-model.value:visible="showApprovalRecordDialog">
+      <el-steps
+        :active="approvalRecords.length"
+        direction="vertical"
+        :space="80"
+        style="max-height: 500px; overflow-y: scroll"
+      >
+        <el-step
+          v-for="(record, index) in approvalRecords"
+          :key="index"
+          :title="record.approver"
+          :description="`${record.time} - ${record.result}`"
+        >
+        </el-step>
+      </el-steps>
+      <div class="flex justify-end pt-4">
+        <el-button @click="showApprovalRecordDialog = false">关闭</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 审批合同弹窗 -->
+    <el-dialog title="审批合同" v-model.value:visible="showApprovalDialog">
+      <el-form :model="approvalForm" label-width="120px">
+        <el-form-item
+          label="审批结果"
+          prop="result"
+          :rules="[{ required: true, message: '请选择审批结果', trigger: 'change' }]"
+        >
+          <el-radio-group v-model="approvalForm.result">
+            <el-radio label="通过">通过</el-radio>
+            <el-radio label="驳回">驳回</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="驳回原因" v-if="approvalForm.result === '驳回'">
+          <el-input type="textarea" v-model="approvalForm.comment" placeholder="请输入驳回原因" />
+        </el-form-item>
+      </el-form>
+      <div class="flex justify-end pt-4">
+        <el-button @click="showApprovalDialog = false">取消</el-button>
+        <el-button type="primary" @click="handleApprovalSubmit">确认</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
+
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { Document, Tickets, Check } from '@element-plus/icons-vue'
+import { ref } from 'vue';
+import { Document, Tickets, Check, Close } from '@element-plus/icons-vue';
+
 interface TableItem {
-  type: string
-  package: string
-  usableQuestionnaire: string
-  amount: number
-  period: string
-  area: string
-  remark: string
-  dealAmount: number
-  startTime: string
-  endTime: string
+  type: string;
+  package: string;
+  usableQuestionnaire: string;
+  amount: number;
+  period: string;
+  area: string;
+  remark: string;
+  dealAmount: number;
+  startTime: string;
+  endTime: string;
 }
 const tableData = ref<TableItem[]>([
   {
@@ -145,8 +192,30 @@ const tableData = ref<TableItem[]>([
     startTime: '2024-04-12 13:00',
     endTime: '2024-04-12 13:00'
   }
-])
+]);
+
+const showApprovalRecordDialog = ref(false);
+const approvalRecords = ref([
+  { approver: '张三15246372929（发起人）', time: '2024-04-12 13:00', result: '发起' },
+  { approver: '李四17817817888（审批人）', time: '2024-04-13 14:00', result: '驳回' }
+]);
+
+const showApprovalDialog = ref(false);
+const approvalForm = ref({
+  result: '',
+  comment: ''
+});
+
+const handleApprovalSubmit = () => {
+  console.log('审批结果', approvalForm.value);
+  showApprovalDialog.value = false;
+};
+
+const goBack = () => {
+  router.push('/hetong/list');
+};
 </script>
+
 <style scoped>
 .el-table {
   --el-table-border-color: #e5e7eb;
