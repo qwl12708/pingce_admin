@@ -1,6 +1,6 @@
 <template>
   <div class="main-content min-h-screen bg-white p-6">
-    <h2 class="text-xl font-medium mb-8">新增产品套餐</h2>
+    <h2 class="text-xl font-medium mb-8">新增/编辑产品套餐</h2>
 
     <div class="space-y-6">
       <!-- 基础信息 -->
@@ -121,7 +121,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const form = reactive({
   name: '',
@@ -167,6 +169,14 @@ const tableData = ref([
     duration: '365天'
   }
 ])
+
+onMounted(() => {
+  const { query } = router.currentRoute.value
+  if (query?.id) {
+    // 根据 id 查询数据
+    console.log('根据 id 查询数据', query.id)
+  }
+})
 
 const handleSubmit = () => {
   // 处理表单提交

@@ -17,31 +17,32 @@
       </div>
     </div>
 
-    <el-table
-      :data="tableData"
-      @selection-change="handleSelectionChange"
-      class="w-full"
-      :header-cell-style="{ background: '#F5F7FA' }"
-    >
-      <el-table-column type="selection" width="55" />
-      <el-table-column label="序号" type="index" width="80" />
-      <el-table-column label="问卷编号" prop="code" />
-      <el-table-column label="类型" prop="type" width="120" />
-      <el-table-column label="岗位类别" prop="position" width="120" />
+    <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
+      <el-table-column type="selection" fixed="left" width="55" />
+      <el-table-column label="问卷编号" fixed="left" prop="code" width="80" />
+      <el-table-column label="问卷名称" prop="name" width="200" sortable />
+      <el-table-column label="类别" prop="type" width="120" sortable />
+      <el-table-column label="岗位类别" prop="position" width="120" sortable />
       <el-table-column label="题目总数" prop="questionCount" width="100" />
-      <el-table-column label="时长(分钟)" prop="duration" width="100" />
+      <el-table-column label="时长(分钟)" prop="duration" width="120" />
       <el-table-column label="点数" prop="points" width="80" />
-      <el-table-column label="语言" prop="language" width="100" />
-      <el-table-column label="作答指引" prop="guide" width="100" />
-      <el-table-column label="测评报告" prop="report" width="100" />
-      <el-table-column label="对比报告" prop="comparison" width="100" />
-      <el-table-column label="操作" fixed="right" width="300">
-        <template #default="{ row }">
-          <div class="space-x-2">
-            <el-button type="primary" link @click="handleEdit(row)"> 调整设置 </el-button>
-            <el-button type="primary" link @click="handleOnlineEdit(row)"> 在线编辑 </el-button>
-            <el-button type="primary" link @click="handleToggleStatus(row)">
-              {{ row.status === 'active' ? '冻结' : '解冻' }}
+      <el-table-column label="邀请函" prop="invitePaper" width="80" />
+      <el-table-column label="作答指引" prop="guide" width="120" />
+      <el-table-column label="测评报告" prop="report" width="120" />
+      <el-table-column label="横向对比报告" prop="comparison" width="120" />
+      <el-table-column label="简介" prop="desc" width="120" />
+      <el-table-column label="打乱题序" prop="disruptQuestions" width="120" />
+      <el-table-column label="限制切屏" prop="limitSwitchScreen" width="120" />
+      <el-table-column label="状态" prop="status" width="120" sortable />
+      <el-table-column label="报告生成类别" prop="reportDate" width="150" sortable />
+      <el-table-column label="交付日期" prop="deadlineDate" width="120" />
+      <el-table-column label="操作" fixed="right" width="300" align="center">
+        <template #default="scope">
+          <div class="flex gap-2">
+            <el-button type="primary" link @click="handleSettings(scope.row)"> 调整问卷设置 </el-button>
+            <el-button type="primary" link @click="handleEdit(scope.row)"> 在线编辑问卷 </el-button>
+            <el-button link :type="scope.row.status === '冻结' ? 'danger' : 'warning'" @click="handleFreeze(scope.row)">
+              {{ scope.row.status === '冻结' ? '解冻' : '冻结' }}
             </el-button>
           </div>
         </template>
@@ -70,62 +71,82 @@ import { Delete, Plus } from '@element-plus/icons-vue'
 import router from '@/router'
 
 interface TableItem {
-  id: number
   code: string
+  name: string
   type: string
   position: string
   questionCount: number
-  duration: number
+  duration: number | string
   points: number
-  language: string
+  invitePaper: string
   guide: string
   report: string
   comparison: string
-  status: 'active' | 'frozen'
+  desc: string
+  disruptQuestions: string
+  limitSwitchScreen: string
+  status: '正常' | '冻结'
+  reportDate: string
+  deadlineDate: string
 }
 
 const tableData = ref<TableItem[]>([
   {
-    id: 1,
-    code: '校园招聘通用测评问卷',
+    code: 'KX001',
+    name: '校园招聘通用测评问卷',
     type: '通用',
     position: '岗位类别名称',
-    questionCount: 50,
+    questionCount: 5,
     duration: 30,
     points: 5,
-    language: '中文',
-    guide: '标准指引',
-    report: '标准报告',
-    comparison: '对比报告A',
-    status: 'active'
+    invitePaper: '邀请函名称',
+    guide: '模板名称',
+    report: '模板名称',
+    comparison: '模板名称',
+    desc: '简介',
+    disruptQuestions: '是',
+    limitSwitchScreen: '是',
+    status: '正常',
+    reportDate: '报告生成类别',
+    deadlineDate: '交付日期'
   },
   {
-    id: 2,
-    code: '岗位胜任力测评问卷',
+    code: 'KX002',
+    name: '校园招聘通用测评问卷',
     type: '岗位胜任力',
-    position: '技术岗位',
-    questionCount: 60,
-    duration: 45,
-    points: 5,
-    language: '中文',
-    guide: '详细指引',
-    report: '深度报告',
-    comparison: '对比报告B',
-    status: 'active'
+    position: '调查问卷',
+    questionCount: 8,
+    duration: '包年/月',
+    points: 5000,
+    invitePaper: '邀请函名称',
+    guide: '模板名称',
+    report: '模板名称',
+    comparison: '模板名称',
+    desc: '简介',
+    disruptQuestions: '是',
+    limitSwitchScreen: '是',
+    status: '冻结',
+    reportDate: '报告生成类别',
+    deadlineDate: '交付日期'
   },
   {
-    id: 3,
-    code: '定制化评估问卷',
+    code: 'KX003',
+    name: '校园招聘通用测评问卷',
     type: '订制',
-    position: '管理岗位',
-    questionCount: 40,
-    duration: 60,
+    position: '调查问卷',
+    questionCount: 10,
+    duration: 30,
     points: 5,
-    language: '中文',
-    guide: '简要指引',
-    report: '简报',
-    comparison: '对比报告C',
-    status: 'frozen'
+    invitePaper: '邀请函名称',
+    guide: '模板名称',
+    report: '模板名称',
+    comparison: '模板名称',
+    desc: '简介',
+    disruptQuestions: '是',
+    limitSwitchScreen: '是',
+    status: '冻结',
+    reportDate: '报告生成类别',
+    deadlineDate: '交付日期'
   }
 ])
 

@@ -191,7 +191,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
         path: 'add',
         component: () => import('@/views/product/add.vue'),
         meta: {
-          title: '新增产品套餐',
+          title: '新增/编辑产品套餐',
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,

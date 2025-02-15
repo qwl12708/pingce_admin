@@ -4,8 +4,8 @@
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-xl font-medium">产品套餐设置</h1>
         <div class="space-x-4">
-          <el-button type="primary" class="!rounded-button" @click="handleAdd">
-            <el-icon @click="onAddProduct" class="mr-1"><Plus /></el-icon>新增套餐
+          <el-button type="primary" class="!rounded-button" @click="onAddProduct">
+            <el-icon class="mr-1"><Plus /></el-icon>新增套餐
           </el-button>
           <el-button class="!rounded-button" @click="handleRefresh">
             <el-icon class="mr-1"><Refresh /></el-icon>刷新
@@ -19,9 +19,9 @@
         <el-table-column prop="packageName" label="套餐名称" width="150" sortable />
         <el-table-column prop="type" label="类别" width="100" sortable />
         <el-table-column prop="availableSurveys" label="可使用问卷" width="180" sortable />
-        <el-table-column prop="region" label="限制地区" width="120" sortable />
+        <el-table-column prop="region" label="限制区域" width="120" sortable />
         <el-table-column prop="price" label="产品价格(元)" width="120" />
-        <el-table-column prop="duration" label="使用期限" width="100" />
+        <el-table-column prop="duration" label="使用周期" width="100" />
         <el-table-column label="状态" width="80">
           <template #default="{ row }">
             <div class="flex items-center">
@@ -119,12 +119,9 @@ const handleSelectionChange = (val: TableItem[]) => {
   console.log('selection change:', val)
 }
 
-const handleAdd = () => {
-  console.log('add new package')
-}
-
 const handleEdit = (row: TableItem) => {
   console.log('edit row:', row)
+  router.push({ path: '/product/add', query: { id: row.id } })
 }
 
 const handleFreeze = (row: TableItem) => {
