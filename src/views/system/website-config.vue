@@ -85,6 +85,7 @@ import Evaluation from './components/Evaluation.vue'
 import Channel from './components/Channel.vue'
 import About from './components/About.vue'
 import Contact from './components/Contact.vue'
+import router from '@/router'
 
 const tabs = [
   { key: 'banner', label: 'banner图' },
@@ -92,7 +93,7 @@ const tabs = [
   { key: 'solution', label: '解决方案' },
   { key: 'evaluation', label: '公益测评' },
   { key: 'channel', label: '渠道合作' },
-  { key: 'about', label: '了解科鉴' },
+  { key: 'about', label: '了解科懿' },
   { key: 'contact', label: '联系我们' }
 ]
 const currentComponent = computed(() => {
@@ -153,6 +154,7 @@ const handleSelectionChange = (rows: any[]) => {
 
 const handleAdd = () => {
   console.log('Add new item')
+  router.push('/system/banner-add')
 }
 
 const handleDelete = () => {
@@ -165,6 +167,7 @@ const handleDetail = (row: any) => {
 
 const handleEdit = (row: any) => {
   console.log('Edit item', row)
+  router.push(`/system/banner-add?id=${row.id}`)
 }
 
 const handleRowDelete = (row: any) => {

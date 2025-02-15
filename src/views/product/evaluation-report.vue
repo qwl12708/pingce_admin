@@ -35,12 +35,27 @@
         <div class="p-4 flex justify-between items-center border-b border-gray-100">
           <h2 class="text-lg font-medium">邀请函模版</h2>
           <div class="space-x-2">
-            <el-button @click="onAdd" type="primary" class="!rounded-button whitespace-nowrap">
-              <el-icon class="mr-1"><Plus /></el-icon>新增模版
-            </el-button>
-            <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
-              <el-icon class="mr-1"><Delete /></el-icon>删除模版
-            </el-button>
+            <el-button @click="onAdd" type="primary" class="!rounded-button whitespace-nowrap"> 导出 </el-button>
+            <template v-if="activeTab === 'pending'">
+              <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+                测评结果批量下载
+              </el-button>
+              <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+                线上测评报告批量上传
+              </el-button>
+              <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+                横向对比上传表批量上传
+              </el-button>
+            </template>
+
+            <template v-if="activeTab === 'uploaded'">
+              <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+                测评结果批量下载
+              </el-button>
+              <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+                测评报告批量下载
+              </el-button>
+            </template>
           </div>
         </div>
 

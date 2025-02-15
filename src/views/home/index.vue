@@ -122,6 +122,12 @@
 
 <script lang="ts" setup>
 // import { ref } from 'vue'
+import taocan1 from '@/assets/image/icons/icon-taocan1.png'
+import taocan2 from '@/assets/image/icons/icon-taocan2.png'
+import taocan3 from '@/assets/image/icons/icon-taocan3.png'
+import taocan4 from '@/assets/image/icons/icon-taocan4.png'
+import taocan5 from '@/assets/image/icons/icon-taocan5.png'
+import taocan6 from '@/assets/image/icons/icon-taocan6.png'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
@@ -154,32 +160,32 @@ const surveyStats = [
 const productSections = [
   {
     title: '最近15天新上线产品套餐',
-    icon: '/src/assets/image/icons/icon-taocan1.png',
+    icon: taocan1,
     items: ['企业人才测评基础套餐', '领导力发展评估套餐', '团队效能提升方案', '职业发展规划套餐']
   },
   {
     title: '最近15天新屏蔽产品套餐',
-    icon: '/src/assets/image/icons/icon-taocan2.png',
+    icon: taocan2,
     items: ['组织文化诊断套餐', '人才甄选与发展套餐', '员工敬业度调研套餐', '管理者能力评估套餐']
   },
   {
     title: '最近15天新解除屏蔽产品套餐',
-    icon: '/src/assets/image/icons/icon-taocan3.png',
+    icon: taocan3,
     items: ['职业倾向分析问卷', '领导力潜质评估', '团队协作能力测评', '岗位胜任力评估']
   },
   {
     title: '客户购买数量最多的产品套餐',
-    icon: '/src/assets/image/icons/icon-taocan4.png',
+    icon: taocan4,
     items: ['企业人才测评基础套餐', '领导力发展评估套餐', '团队效能提升方案', '职业发展规划套餐']
   },
   {
     title: '最近30天客户购买数量最多的产品套餐',
-    icon: '/src/assets/image/icons/icon-taocan5.png',
+    icon: taocan5,
     items: ['组织文化诊断套餐', '人才甄选与发展套餐', '员工敬业度调研套餐', '管理者能力评估套餐']
   },
   {
     title: '最近15天新交付问卷',
-    icon: '/src/assets/image/icons/icon-taocan6.png',
+    icon: taocan6,
     items: ['职业倾向分析问卷', '领导力潜质评估', '团队协作能力测评', '岗位胜任力评估']
   }
 ]

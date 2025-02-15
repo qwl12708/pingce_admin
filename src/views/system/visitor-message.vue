@@ -6,10 +6,10 @@
       <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
         <el-table-column type="selection" width="55" />
         <el-table-column label="序号" prop="id" width="100" />
-        <el-table-column label="留言者姓名" prop="name" sortable />
+        <el-table-column label="访客姓名" prop="name" sortable />
+        <el-table-column label="访客电话" prop="messageTime" sortable />
+        <el-table-column label="留言内容" prop="messageTime" sortable />
         <el-table-column label="留言时间" prop="messageTime" sortable />
-        <el-table-column label="回复时间" prop="replyTime" sortable />
-        <el-table-column label="回复内容" prop="replyContent" sortable />
         <el-table-column label="回复状态" prop="replyStatus" sortable />
         <el-table-column label="回复人" prop="replier" sortable />
         <el-table-column label="回复记录" prop="replyRecord" sortable />

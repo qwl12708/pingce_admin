@@ -97,9 +97,9 @@
           <el-input v-model="servicePhone" placeholder="请输入客服电话" class="!w-[300px]" />
         </div>
 
-        <!-- 网位展任务测评产品介绍 -->
+        <!-- 岗位胜任力测评产品介绍 -->
         <div class="border-b pb-6">
-          <h2 class="text-base font-medium mb-4">网位展任务测评产品介绍</h2>
+          <h2 class="text-base font-medium mb-4">岗位胜任力测评产品介绍</h2>
           <WangEditor height="300px" v-model:value="networkEvaluation" />
         </div>
         <!-- 订制测评产品介绍 -->

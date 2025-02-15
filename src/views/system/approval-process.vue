@@ -59,6 +59,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
+import router from '@/router'
 
 const roleValue = ref('1')
 const roleOptions = [
@@ -109,9 +110,11 @@ const tableData = ref([
 ])
 const handleAdd = () => {
   console.log('添加')
+  router.push('/system/approval-process-update')
 }
 const handleEdit = (row: any) => {
   console.log('编辑', row)
+  router.push(`/system/approval-process-update?id=${row.id}`)
 }
 const handleDelete = (row: any) => {
   console.log('删除', row)

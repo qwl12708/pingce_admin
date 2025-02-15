@@ -14,8 +14,8 @@
       </div>
 
       <div class="flex justify-center gap-4 mt-8">
-        <el-button type="primary" class="!rounded-button" @click="handleSubmit">确认</el-button>
-        <el-button class="!rounded-button" @click="handleCancel">返回</el-button>
+        <el-button type="primary" class="!rounded-button" @click="handleSubmit">保存</el-button>
+        <el-button class="!rounded-button" @click="handleCancel">另存为新模板</el-button>
       </div>
     </div>
   </div>

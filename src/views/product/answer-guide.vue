@@ -34,11 +34,11 @@
             <el-button type="primary" link @click="handleEdit(row)">{{ row.name }}</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="备注" prop="remark" />
+        <el-table-column label="模板内容" prop="remark" />
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">编辑模版</el-button>
-            <el-button type="primary" link @click="handleDelete(row)">删除模版</el-button>
+            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+            <el-button type="primary" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -112,6 +112,7 @@ const handleAdd = () => {
 
 const handleEdit = (row: any) => {
   // 实现编辑逻辑
+  router.push(`/product/answer-guide-add?id=${row.id}`)
 }
 
 const handleDelete = (row: any) => {

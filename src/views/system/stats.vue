@@ -43,23 +43,15 @@
 
       <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
         <el-table-column type="selection" width="55" />
-        <el-table-column label="序号" prop="id" width="100" />
-        <el-table-column label="用户名称" prop="name">
-          <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">{{ row.name }}</el-button>
-          </template>
-        </el-table-column>
-        <el-table-column label="手机号码" prop="tel" sortable />
-        <el-table-column label="用户角色" prop="role" />
-        <el-table-column label="所在部门" prop="department" />
-        <el-table-column label="负责区域" prop="area" />
-        <el-table-column label="创建时间" prop="createdTime" sortable />
-        <!-- <el-table-column label="操作" width="200">
-          <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">编辑模版</el-button>
-            <el-button type="primary" link @click="handleDelete(row)">删除模版</el-button>
-          </template>
-        </el-table-column> -->
+        <el-table-column label="问卷编号" prop="id" />
+        <el-table-column label="问卷类别" prop="type" sortable />
+        <el-table-column label="问卷名称" prop="name" sortable />
+        <el-table-column label="问卷状态" prop="status" sortable />
+        <el-table-column label="题目总数" prop="total" />
+        <el-table-column label="总分" prop="point" />
+        <el-table-column label="标准答题时间（分钟）" prop="time" />
+        <el-table-column label="未提交试卷人数" prop="notSubmitTotal" sortable />
+        <el-table-column label="累计测评人数" prop="accuTime" sortable />
       </el-table>
 
       <div class="flex justify-between items-center p-4">

@@ -38,12 +38,14 @@
         <el-table-column prop="updateTime" label="更新时间" width="180" />
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="handleEdit(row)">
-              编辑
-            </el-button>
-            <el-button type="danger" link class="!rounded-button whitespace-nowrap" @click="handleDelete(row)">
-              删除
-            </el-button>
+            <template v-if="row.children">
+              <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="handleEdit(row)">
+                编辑
+              </el-button>
+              <el-button type="danger" link class="!rounded-button whitespace-nowrap" @click="handleDelete(row)">
+                删除
+              </el-button>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -63,7 +65,7 @@
 
       <el-dialog
         v-model="dialogVisible"
-        title="新增部门"
+        title="新增/编辑部门"
         width="500px"
         :close-on-click-modal="false"
         :show-close="true"
@@ -222,6 +224,7 @@ const handleAdd = () => {
 
 const handleEdit = (row: any) => {
   // 实现编辑逻辑
+  dialogVisible.value = true
 }
 
 const handleDelete = (row: any) => {
