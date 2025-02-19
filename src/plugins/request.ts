@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { getToken } from '@/utils/auth'
 import { isOnLine } from '@/utils/index'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElLoading } from 'element-plus'
 import router from '@/router'
 
 /**
@@ -47,16 +47,13 @@ export const checkStatus = (status: number) => {
 }
 
 // Full config:  https://github.com/axios/axios#request-config
-const request = axios.create({
-  // 默认地址请求地址，可在 .env.** 文件中修改
+const instance = axios.create({
   // baseURL: import.meta.env.VITE_API_URL,
   baseURL: '/api',
   timeout: 30 * 1000, // Timeout
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
   }
-  // 跨域时候允许携带凭证
-  // withCredentials: true
 })
 
 /**
@@ -64,12 +61,21 @@ const request = axios.create({
  * 客户端发送请求 -> [请求拦截器] -> 服务器
  * token校验(JWT) : 接受服务器返回的 token,存储到 vuex/pinia/本地储存当中
  */
-request.interceptors.request.use(
+instance.interceptors.request.use(
   config => {
     // 在发送请求之前执行处理操作
     const token = getToken()
     if (token) {
-      config.headers.Authorization = token
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    if (config._headers) {
+      config.headers = {
+        ...config.headers,
+        ...config._headers
+      }
+    }
+    if (config.showLoading !== false) {
+      config.loadingInstance = ElLoading.service({ fullscreen: true })
     }
     return config
   },
@@ -83,11 +89,22 @@ request.interceptors.request.use(
  * @description 响应拦截器
  *  服务器换返回信息 -> [拦截统一处理] -> 客户端JS获取到信息
  */
-request.interceptors.response.use(
+instance.interceptors.response.use(
   response => {
-    return response.data
+    if (response.config.loadingInstance) {
+      response.config.loadingInstance.close()
+    }
+    const res = response.data
+    if (res.code !== 200) {
+      ElMessage.error(res.msg || '请求失败')
+      return Promise.reject(new Error(res.msg || 'Error'))
+    }
+    return res
   },
   async error => {
+    if (error.config.loadingInstance) {
+      error.config.loadingInstance.close()
+    }
     const { response } = error
     // 根据服务器响应的错误状态码，做不同的处理
     if (response) checkStatus(response.status)
@@ -98,4 +115,4 @@ request.interceptors.response.use(
   }
 )
 
-export default request
+export default instance

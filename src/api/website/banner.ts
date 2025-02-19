@@ -11,7 +11,7 @@ export const createBanner = (params: { type?: number; sort?: number; img?: strin
   })
 
 // 平台/网站-banner - 编辑banner
-export const editBanner = (params: { type?: number; sort?: number; img?: string; content?: string; id?: string }) =>
+export const editBanner = (params: { type?: number; sort?: number; img?: string; content?: string; id?: number }) =>
   request({
     url: PATH + '/edit',
     method: 'POST',

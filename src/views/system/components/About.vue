@@ -15,8 +15,8 @@
         :rules="[{ required: true, message: '请选择是否展示', trigger: 'blur' }]"
       >
         <el-radio-group v-model="form.isShow">
-          <el-radio label="1">是</el-radio>
-          <el-radio label="0">否</el-radio>
+          <el-radio :label="1">是</el-radio>
+          <el-radio :label="0">否</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
@@ -28,28 +28,48 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
-// import type { FormInstance } from 'element-plus'
+import { ref, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import WangEditor from '@/components/WangEditor/index.vue'
+import { getUnderstand, setUnderstand } from '@/api/website/index'
 
 const formRef = ref()
 
 const form = ref({
-  name: '',
+  content: '',
   isShow: false
 })
 
 const rules = {
-  content: [{ required: true, message: '请输入详情内容', trigger: 'blur' }]
+  content: [{ required: true, message: '请输入详情内容', trigger: 'blur' }],
+  isShow: [{ required: true, message: '请选择是否展示', trigger: 'blur' }]
 }
+
+const fetchUnderstand = async () => {
+  try {
+    const response = await getUnderstand()
+    form.value.content = response.data.info
+    form.value.isShow = response.data.is_show_feedback
+  } catch (error) {
+    ElMessage.error('获取详情失败')
+  }
+}
+
+onMounted(() => {
+  fetchUnderstand()
+})
 
 const onSubmit = async () => {
   if (!formRef.value) return
 
-  await formRef.value.validate(valid => {
+  await formRef.value.validate(async valid => {
     if (valid) {
-      console.log('submit form', form.value)
+      try {
+        await setUnderstand({ info: form.value.content, is_show_feedback: form.value.isShow })
+        ElMessage.success('保存成功')
+      } catch (error) {
+        ElMessage.error('保存失败')
+      }
     }
   })
 }

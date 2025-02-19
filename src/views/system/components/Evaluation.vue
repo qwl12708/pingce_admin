@@ -17,8 +17,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import WangEditor from '@/components/WangEditor/index.vue'
+import { getWelfareEvaluation, setWelfareEvaluation } from '@/api/website/index'
 
 const formRef = ref()
 
@@ -30,12 +32,30 @@ const rules = {
   content: [{ required: true, message: '请输入详情内容', trigger: 'blur' }]
 }
 
+const fetchWelfareEvaluation = async () => {
+  try {
+    const response = await getWelfareEvaluation()
+    form.value.content = response.data.info
+  } catch (error) {
+    ElMessage.error('获取详情失败')
+  }
+}
+
+onMounted(() => {
+  fetchWelfareEvaluation()
+})
+
 const onSubmit = async () => {
   if (!formRef.value) return
 
-  await formRef.value.validate(valid => {
+  await formRef.value.validate(async valid => {
     if (valid) {
-      console.log('submit form', form.value)
+      try {
+        await setWelfareEvaluation({ info: form.value.content })
+        ElMessage.success('保存成功')
+      } catch (error) {
+        ElMessage.error('保存失败')
+      }
     }
   })
 }

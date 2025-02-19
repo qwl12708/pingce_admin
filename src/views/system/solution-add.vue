@@ -1,6 +1,6 @@
 <template>
   <div class="main-content min-h-screen bg-white p-6">
-    <h2 class="text-xl font-medium mb-6">新增解决方案</h2>
+    <h2 class="text-xl font-medium mb-6">{{ isEditPage ? '编辑解决方案' : '新增解决方案' }}</h2>
 
     <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" class="space-y-6">
       <el-form-item
@@ -25,20 +25,25 @@
     </el-form>
 
     <div class="flex justify-center gap-4 mt-8">
-      <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="onSubmit"> 保存并发布 </el-button>
+      <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleSubmit"> 保存并发布 </el-button>
+      <el-button @click="handleCancel">取消</el-button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
-// import type { FormInstance } from 'element-plus'
+import { ref, reactive, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { getSolutionInfo, addSolution, editSolution } from '@/api/website/index'
 import WangEditor from '@/components/WangEditor/index.vue'
 
+const route = useRoute()
+const router = useRouter()
+const isEditPage = ref(false)
 const formRef = ref()
 
-const form = ref({
+const form = reactive({
   name: '',
   sort: 0,
   content: ''
@@ -52,18 +57,43 @@ const rules = {
   content: [{ required: true, message: '请输入详情内容', trigger: 'blur' }]
 }
 
-const onSubmit = async () => {
-  if (!formRef.value) return
-
-  await formRef.value.validate(valid => {
-    if (valid) {
-      console.log('submit form', form.value)
-    }
-  })
+const fetchSolutionInfo = async id => {
+  try {
+    const response = await getSolutionInfo({ id })
+    form.name = response.data.name
+    form.content = response.data.content
+    form.sort = response.data.sort
+  } catch (error) {
+    ElMessage.error('获取详情失败')
+  }
 }
 
-const onCancel = () => {
-  formRef.value?.resetFields()
+onMounted(() => {
+  if (route.query.id) {
+    isEditPage.value = true
+    const id = Number(route.query.id)
+    fetchSolutionInfo(id)
+  }
+})
+
+const handleSubmit = async () => {
+  if (!formRef.value) return
+  try {
+    await formRef.value.validate()
+    if (isEditPage.value) {
+      await editSolution({ ...form, id: Number(route.query.id) })
+    } else {
+      await addSolution(form)
+    }
+    ElMessage.success('保存成功')
+    router.push('/system/solution-list')
+  } catch (error) {
+    ElMessage.error('保存失败')
+  }
+}
+
+const handleCancel = () => {
+  router.back()
 }
 </script>
 

@@ -1,122 +1,109 @@
 <template>
-  <div class="main-content min-h-screen bg-white p-6">
-    <h2 class="text-xl font-medium mb-6">选择科验配置</h2>
-    <div class="space-y-6">
-      <!-- 标题 -->
-      <div class="form-group flex items-center gap-4">
-        <label class="required-label w-24 flex-shrink-0">标题</label>
-        <el-input v-model="formData.title" placeholder="请输入" maxlength="50" show-word-limit class="!w-[500px]" />
+  <div class="min-h-screen bg-white p-6">
+    <h2 class="text-xl font-medium mb-6">{{ isEditPage ? '编辑' : '新增' }}</h2>
+    <el-form ref="formRef" :model="form" label-width="120px">
+      <el-form-item label="标题" prop="title" required>
+        <el-input v-model="form.title" placeholder="请输入标题" />
+      </el-form-item>
+      <el-form-item label="内容" prop="content" required>
+        <el-input type="textarea" v-model="form.content" placeholder="请输入内容" />
+      </el-form-item>
+      <el-form-item label="图标" prop="icon" required>
+        <ImageUploader v-model:value="form.icon" />
+      </el-form-item>
+      <el-form-item label="排序" prop="sort" required>
+        <el-input-number v-model="form.sort" :min="1" />
+      </el-form-item>
+      <div class="flex justify-center gap-4 mt-8">
+        <el-button type="primary" @click="handleSubmit">保存</el-button>
+        <el-button @click="handleCancel">取消</el-button>
       </div>
-      <!-- 内容 -->
-      <div class="form-group flex items-start gap-4">
-        <label class="required-label w-24 flex-shrink-0 mt-2">内容</label>
-        <el-input
-          v-model="formData.content"
-          type="textarea"
-          placeholder="请输入"
-          maxlength="100"
-          show-word-limit
-          rows="4"
-          class="!w-[500px]"
-        />
-      </div>
-      <!-- 图标上传 -->
-      <div class="form-group flex items-start gap-4">
-        <label class="required-label w-24 flex-shrink-0 mt-2">图标</label>
-        <el-upload class="upload-demo !w-[500px]" :auto-upload="false" :limit="1" :on-change="handleFileChange">
-          <template #trigger>
-            <el-button type="primary" class="!rounded-button">
-              <el-icon class="mr-1"><Plus /></el-icon>上传
-            </el-button>
-          </template>
-          <template #tip>
-            <div class="text-gray-400 text-sm mt-2">图片格式为jpg、jpeg、png，尺寸48*48</div>
-          </template>
-        </el-upload>
-      </div>
-      <!-- 排序 -->
-      <div class="form-group flex items-center gap-4">
-        <label class="required-label w-24 flex-shrink-0">排序</label>
-        <el-input v-model="formData.sort" placeholder="请输入" class="!w-[500px]" />
-      </div>
-      <!-- 按钮组 -->
-      <div class="flex justify-start space-x-4 mt-10 pl-16">
-        <el-button type="primary" @click="handleSubmit" class="!rounded-button whitespace-nowrap">
-          保存并发布
-        </el-button>
-        <el-button @click="handleCancel" class="!rounded-button whitespace-nowrap"> 返回 </el-button>
-      </div>
-    </div>
+    </el-form>
   </div>
 </template>
+
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
-interface FormData {
-  title: string
-  content: string
-  icon: File | null
-  sort: string
-}
-const formData = ref<FormData>({
+import { getAdvantageInfo, addAdvantage, editAdvantage } from '@/api/website/index'
+import ImageUploader from '@/components/ImageUploader/index.vue'
+import type { FormInstance } from 'element-plus'
+
+const route = useRoute()
+const router = useRouter()
+const isEditPage = ref(false)
+const formRef = ref<FormInstance>()
+const form = reactive({
   title: '',
   content: '',
-  icon: null,
-  sort: ''
+  icon: '',
+  sort: 1
 })
-const handleFileChange = (file: any) => {
-  formData.value.icon = file.raw
+
+const fetchAdvantageInfo = async (id: number) => {
+  try {
+    const response = await getAdvantageInfo({ id })
+    form.title = response.data.title
+    form.content = response.data.content
+    form.icon = response.data.icon
+    form.sort = response.data.sort
+  } catch (error) {
+    ElMessage.error('获取详情失败')
+  }
 }
-const handleSubmit = () => {
-  if (!formData.value.title) {
-    ElMessage.warning('请输入标题')
-    return
+
+onMounted(() => {
+  if (route.query.id) {
+    isEditPage.value = true
+    const id = Number(route.query.id)
+    fetchAdvantageInfo(id)
   }
-  if (!formData.value.content) {
-    ElMessage.warning('请输入内容')
-    return
+})
+
+const handleSubmit = async () => {
+  if (!formRef.value) return
+  try {
+    await formRef.value.validate()
+    if (isEditPage.value) {
+      await editAdvantage({ ...form, id: Number(route.query.id) })
+    } else {
+      await addAdvantage(form)
+    }
+    ElMessage.success('保存成功')
+    router.push('/system/home')
+  } catch (error) {
+    ElMessage.error('保存失败')
   }
-  if (!formData.value.icon) {
-    ElMessage.warning('请上传图标')
-    return
-  }
-  if (!formData.value.sort) {
-    ElMessage.warning('请输入排序')
-    return
-  }
-  ElMessage.success('保存成功')
 }
+
 const handleCancel = () => {
-  // 返回上一页
-  history.back()
+  router.back()
 }
 </script>
+
 <style scoped>
-.required-label {
-  text-align: right;
+.avatar-uploader {
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
 }
-.required-label::before {
-  content: '*';
-  color: #f56c6c;
-  margin-right: 4px;
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
-.form-group :deep(.el-input__wrapper),
-.form-group :deep(.el-textarea__inner) {
-  box-shadow: 0 0 0 1px #dcdfe6 inset;
-}
-.form-group :deep(.el-input__wrapper:hover),
-.form-group :deep(.el-textarea__inner:hover) {
-  box-shadow: 0 0 0 1px #c0c4cc inset;
-}
-.form-group :deep(.el-input__wrapper.is-focus),
-.form-group :deep(.el-textarea__inner:focus) {
-  box-shadow: 0 0 0 1px #409eff inset;
-}
-/* 移除number类型input的箭头 */
-.form-group :deep(.el-input__inner::-webkit-outer-spin-button),
-.form-group :deep(.el-input__inner::-webkit-inner-spin-button) {
-  -webkit-appearance: none;
-  margin: 0;
+.avatar {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 </style>

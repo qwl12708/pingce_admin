@@ -14,6 +14,7 @@
         </div>
 
         <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
+          <el-table-column type="selection" width="55" />
           <el-table-column prop="title" label="标题" />
           <el-table-column prop="sort" label="排序" />
           <el-table-column prop="creator" label="创建人" />
@@ -46,9 +47,11 @@ import { ref } from 'vue'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
+import { deleteSolution } from '@/api/website/index'
 
 const tableData = ref([
   {
+    id: 1,
     icon: 'https://ai-public.mastergo.com/ai/img_res/c7fe00e9801f961e1d625fc00f964eff.jpg',
     title: '科验人才评测系统',
     content: '专业的人才测评解决方案，助力企业精准选才',
@@ -58,6 +61,7 @@ const tableData = ref([
     createTime: '2024-04-12 13:00'
   },
   {
+    id: 2,
     icon: 'https://ai-public.mastergo.com/ai/img_res/f46b32617d1202d9e5755bd5424a2810.jpg',
     title: '智能招聘系统',
     content: '智能化的招聘流程管理，提升招聘效率',
@@ -67,6 +71,7 @@ const tableData = ref([
     createTime: '2024-04-12 13:00'
   },
   {
+    id: 3,
     icon: 'https://ai-public.mastergo.com/ai/img_res/c42e1e91f69e8eb9411a73f3e92115f4.jpg',
     title: '企业管理系统',
     content: '全方位的企业管理解决方案',
@@ -76,6 +81,12 @@ const tableData = ref([
     createTime: '2024-04-12 13:00'
   }
 ])
+
+const selectedItems = ref([])
+
+const handleSelectionChange = (val: any[]) => {
+  selectedItems.value = val
+}
 
 const handleAdd = () => {
   ElMessage.success('触发新增操作')
@@ -87,16 +98,33 @@ const handleEdit = (row: any) => {
   router.push(`/system/solution-add?id=${row.id}`)
 }
 
-const handleDelete = (row: any) => {
-  ElMessage.success('触发删除操作')
+const handleDelete = async (row: any) => {
+  try {
+    await deleteSolution({ ids: row.id.toString() })
+    ElMessage.success('删除成功')
+    fetchSolutionList()
+  } catch (error) {
+    ElMessage.error('删除失败')
+  }
 }
 
-const handleBatchDelete = () => {
+const handleBatchDelete = async () => {
   if (selectedItems.value.length === 0) {
     ElMessage.warning('请选择要删除的项目')
     return
   }
-  ElMessage.success('触发批量删除操作')
+  const ids = selectedItems.value.map(item => item.id).join(',')
+  try {
+    await deleteSolution({ ids })
+    ElMessage.success('批量删除成功')
+    fetchSolutionList()
+  } catch (error) {
+    ElMessage.error('批量删除失败')
+  }
+}
+
+const fetchSolutionList = async () => {
+  // 实现获取解决方案列表的逻辑
 }
 </script>
 

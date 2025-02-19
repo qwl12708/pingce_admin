@@ -1,127 +1,139 @@
-<!-- 代码已包含 CSS：使用 TailwindCSS , 安装 TailwindCSS 后方可看到布局样式效果 -->
-
 <template>
   <div class="min-h-screen bg-white p-4">
     <div class="max-w-4xl bg-white rounded-lg shadow-sm p-6">
-      <h2 class="text-xl font-medium mb-6">新增 banner 图</h2>
+      <h2 class="text-xl font-medium mb-6">
+        {{ isDetailPage ? '查看 banner 图' : isEditPage ? '编辑 banner 图' : '新增 banner 图' }}
+      </h2>
 
-      <div class="space-y-6">
-        <!-- 类型选择 -->
-        <div class="flex items-center">
-          <span class="text-red-500 mr-1">*</span>
-          <span class="w-24 text-gray-600">类型</span>
-          <div class="flex gap-6">
-            <el-radio-group v-model="type">
-              <el-radio label="image">图文详情</el-radio>
-              <el-radio label="link">跳转链接</el-radio>
-              <el-radio label="module">跳转模块</el-radio>
-            </el-radio-group>
-          </div>
-        </div>
+      <el-form ref="formRef" :model="form" label-width="120px" :disabled="isDetailPage">
+        <div class="space-y-6">
+          <!-- 类型选择 -->
+          <el-form-item label="类型" prop="type" required>
+            <div class="flex gap-6">
+              <el-radio-group v-model="form.type">
+                <el-radio :label="0">图文详情</el-radio>
+                <el-radio :label="1">跳转链接</el-radio>
+                <el-radio :label="2">跳转模块</el-radio>
+              </el-radio-group>
+            </div>
+          </el-form-item>
 
-        <!-- Banner图片上传 -->
-        <div class="flex">
-          <span class="text-red-500 mr-1">*</span>
-          <span class="w-24 text-gray-600">banner图片</span>
-          <div>
-            <el-upload
-              class="banner-uploader"
-              :show-file-list="false"
-              :before-upload="beforeUpload"
-              v-model:file-list="fileList"
-            >
-              <div v-if="!imageUrl" class="upload-placeholder">
-                <el-icon><Plus /></el-icon>
-                <div class="text-xs mt-1">上传</div>
-              </div>
-              <img v-else :src="imageUrl" class="uploaded-image" />
-            </el-upload>
+          <!-- Banner图片上传 -->
+          <el-form-item label="banner图片" prop="img" required>
+            <ImageUploader v-model:value="form.img" />
             <div class="text-gray-400 text-xs mt-2">图片格式为jpg、jpeg、png，尺寸1920*366</div>
-          </div>
+          </el-form-item>
+
+          <!-- 排序 -->
+          <el-form-item label="排序" prop="sort" required>
+            <el-input v-model="form.sort" class="w-64" placeholder="请输入" />
+          </el-form-item>
+
+          <!-- 根据类型显示不同字段 -->
+          <el-form-item v-if="form.type === 'image'" label="详情内容" prop="content" required>
+            <el-input type="textarea" v-model="form.content" :rows="6" placeholder="请输入详情内容" />
+          </el-form-item>
+
+          <el-form-item v-if="form.type === 'link'" label="链接地址" prop="link" required>
+            <el-input v-model="form.link" class="w-64" placeholder="请输入链接地址" />
+          </el-form-item>
+
+          <el-form-item v-if="form.type === 'module'" label="跳转模块" prop="module" required>
+            <el-select v-model="form.module" class="w-64" placeholder="请选择">
+              <el-option label="解决方案" value="solution" />
+              <el-option label="公益测评" value="publicTest" />
+              <el-option label="渠道合作" value="channel" />
+              <el-option label="了解科1" value="about" />
+              <el-option label="联系我们" value="contact" />
+              <el-option label="注册页面" value="register" />
+              <el-option label="登录页面" value="login" />
+            </el-select>
+          </el-form-item>
         </div>
 
-        <!-- 排序 -->
-        <div class="flex items-center">
-          <span class="text-red-500 mr-1">*</span>
-          <span class="w-24 text-gray-600">排序</span>
-          <el-input v-model="sort" class="w-64" placeholder="请输入" />
+        <!-- 操作按钮 -->
+        <div class="flex justify-center gap-4 mt-8">
+          <el-button v-if="!isDetailPage" type="primary" class="!rounded-button" @click="handleSubmit(formRef)">
+            保存并发布
+          </el-button>
+          <el-button class="!rounded-button" @click="handleCancel">返回</el-button>
         </div>
-
-        <!-- 根据类型显示不同字段 -->
-        <div v-if="type === 'image'" class="flex">
-          <span class="text-red-500 mr-1">*</span>
-          <span class="w-24 text-gray-600">详情内容</span>
-          <div class="flex-1">
-            <el-input type="textarea" v-model="content" :rows="6" placeholder="请输入详情内容" />
-          </div>
-        </div>
-
-        <div v-if="type === 'link'" class="flex">
-          <span class="text-red-500 mr-1">*</span>
-          <span class="w-24 text-gray-600">链接地址</span>
-          <el-input v-model="link" class="w-64" placeholder="请输入链接地址" />
-        </div>
-
-        <div v-if="type === 'module'" class="flex">
-          <span class="text-red-500 mr-1">*</span>
-          <span class="w-24 text-gray-600">跳转模块</span>
-          <el-select v-model="module" class="w-64" placeholder="请选择">
-            <el-option label="解决方案" value="solution" />
-            <el-option label="公益测评" value="publicTest" />
-            <el-option label="渠道合作" value="channel" />
-            <el-option label="了解科1" value="about" />
-            <el-option label="联系我们" value="contact" />
-            <el-option label="注册页面" value="register" />
-            <el-option label="登录页面" value="login" />
-          </el-select>
-        </div>
-      </div>
-
-      <!-- 操作按钮 -->
-      <div class="flex justify-center gap-4 mt-8">
-        <el-button type="primary" class="!rounded-button" @click="handleSubmit"> 保存并发布 </el-button>
-        <el-button class="!rounded-button" @click="handleCancel">返回</el-button>
-      </div>
+      </el-form>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
+import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useRoute } from 'vue-router'
+import { getBannerInfo, createBanner, editBanner } from '@/api/website/banner'
+import ImageUploader from '@/components/ImageUploader/index.vue'
+import type { FormInstance } from 'element-plus'
 
-const type = ref('image')
-const imageUrl = ref('')
-const fileList = ref([])
-const sort = ref('')
-const content = ref('')
-const link = ref('')
-const module = ref('')
-
-const beforeUpload = (file: File) => {
-  const isImage = file.type.startsWith('image/')
-  const isLt2M = file.size / 1024 / 1024 < 2
-
-  if (!isImage) {
-    ElMessage.error('上传文件只能是图片格式!')
-    return false
-  }
-  if (!isLt2M) {
-    ElMessage.error('上传图片大小不能超过 2MB!')
-    return false
-  }
-
-  const reader = new FileReader()
-  reader.readAsDataURL(file)
-  reader.onload = () => {
-    imageUrl.value = reader.result as string
-  }
-  return false
+const typeEnum = {
+  1: 'image',
+  2: 'link',
+  3: 'module'
 }
 
-const handleSubmit = () => {
-  ElMessage.success('保存成功')
+const route = useRoute()
+const isDetailPage = ref(false)
+const isEditPage = ref(false)
+
+const formRef = ref<FormInstance>()
+const form = ref({
+  type: '',
+  img: '',
+  sort: '',
+  content: '',
+  link: '',
+  module: ''
+})
+
+const fetchBannerInfo = async (id: string) => {
+  try {
+    const response = await getBannerInfo({ id })
+    const data = response.data
+    form.value.type = data.type
+    form.value.img = data.img
+    form.value.sort = data.sort
+    form.value.content = data.content
+    form.value.link = data.link
+    form.value.module = data.module
+  } catch (error) {
+    console.error('获取Banner详情失败', error)
+  }
+}
+
+onMounted(() => {
+  if (route.query.type === 'detail') {
+    isDetailPage.value = true
+    const id = route.query.id as string
+    fetchBannerInfo(id)
+  } else if (route.query.type === 'edit') {
+    isEditPage.value = true
+    const id = route.query.id as string
+    fetchBannerInfo(id)
+  }
+})
+
+const handleSubmit = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  try {
+    const r = await formEl.validate()
+    console.log('%c [ form.value ]-167', 'font-size:13px; background:pink; color:#bf2c9f;', form.value)
+    console.log('%c [ r ]-167', 'font-size:13px; background:pink; color:#bf2c9f;', r)
+
+    if (route.query.type === 'edit') {
+      await editBanner({ ...form.value, id: route.query.id })
+    } else {
+      await createBanner(form.value)
+    }
+    ElMessage.success('保存成功')
+  } catch (error) {
+    console.error('保存失败', error)
+  }
 }
 
 const handleCancel = () => {

@@ -9,7 +9,7 @@
               <el-icon class="mr-1"><Plus /></el-icon>新增
             </el-button>
             <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
-              <el-icon class="mr-1"><Delete /></el-icon>删除
+              <el-icon class="mr-1"><Delete /></el-icon>批量删除
             </el-button>
           </div>
         </div>
@@ -26,15 +26,15 @@
           <el-table-column prop="title" label="标题" />
           <el-table-column prop="content" label="内容" show-overflow-tooltip />
           <el-table-column prop="sort" label="排序" width="80" />
-          <el-table-column prop="creator" label="创建人" width="100" />
+          <el-table-column prop="creater" label="创建人" width="100" />
           <el-table-column prop="status" label="状态" width="100">
             <template #default="scope">
-              <el-tag :type="scope.row.status === '显示' ? 'success' : 'info'">
-                {{ scope.row.status }}
+              <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
+                {{ scope.row.status === 1 ? '显示' : '隐藏' }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" width="180" />
+          <el-table-column prop="create_time" label="创建时间" width="180" />
           <el-table-column label="操作" width="150" fixed="right">
             <template #default="scope">
               <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="handleEdit(scope.row)">
@@ -58,12 +58,12 @@
               <el-icon class="mr-1"><Plus /></el-icon>新增
             </el-button>
             <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDeleteClient">
-              <el-icon class="mr-1"><Delete /></el-icon>删除
+              <el-icon class="mr-1"><Delete /></el-icon>批量删除
             </el-button>
           </div>
         </div>
 
-        <el-table :data="clientData" @selection-change="handleClientSelectionChange" class="w-full">
+        <el-table :data="CustomerData" @selection-change="handleClientSelectionChange" class="w-full">
           <el-table-column type="selection" width="55" />
           <el-table-column label="图标" width="80">
             <template #default="scope">
@@ -72,17 +72,17 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="name" label="客户名称" />
+          <el-table-column prop="title" label="客户名称" />
           <el-table-column prop="sort" label="排序" width="80" />
-          <el-table-column prop="creator" label="创建人" width="100" />
+          <el-table-column prop="creater" label="创建人" width="100" />
           <el-table-column prop="status" label="状态" width="100">
             <template #default="scope">
-              <el-tag :type="scope.row.status === '显示' ? 'success' : 'info'">
-                {{ scope.row.status }}
+              <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
+                {{ scope.row.status === 1 ? '显示' : '隐藏' }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" width="180" />
+          <el-table-column prop="create_time" label="创建时间" width="180" />
           <el-table-column label="操作" width="150" fixed="right">
             <template #default="scope">
               <el-button
@@ -110,67 +110,36 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
+import { getCustomerList, getAdvantageList, deleteCustomer, deleteAdvantage } from '@/api/website/index'
 
-const tableData = ref([
-  {
-    icon: 'https://ai-public.mastergo.com/ai/img_res/c7fe00e9801f961e1d625fc00f964eff.jpg',
-    title: '科验人才评测系统',
-    content: '专业的人才测评解决方案，助力企业精准选才',
-    sort: 1,
-    creator: '张经理',
-    status: '显示',
-    createTime: '2024-04-12 13:00'
-  },
-  {
-    icon: 'https://ai-public.mastergo.com/ai/img_res/f46b32617d1202d9e5755bd5424a2810.jpg',
-    title: '智能招聘系统',
-    content: '智能化的招聘流程管理，提升招聘效率',
-    sort: 2,
-    creator: '李总监',
-    status: '隐藏',
-    createTime: '2024-04-12 13:00'
-  },
-  {
-    icon: 'https://ai-public.mastergo.com/ai/img_res/c42e1e91f69e8eb9411a73f3e92115f4.jpg',
-    title: '企业管理系统',
-    content: '全方位的企业管理解决方案',
-    sort: 3,
-    creator: '王主管',
-    status: '隐藏',
-    createTime: '2024-04-12 13:00'
-  }
-])
+interface TableItem {
+  content: string
+  create_time: number
+  creater: string
+  id: number
+  icon: string
+  sort: number
+  status: number
+  type: number
+  update_time: number
+  updater: string
+}
 
-const clientData = ref([
-  {
-    icon: 'https://ai-public.mastergo.com/ai/img_res/44c9a3b1ad34eba34d43fb21b3f10fc6.jpg',
-    name: '未来科技有限公司',
-    sort: 1,
-    creator: '陈经理',
-    status: '显示',
-    createTime: '2024-04-12 13:00'
-  },
-  {
-    icon: 'https://ai-public.mastergo.com/ai/img_res/90b4a7435fddc553f5410ca822e487c3.jpg',
-    name: '智慧网络科技公司',
-    sort: 2,
-    creator: '赵总监',
-    status: '隐藏',
-    createTime: '2024-04-12 13:00'
-  },
-  {
-    icon: 'https://ai-public.mastergo.com/ai/img_res/6ef0fdce033ec43d5ad2b218a3a4238f.jpg',
-    name: '创新软件科技公司',
-    sort: 3,
-    creator: '刘主管',
-    status: '隐藏',
-    createTime: '2024-04-12 13:00'
-  }
-])
+interface CustomerTableItem {
+  content: string
+  icon: string
+  id: number
+  sort: number
+  status: number
+  title: string
+}
+
+const tableData = ref<TableItem[]>([])
+const CustomerData = ref<CustomerTableItem[]>([])
 
 const selectedItems = ref([])
 const selectedClients = ref([])
@@ -193,16 +162,29 @@ const handleEdit = (row: any) => {
   router.push(`/system/whychoose-update?id=${row.id}`)
 }
 
-const handleDelete = (row: any) => {
-  ElMessage.success('触发删除操作')
+const handleDelete = async (row: any) => {
+  try {
+    await deleteAdvantage({ ids: row.id.toString() })
+    ElMessage.success('删除成功')
+    fetchAdvantageList()
+  } catch (error) {
+    ElMessage.error('删除失败')
+  }
 }
 
-const handleBatchDelete = () => {
+const handleBatchDelete = async () => {
   if (selectedItems.value.length === 0) {
     ElMessage.warning('请选择要删除的项目')
     return
   }
-  ElMessage.success('触发批量删除操作')
+  const ids = selectedItems.value.map(item => item.id).join(',')
+  try {
+    await deleteAdvantage({ ids })
+    ElMessage.success('批量删除成功')
+    fetchAdvantageList()
+  } catch (error) {
+    ElMessage.error('批量删除失败')
+  }
 }
 
 const handleAddClient = () => {
@@ -215,17 +197,55 @@ const handleEditClient = (row: any) => {
   router.push(`/system/logo-add?id=${row.id}`)
 }
 
-const handleDeleteClient = (row: any) => {
-  ElMessage.success('触发删除客户操作')
+const handleDeleteClient = async (row: any) => {
+  try {
+    await deleteCustomer({ ids: row.id.toString() })
+    ElMessage.success('删除成功')
+    fetchCustomerList()
+  } catch (error) {
+    ElMessage.error('删除失败')
+  }
 }
 
-const handleBatchDeleteClient = () => {
+const handleBatchDeleteClient = async () => {
   if (selectedClients.value.length === 0) {
     ElMessage.warning('请选择要删除的客户')
     return
   }
-  ElMessage.success('触发批量删除客户操作')
+  const ids = selectedClients.value.map(item => item.id).join(',')
+  try {
+    await deleteCustomer({ ids })
+    ElMessage.success('批量删除成功')
+    fetchCustomerList()
+  } catch (error) {
+    ElMessage.error('批量删除失败')
+  }
 }
+
+const fetchCustomerList = async () => {
+  try {
+    const response = await getCustomerList()
+    console.log('%c [ response ]-180', 'font-size:13px; background:pink; color:#bf2c9f;', response)
+    CustomerData.value = response.data
+  } catch (error) {
+    console.error('获取客户列表失败', error)
+  }
+}
+
+const fetchAdvantageList = async () => {
+  try {
+    const response = await getAdvantageList()
+    console.log('%c [ 获取优势列表 ]-190', 'font-size:13px; background:pink; color:#bf2c9f;', response)
+    tableData.value = response.data
+  } catch (error) {
+    console.error('获取优势列表失败', error)
+  }
+}
+
+onMounted(() => {
+  fetchCustomerList()
+  fetchAdvantageList()
+})
 </script>
 
 <style scoped>
