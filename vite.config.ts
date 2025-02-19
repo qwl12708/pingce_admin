@@ -62,11 +62,10 @@ export default defineConfig({
 
     //自定义代理规则
     proxy: {
-      // mock 数据相关前缀
-      '/api/mock': {
-        target: 'https://mock.apifox.cn/m1/1982890-0-default/',
+      '/api': {
+        target: 'http://hzcpcs.qifudaren.net/',
         changeOrigin: true,
-        rewrite: path => path.replace(new RegExp(`^/api/mock`), '')
+        rewrite: path => path.replace(new RegExp(`^/api`), '')
       }
     }
   }

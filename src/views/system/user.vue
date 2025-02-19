@@ -117,10 +117,10 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import router from '@/router'
+import { getUserList, createRole } from '@/api/system/user'
 
 const searchKeyword = ref('')
 const currentPage = ref(1)
@@ -128,35 +128,7 @@ const pageSize = ref(10)
 const total = ref(999)
 const selectedRows = ref<any[]>([])
 
-const tableData = ref([
-  {
-    id: 1,
-    name: '张三',
-    tel: '13800138000',
-    role: '管理员',
-    department: '技术部',
-    area: '北京市',
-    createdTime: '2021-09-01 12:00:00'
-  },
-  {
-    id: 2,
-    name: '李四',
-    tel: '13800138001',
-    role: 'HR',
-    department: '人力资源部',
-    area: '上海市',
-    createdTime: '2021-09-02 12:00:00'
-  },
-  {
-    id: 3,
-    name: '王五',
-    tel: '13800138002',
-    role: '员工',
-    department: '技术部',
-    area: '广州市',
-    createdTime: '2021-09-03 12:00:00'
-  }
-])
+const tableData = ref([])
 
 const dialogVisible = ref(false)
 const formRef = ref<FormInstance>()
@@ -185,10 +157,21 @@ const rules = reactive<FormRules>({
 const handleSubmit = async () => {
   if (!formRef.value) return
 
-  await formRef.value.validate(valid => {
+  await formRef.value.validate(async valid => {
     if (valid) {
-      console.log('表单提交', form)
-      dialogVisible.value = false
+      try {
+        await createRole({
+          type_id: 1, // 示例值，请根据实际情况修改
+          name: form.username,
+          sort: 1, // 示例值，请根据实际情况修改
+          status: 1, // 示例值，请根据实际情况修改
+          rules: '' // 示例值，请根据实际情况修改
+        })
+        console.log('表单提交', form)
+        dialogVisible.value = false
+      } catch (error) {
+        console.error('创建角色失败', error)
+      }
     }
   })
 }
@@ -236,6 +219,16 @@ const handleCurrentChange = (val: number) => {
 const onAdd = () => {
   dialogVisible.value = true
 }
+
+const fetchUserList = async () => {
+  const response = await getUserList({ page: currentPage.value, pageSize: pageSize.value })
+  tableData.value = response.data
+  total.value = response.total
+}
+
+onMounted(() => {
+  fetchUserList()
+})
 </script>
 
 <style scoped>

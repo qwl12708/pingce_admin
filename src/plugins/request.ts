@@ -49,7 +49,8 @@ export const checkStatus = (status: number) => {
 // Full config:  https://github.com/axios/axios#request-config
 const request = axios.create({
   // 默认地址请求地址，可在 .env.** 文件中修改
-  baseURL: import.meta.env.VITE_API_URL,
+  // baseURL: import.meta.env.VITE_API_URL,
+  baseURL: '/api',
   timeout: 30 * 1000, // Timeout
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
