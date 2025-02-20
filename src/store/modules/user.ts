@@ -38,8 +38,13 @@ export const useUserStore = defineStore('user', () => {
   function getInfo() {
     return new Promise<any>((resolve): any => {
       let info: any = null
-      const userToken = initData.token.split('-')[0]
-      info = mockUser[userToken] || {}
+      // TODO
+      info = {
+        name: 'admin',
+        avatar: '', // 头像
+        introduction: '管理员', // 介绍
+        roles: ['admin'] // 角色
+      }
       const { roles, name, avatar, introduction } = info
       setName(name)
       setAvatar(avatar)

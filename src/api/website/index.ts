@@ -100,6 +100,13 @@ export const deleteSolution = (data: { ids?: string }) =>
     data
   })
 
+// 获取解决方案列表
+export const getSolutionList = () =>
+  request({
+    url: SOLUTION_PATH + '/lst',
+    method: 'GET'
+  })
+
 // 编辑合作客户
 export const editCustomer = (data: { title?: string; icon?: string; sort?: number; id?: number }) =>
   request({

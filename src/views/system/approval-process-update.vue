@@ -43,6 +43,14 @@
           </label>
           <el-select v-model="formData.scope" placeholder="请选择" class="w-full !rounded-button">
             <el-option v-for="item in scopeOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <template #footer>
+              <el-button v-if="!isAdding" text bg size="small" @click="onAddOption"> 新增适用范围 </el-button>
+              <template v-else>
+                <el-input v-model="optionName" class="option-input" placeholder="input option name" size="small" />
+                <el-button type="primary" size="small" @click="onConfirm"> confirm </el-button>
+                <el-button size="small" @click="clear">cancel</el-button>
+              </template>
+            </template>
           </el-select>
         </div>
 
@@ -199,8 +207,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Document } from '@element-plus/icons-vue'
+import { getApprovalRangeList } from '@/api/system/user'
 
 interface FormData {
   name: string
@@ -210,7 +219,7 @@ interface FormData {
 }
 
 const activeTab = ref('basic-design')
-
+const isAdding = ref(false)
 const formData = ref<FormData>({
   name: '',
   scope: '',
@@ -218,12 +227,39 @@ const formData = ref<FormData>({
   description: ''
 })
 
-const scopeOptions = [
-  { value: '1', label: '全公司' },
-  { value: '2', label: '技术部' },
-  { value: '3', label: '市场部' },
-  { value: '4', label: '销售部' }
-]
+const scopeOptions = ref<any[]>([])
+const optionName = ref('')
+
+const fetchApprovalRangeList = async () => {
+  const response = await getApprovalRangeList()
+  scopeOptions.value = response.data.map((item: any) => ({
+    value: item.id,
+    label: item.name
+  }))
+}
+
+onMounted(() => {
+  fetchApprovalRangeList()
+})
+
+const onAddOption = () => {
+  isAdding.value = true
+}
+
+const onConfirm = () => {
+  if (optionName.value) {
+    scopeOptions.value.push({
+      label: optionName.value,
+      value: optionName.value
+    })
+    clear()
+  }
+}
+
+const clear = () => {
+  optionName.value = ''
+  isAdding.value = false
+}
 
 const ccUserOptions = [
   { value: '1', label: '部门主管' },

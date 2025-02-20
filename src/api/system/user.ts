@@ -51,23 +51,23 @@ export const editRoleType = (data: { id: number; name: string }) =>
   })
 
 // 平台/用户角色 - 删除角色类型
-export const deleteRoleType = (params: { id: string }) =>
+export const deleteRoleType = (data: { id: string }) =>
   request({
     url: '/platformApi/role/type/del',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/用户角色 - 创建角色
-export const createRole = (params: { type_id: number; name: string; sort: number; status: number; rules: string }) =>
+export const createRole = (data: { type_id: number; name: string; sort: number; status: number; rules: string }) =>
   request({
     url: '/platformApi/role/create',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/用户角色 - 编辑角色
-export const editRole = (params: {
+export const editRole = (data: {
   id?: number
   type_id?: number
   name?: string
@@ -78,7 +78,7 @@ export const editRole = (params: {
   request({
     url: '/platformApi/role/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/用户角色 - 获取角色详情
@@ -90,11 +90,11 @@ export const getRoleInfo = (params: { id?: number }) =>
   })
 
 // 平台/用户角色 - 角色开启/关闭
-export const toggleRoleStatus = (params: { id?: number }) =>
+export const toggleRoleStatus = (data: { id?: number }) =>
   request({
     url: '/platformApi/role/status',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/用户角色 - 获取绑定用户列表
@@ -106,26 +106,27 @@ export const getBoundUserList = (params: { id?: number; page?: number; pageSize?
   })
 
 // 平台/部门管理 - 创建部门
-export const createDepartment = (params: { name?: string; pid?: number; sort?: number; director_id?: number }) =>
+export const createDepartment = (data: { name?: string; pid?: number; sort?: number; director_id?: number }) =>
   request({
     url: '/platformApi/dept/create',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/部门管理 - 获取部门列表
-export const getDepartmentList = () =>
+export const getDepartmentList = (params: { name?: string }) =>
   request({
     url: '/platformApi/dept/lst',
-    method: 'GET'
+    method: 'GET',
+    params
   })
 
 // 平台/部门管理 - 删除部门
-export const deleteDepartment = (params: { id?: number }) =>
+export const deleteDepartment = (data: { id?: number }) =>
   request({
     url: '/platformApi/dept/del',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/部门管理 - 获取部门详情
@@ -137,7 +138,7 @@ export const getDepartmentInfo = (params: { id?: number }) =>
   })
 
 // 平台/部门管理 - 编辑部门
-export const editDepartment = (params: {
+export const editDepartment = (data: {
   id?: number
   name?: string
   pid?: number
@@ -147,11 +148,11 @@ export const editDepartment = (params: {
   request({
     url: '/platformApi/dept/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/用户管理 - 创建平台账号
-export const createPlatformUser = (params: {
+export const createPlatformUser = (data: {
   name?: string
   username?: string
   phone?: string
@@ -162,15 +163,15 @@ export const createPlatformUser = (params: {
   request({
     url: '/platformApi/user/add',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/用户管理 - 批量删除用户
-export const deleteUsers = (params: { ids: string }) =>
+export const deleteUsers = (data: { ids: string }) =>
   request({
     url: '/platformApi/user/del',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/用户管理 - 获取用户详情
@@ -182,19 +183,19 @@ export const getUserInfo = (params: { id?: number }) =>
   })
 
 // 平台/用户管理 - 编辑用户信息
-export const editUserInfo = (params: { avatar?: string; nickname?: string; dept_id?: number }) =>
+export const editUserInfo = (data: { avatar?: string; nickname?: string; dept_id?: number }) =>
   request({
     url: '/platformApi/user/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/自定义审批流程设置 - 新增审批流程
-export const createApprovalFlow = (params: { name?: string; cc_user_id?: number; info?: string; type_id?: number }) =>
+export const createApprovalFlow = (data: { name?: string; cc_user_id?: number; info?: string; type_id?: number }) =>
   request({
     url: '/platformApi/approval/flow/add',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/自定义审批流程设置 - 获取流程详情
@@ -206,7 +207,7 @@ export const getApprovalFlowInfo = (params: { id?: number }) =>
   })
 
 // 平台/自定义审批流程设置 - 编辑审批流程
-export const editApprovalFlow = (params: {
+export const editApprovalFlow = (data: {
   id?: number
   name?: string
   cc_user_id?: number
@@ -216,39 +217,39 @@ export const editApprovalFlow = (params: {
   request({
     url: '/platformApi/approval/flow/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/自定义审批流程设置 - 删除审批流程
-export const deleteApprovalFlow = (params: { id?: number }) =>
+export const deleteApprovalFlow = (data: { id?: number }) =>
   request({
     url: '/platformApi/approval/flow/del',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/自定义审批流程设置 - 审批流程状态修改
-export const toggleApprovalFlowStatus = (params: { id?: number }) =>
+export const toggleApprovalFlowStatus = (data: { id?: number }) =>
   request({
     url: '/platformApi/approval/flow/status',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/自定义审批流程设置 - 保存流程审批规则
-export const saveApprovalFlowContent = (params: { id?: number; content?: string }) =>
+export const saveApprovalFlowContent = (data: { id?: number; content?: string }) =>
   request({
     url: '/platformApi/approval/flow/content',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/自定义审批流程设置 - 添加审批流程分类
-export const createApprovalType = (params: { name: string }) =>
+export const createApprovalType = (data: { name: string }) =>
   request({
     url: '/platformApi/approval/type/add',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/自定义审批流程设置 - 获取审批流程分类
@@ -260,11 +261,11 @@ export const getApprovalTypeInfo = (params: { id?: number }) =>
   })
 
 // 平台/自定义审批流程设置 - 编辑审批流程分类
-export const editApprovalType = (params: { id?: number; name?: string }) =>
+export const editApprovalType = (data: { id?: number; name?: string }) =>
   request({
     url: '/platformApi/approval/type/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/自定义审批流程设置 - 获取审批流程分类列表
@@ -275,27 +276,27 @@ export const getApprovalTypeList = () =>
   })
 
 // 平台/自定义审批流程设置 - 删除审批流程分类
-export const deleteApprovalType = (params: { id?: number }) =>
+export const deleteApprovalType = (data: { id?: number }) =>
   request({
     url: '/platformApi/approval/type/del',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/自定义审批流程设置 - 创建审批流程适用范围
-export const createApprovalRange = (params: { name: string }) =>
+export const createApprovalRange = (data: { name: string }) =>
   request({
     url: '/platformApi/approval/rang/add',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/自定义审批流程设置 - 编辑审批流程适用范围
-export const editApprovalRange = (params: { id?: number; name?: string }) =>
+export const editApprovalRange = (data: { id?: number; name?: string }) =>
   request({
     url: '/platformApi/approval/rang/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/自定义审批流程设置 - 获取审批流程详情
@@ -314,15 +315,15 @@ export const getApprovalRangeList = () =>
   })
 
 // 平台/自定义审批流程设置 - 删除审批适用范围
-export const deleteApprovalRange = (params: { id?: number }) =>
+export const deleteApprovalRange = (data: { id?: number }) =>
   request({
     url: '/platformApi/approval/rang/del',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/系统配置 - 设置系统配置
-export const setSystemConfig = (params: {
+export const setSystemConfig = (data: {
   name?: string
   logo?: string
   self_service?: number
@@ -332,7 +333,7 @@ export const setSystemConfig = (params: {
   request({
     url: '/platformApi/config/system',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/系统配置 - 获取系统配置信息
@@ -343,7 +344,7 @@ export const getSystemConfig = () =>
   })
 
 // 平台/系统配置 - 设置其他配置设置
-export const setOtherConfig = (params: {
+export const setOtherConfig = (data: {
   service_protocol_name?: string
   service_protocol_size?: number
   service_protocol_file?: string
@@ -366,7 +367,7 @@ export const setOtherConfig = (params: {
   request({
     url: '/platformApi/config/other',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/系统配置 - 获取其他配置设置
@@ -377,27 +378,27 @@ export const getOtherConfig = () =>
   })
 
 // 平台/通知公告 - 创建通知公告
-export const createNotice = (params: { title?: string; img?: string; content?: string }) =>
+export const createNotice = (data: { title?: string; img?: string; content?: string }) =>
   request({
     url: '/platformApi/notice/add',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/通知公告 - 编辑通知公告
-export const editNotice = (params: { id?: number; title?: string; img?: string; content?: string }) =>
+export const editNotice = (data: { id?: number; title?: string; img?: string; content?: string }) =>
   request({
     url: '/platformApi/notice/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/通知公告 - 删除通知公告
-export const deleteNotice = (params: { id?: number }) =>
+export const deleteNotice = (data: { id?: number }) =>
   request({
     url: '/platformApi/notice/del',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/通知公告 - 获取通知详情
@@ -433,11 +434,11 @@ export const getVisitorMessageInfo = (params: { id?: number }) =>
   })
 
 // 平台/访客留言 - 回复访客留言
-export const replyVisitorMessage = (params: { replay_content?: string; replay_time?: string; id: number }) =>
+export const replyVisitorMessage = (data: { replay_content?: string; replay_time?: string; id: number }) =>
   request({
     url: '/platformApi/feedback/reply',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/供应商留言 - 获取供应商留言列表
@@ -457,11 +458,11 @@ export const getSupplierMessageInfo = (params: { id?: number }) =>
   })
 
 // 平台/供应商留言 - 回复供应商留言
-export const replySupplierMessage = (params: { replay_content?: string; replay_time?: string; id: number }) =>
+export const replySupplierMessage = (data: { replay_content?: string; replay_time?: string; id: number }) =>
   request({
     url: '/platformApi/supplier/feedback/reply',
     method: 'POST',
-    params
+    data
   })
 
 // -------
@@ -476,27 +477,27 @@ const QUESTIONNAIRE_PATH = '/platformApi/questionnaire'
 const PRODUCT_PATH = '/platformApi/product'
 
 // 添加岗位
-export const addIndustry = (params: { name?: string }) =>
+export const addIndustry = (data: { name?: string }) =>
   request({
     url: INDUSTRY_PATH + '/add',
     method: 'POST',
-    params
+    data
   })
 
 // 编辑岗位
-export const editIndustry = (params: { name?: string; id?: number }) =>
+export const editIndustry = (data: { name?: string; id?: number }) =>
   request({
     url: INDUSTRY_PATH + '/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 删除岗位
-export const deleteIndustry = (params: { ids?: string }) =>
+export const deleteIndustry = (data: { ids?: string }) =>
   request({
     url: INDUSTRY_PATH + '/del',
     method: 'POST',
-    params
+    data
   })
 
 // 获取岗位详情
@@ -516,7 +517,7 @@ export const getIndustryList = (params: { id?: string }) =>
   })
 
 // 添加客户
-export const addInstitution = (params: {
+export const addInstitution = (data: {
   type?: number
   org_name?: string
   employees_num?: number
@@ -536,11 +537,11 @@ export const addInstitution = (params: {
   request({
     url: INSTITUTION_PATH + '/add',
     method: 'POST',
-    params
+    data
   })
 
 // 修改客户
-export const editInstitution = (params: {
+export const editInstitution = (data: {
   type?: number
   org_name?: string
   employees_num?: number
@@ -561,15 +562,15 @@ export const editInstitution = (params: {
   request({
     url: INSTITUTION_PATH + '/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 修改客户状态
-export const updateInstitutionStatus = (params: { id?: number }) =>
+export const updateInstitutionStatus = (data: { id?: number }) =>
   request({
     url: INSTITUTION_PATH + '/status',
     method: 'POST',
-    params
+    data
   })
 
 // 获取客户列表
@@ -589,11 +590,11 @@ export const getInstitutionInfo = (params: { id?: number }) =>
   })
 
 // 用户绑定管理区域
-export const bindUserArea = (params: { id?: number; area?: string }) =>
+export const bindUserArea = (data: { id?: number; area?: string }) =>
   request({
     url: USER_PATH + '/bind/area',
     method: 'POST',
-    params
+    data
   })
 
 // 获取评测顾问列表
@@ -604,23 +605,23 @@ export const getConsultantList = () =>
   })
 
 // 绑定评测顾问
-export const bindConsultant = (params: { id?: number; consultant_id?: number }) =>
+export const bindConsultant = (data: { id?: number; consultant_id?: number }) =>
   request({
     url: INSTITUTION_PATH + '/bind/consultant',
     method: 'POST',
-    params
+    data
   })
 
 // 添加邀请模板替换关键字
-export const addInviteKey = (params: { name?: string; key?: string }) =>
+export const addInviteKey = (data: { name?: string; key?: string }) =>
   request({
     url: INVITE_PATH + '/key/add',
     method: 'POST',
-    params
+    data
   })
 
 // 添加邀请模板
-export const addInviteTemplate = (params: {
+export const addInviteTemplate = (data: {
   name?: string
   content?: string
   replace_content?: string
@@ -629,11 +630,11 @@ export const addInviteTemplate = (params: {
   request({
     url: INVITE_PATH + '/template/add',
     method: 'POST',
-    params
+    data
   })
 
 // 编辑邀请模板
-export const editInviteTemplate = (params: {
+export const editInviteTemplate = (data: {
   name?: string
   content?: string
   replace_content?: string
@@ -643,15 +644,15 @@ export const editInviteTemplate = (params: {
   request({
     url: INVITE_PATH + '/template/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 删除邀请模板
-export const deleteInviteTemplate = (params: { ids?: string }) =>
+export const deleteInviteTemplate = (data: { ids?: string }) =>
   request({
     url: INVITE_PATH + '/template/del',
     method: 'POST',
-    params
+    data
   })
 
 // 获取邀请模板详情
@@ -670,19 +671,19 @@ export const getInviteTemplateList = () =>
   })
 
 // 编辑邀请模板替换关键字
-export const editInviteKey = (params: { name?: string; key?: string; id?: number }) =>
+export const editInviteKey = (data: { name?: string; key?: string; id?: number }) =>
   request({
     url: INVITE_PATH + '/key/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 删除邀请模板替换关键字
-export const deleteInviteKey = (params: { ids?: string }) =>
+export const deleteInviteKey = (data: { ids?: string }) =>
   request({
     url: INVITE_PATH + '/key/del',
     method: 'POST',
-    params
+    data
   })
 
 // 获取邀请模板替换关键字详情
@@ -701,27 +702,27 @@ export const getInviteKeyList = () =>
   })
 
 // 添加作答指引模板
-export const addAnswerTemplate = (params: { name?: string; content?: string }) =>
+export const addAnswerTemplate = (data: { name?: string; content?: string }) =>
   request({
     url: ANSWER_PATH + '/template/add',
     method: 'POST',
-    params
+    data
   })
 
 // 编辑作答指引模板
-export const editAnswerTemplate = (params: { name?: string; content?: string; id?: number }) =>
+export const editAnswerTemplate = (data: { name?: string; content?: string; id?: number }) =>
   request({
     url: ANSWER_PATH + '/template/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 删除作答指引模板
-export const deleteAnswerTemplate = (params: { ids?: string }) =>
+export const deleteAnswerTemplate = (data: { ids?: string }) =>
   request({
     url: ANSWER_PATH + '/template/del',
     method: 'POST',
-    params
+    data
   })
 
 // 获取作答指引模板详情
@@ -740,19 +741,19 @@ export const getAnswerTemplateList = () =>
   })
 
 // 创建岗位类型
-export const addJobType = (params: { name?: string }) =>
+export const addJobType = (data: { name?: string }) =>
   request({
     url: QUESTIONNAIRE_PATH + '/job/type/add',
     method: 'POST',
-    params
+    data
   })
 
 // 创建岗位
-export const addJob = (params: { name?: string }) =>
+export const addJob = (data: { name?: string }) =>
   request({
     url: QUESTIONNAIRE_PATH + '/job/add',
     method: 'POST',
-    params
+    data
   })
 
 // 获取岗位类型列表
@@ -786,7 +787,7 @@ export const getQuestionnaireInfo = (params: { id?: number }) =>
   })
 
 // 添加问卷调查
-export const addQuestionnaire = (params: {
+export const addQuestionnaire = (data: {
   type?: number
   post_type_id?: number
   job_id?: number
@@ -808,11 +809,11 @@ export const addQuestionnaire = (params: {
   request({
     url: QUESTIONNAIRE_PATH + '/add',
     method: 'POST',
-    params
+    data
   })
 
 // 编辑问卷调查
-export const editQuestionnaire = (params: {
+export const editQuestionnaire = (data: {
   type?: number
   post_type_id?: number
   job_id?: number
@@ -835,31 +836,31 @@ export const editQuestionnaire = (params: {
   request({
     url: QUESTIONNAIRE_PATH + '/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 删除问卷调查
-export const deleteQuestionnaire = (params: { ids?: string }) =>
+export const deleteQuestionnaire = (data: { ids?: string }) =>
   request({
     url: QUESTIONNAIRE_PATH + '/del',
     method: 'POST',
-    params
+    data
   })
 
 // 更新问卷调查状态
-export const updateQuestionnaireStatus = (params: { id?: string }) =>
+export const updateQuestionnaireStatus = (data: { id?: string }) =>
   request({
     url: QUESTIONNAIRE_PATH + '/status',
     method: 'POST',
-    params
+    data
   })
 
 // 问卷调查-试题
-export const handleQuestionnaireQuestion = (params: { content?: string; questionnaire_id?: number; del_id?: string }) =>
+export const handleQuestionnaireQuestion = (data: { content?: string; questionnaire_id?: number; del_id?: string }) =>
   request({
     url: QUESTIONNAIRE_PATH + '/question/handle',
     method: 'POST',
-    params
+    data
   })
 
 // 问卷调查-试题获取
@@ -871,7 +872,7 @@ export const getQuestionnaireQuestionList = (params: { questionnaire_id?: number
   })
 
 // 添加产品套餐
-export const addProduct = (params: {
+export const addProduct = (data: {
   name?: string
   type?: number
   score?: number
@@ -885,11 +886,11 @@ export const addProduct = (params: {
   request({
     url: PRODUCT_PATH + '/add',
     method: 'POST',
-    params
+    data
   })
 
 // 编辑产品套餐
-export const editProduct = (params: {
+export const editProduct = (data: {
   name?: string
   type?: number
   score?: number
@@ -904,15 +905,15 @@ export const editProduct = (params: {
   request({
     url: PRODUCT_PATH + '/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 删除产品套餐
-export const deleteProduct = (params: { ids?: string }) =>
+export const deleteProduct = (data: { ids?: string }) =>
   request({
     url: PRODUCT_PATH + '/del',
     method: 'POST',
-    params
+    data
   })
 
 // 获取产品套餐

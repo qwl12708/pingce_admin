@@ -134,7 +134,6 @@ const handleRowDelete = async (row: any) => {
 const fetchBannerList = async () => {
   try {
     const response = await getBannerList()
-    console.log('%c [ response ]-120', 'font-size:13px; background:pink; color:#bf2c9f;', response)
     tableData.value = response.data
     total.value = response.total || 999 // TODO: total
   } catch (error) {

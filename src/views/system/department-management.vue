@@ -30,13 +30,13 @@
         @selection-change="handleSelectionChange"
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       >
-        <el-table-column prop="name" label="部门名称" min-width="200" />
-        <el-table-column prop="sort" label="排序" width="120" />
-        <el-table-column prop="creator" label="创建人" width="120" />
-        <el-table-column prop="manager" label="部门负责人" width="120" />
-        <el-table-column prop="createTime" label="创建时间" width="180" />
-        <el-table-column prop="updateTime" label="更新时间" width="180" />
-        <el-table-column label="操作" width="160" fixed="right">
+        <el-table-column prop="name" label="部门名称" />
+        <el-table-column prop="sort" label="排序" />
+        <el-table-column prop="creater" label="创建人" />
+        <el-table-column prop="director_username" label="部门负责人" />
+        <el-table-column prop="create_time" label="创建时间" />
+        <el-table-column prop="update_time" label="更新时间" />
+        <el-table-column label="操作" fixed="right">
           <template #default="{ row }">
             <template v-if="row.children">
               <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="handleEdit(row)">
@@ -72,27 +72,33 @@
         class="rounded-lg"
       >
         <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" class="mt-4">
-          <el-form-item label="部门名称" prop="username">
-            <el-input v-model="form.username" placeholder="请输入" class="w-full !rounded-button" />
+          <el-form-item label="部门名称" prop="name">
+            <el-input v-model="form.name" placeholder="请输入" class="w-full !rounded-button" />
           </el-form-item>
 
-          <el-form-item label="所在上级部门" prop="department">
-            <el-select v-model="form.department" placeholder="可选择" class="w-full !rounded-button">
-              <el-option label="技术部" value="tech" />
-              <el-option label="市场部" value="market" />
-              <el-option label="运营部" value="operation" />
+          <el-form-item label="所在上级部门" prop="pid">
+            <el-select v-model="form.pid" placeholder="可选择" class="w-full !rounded-button">
+              <el-option
+                v-for="option in departmentOptions"
+                :key="option.value"
+                :label="option.label"
+                :value="option.value"
+              />
             </el-select>
           </el-form-item>
 
-          <el-form-item label="排序" prop="phone">
-            <el-input v-model="form.phone" placeholder="请输入" class="w-full !rounded-button" />
+          <el-form-item label="排序" prop="sort">
+            <el-input v-model="form.sort" placeholder="请输入" class="w-full !rounded-button" />
           </el-form-item>
 
-          <el-form-item label="部门负责人" prop="role">
-            <el-select v-model="form.role" placeholder="请选择" class="w-full !rounded-button">
-              <el-option label="老板" value="admin" />
-              <el-option label="普通用户" value="user" />
-              <el-option label="访客" value="guest" />
+          <el-form-item label="部门负责人" prop="director_id">
+            <el-select v-model="form.director_id" placeholder="请选择" class="w-full !rounded-button">
+              <el-option
+                v-for="option in directorOptions"
+                :key="option.value"
+                :label="option.label"
+                :value="option.value"
+              />
             </el-select>
           </el-form-item>
         </el-form>
@@ -109,99 +115,123 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import { getDepartmentList, createDepartment, editDepartment, getUserList } from '@/api/system/user'
+import dayjs from 'dayjs'
 
+interface directorOptions {
+  value: number
+  label: string
+}
 const searchKeyword = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(999)
+const total = ref(0)
 const selectedRows = ref<any[]>([])
+const directorOptions = ref<directorOptions[]>([])
 
-const tableData = ref([
-  {
-    id: 1,
-    name: '研发中心',
-    sort: 999,
-    creator: 'admin',
-    manager: 'admin',
-    createTime: '2024-04-12 13:00',
-    updateTime: '2024-04-12 13:00',
-    children: [
-      {
-        id: 2,
-        name: '前端开发部',
-        sort: 999,
-        creator: 'admin',
-        manager: 'admin',
-        createTime: '2024-04-12 13:00',
-        updateTime: '2024-04-12 13:00'
-      },
-      {
-        id: 3,
-        name: '后端开发部',
-        sort: 999,
-        creator: 'admin',
-        manager: 'admin',
-        createTime: '2024-04-12 13:00',
-        updateTime: '2024-04-12 13:00'
-      }
-    ]
-  },
-  {
-    id: 4,
-    name: '产品设计中心',
-    sort: 999,
-    creator: 'admin',
-    manager: 'admin',
-    createTime: '2024-04-12 13:00',
-    updateTime: '2024-04-12 13:00',
-    children: [
-      {
-        id: 5,
-        name: 'UI设计部',
-        sort: 999,
-        creator: 'admin',
-        manager: 'admin',
-        createTime: '2024-04-12 13:00',
-        updateTime: '2024-04-12 13:00'
-      }
-    ]
-  }
-])
+const tableData = ref<any[]>([])
+const departmentOptions = ref<any[]>([])
+
+const fetchDepartmentList = async (params = {}) => {
+  const response = await getDepartmentList({ ...params })
+  const flatData = response.data.map((item: any) => ({
+    ...item,
+    create_time: dayjs(item.create_time).format('YYYY-MM-DD HH:mm:ss'),
+    update_time: dayjs(item.update_time).format('YYYY-MM-DD HH:mm:ss')
+  }))
+  departmentOptions.value = flatData.map((item: any) => ({
+    value: item.id,
+    label: item.name
+  }))
+  tableData.value = convertToTree(flatData)
+  total.value = flatData.length
+}
+
+const convertToTree = (data: any[]) => {
+  const map = new Map()
+  const roots: any[] = []
+
+  data.forEach(item => {
+    map.set(item.id, { ...item, children: [] })
+  })
+
+  data.forEach(item => {
+    const parent = map.get(item.pid)
+    if (parent) {
+      parent.children.push(map.get(item.id))
+    } else {
+      roots.push(map.get(item.id))
+    }
+  })
+
+  return roots
+}
+
+onMounted(() => {
+  fetchDepartmentList()
+  fetchUserList()
+})
+
+const fetchUserList = async () => {
+  const response = await getUserList()
+  directorOptions.value = response.data.list.map((item: any) => ({
+    value: item.id,
+    label: item.name
+  }))
+}
 
 const dialogVisible = ref(false)
 const formRef = ref<FormInstance>()
 
 const form = reactive({
-  username: '',
-  phone: '',
-  role: '',
-  department: '',
-  businessInfo: ''
+  id: null,
+  name: '',
+  pid: null,
+  sort: '',
+  director_id: ''
 })
 
 const rules = reactive<FormRules>({
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
+  name: [
+    { required: true, message: '请输入部门名称', trigger: 'blur' },
     { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
   ],
-  phone: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
-  ],
-  role: [{ required: true, message: '请选择用户角色', trigger: 'change' }],
-  department: [{ required: true, message: '请选择所在部门', trigger: 'change' }]
+  sort: [{ required: true, message: '请输入排序', trigger: 'blur' }],
+  director_id: [{ required: true, message: '请选择部门负责人', trigger: 'change' }]
 })
 
 const handleSubmit = async () => {
   if (!formRef.value) return
 
-  await formRef.value.validate(valid => {
+  await formRef.value.validate(async valid => {
     if (valid) {
-      console.log('表单提交', form)
-      dialogVisible.value = false
+      try {
+        if (form.id) {
+          await editDepartment({
+            id: form.id,
+            name: form.name,
+            pid: form.pid,
+            sort: form.sort,
+            director_id: form.director_id
+          })
+        } else {
+          await createDepartment({
+            name: form.name,
+            pid: form.pid || 0,
+            sort: form.sort,
+            director_id: form.director_id
+          })
+        }
+        console.log('表单提交', form)
+        formRef.value.resetFields()
+        dialogVisible.value = false
+        fetchDepartmentList() // 重新获取部门列表
+      } catch (error) {
+        console.error('操作失败', error)
+      }
     }
   })
 }
@@ -212,6 +242,7 @@ const handleCancel = () => {
 
 const handleSearch = () => {
   // 实现搜索逻辑
+  fetchDepartmentList({ name: searchKeyword.value })
 }
 
 const handleReset = () => {
@@ -223,7 +254,11 @@ const handleAdd = () => {
 }
 
 const handleEdit = (row: any) => {
-  // 实现编辑逻辑
+  form.id = row.id
+  form.name = row.name
+  form.pid = row.pid
+  form.sort = row.sort
+  form.director_id = row.director_id
   dialogVisible.value = true
 }
 

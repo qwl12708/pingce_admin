@@ -29,22 +29,18 @@
       <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
         <el-table-column type="selection" width="55" />
         <el-table-column label="序号" prop="id" width="100" />
-        <el-table-column label="用户名称" prop="name">
+        <el-table-column label="用户名称" prop="name" />
+        <el-table-column label="手机号码" prop="phone" sortable />
+        <el-table-column label="用户角色" prop="role_name" />
+        <el-table-column label="所在部门" prop="dept_name" />
+        <el-table-column label="负责区域" prop="undertakeArea">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">{{ row.name }}</el-button>
+            {{
+              row.undertakeArea.reduce((acc, cur) => acc + '，' + cur.province_name + cur.city_name + cur.area_name, '')
+            }}
           </template>
         </el-table-column>
-        <el-table-column label="手机号码" prop="tel" sortable />
-        <el-table-column label="用户角色" prop="role" />
-        <el-table-column label="所在部门" prop="department" />
-        <el-table-column label="负责区域" prop="area" />
-        <el-table-column label="创建时间" prop="createdTime" sortable />
-        <!-- <el-table-column label="操作" width="200">
-          <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">编辑模版</el-button>
-            <el-button type="primary" link @click="handleDelete(row)">删除模版</el-button>
-          </template>
-        </el-table-column> -->
+        <el-table-column label="创建时间" prop="create_time" sortable />
       </el-table>
 
       <div class="flex justify-between items-center p-4">
@@ -69,39 +65,34 @@
         class="rounded-lg"
       >
         <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" class="mt-4">
-          <el-form-item label="用户名" prop="username">
-            <el-input v-model="form.username" placeholder="请输入" class="w-full !rounded-button" />
+          <el-form-item label="用户名" prop="name">
+            <el-input v-model="form.name" placeholder="请输入" class="w-full !rounded-button" />
           </el-form-item>
 
           <el-form-item label="预留登录手机号" prop="phone">
             <el-input v-model="form.phone" placeholder="请输入" class="w-full !rounded-button" />
           </el-form-item>
 
-          <el-form-item label="用户角色" prop="role">
-            <el-select v-model="form.role" placeholder="请选择" class="w-full !rounded-button">
-              <el-option label="管理员" value="admin" />
-              <el-option label="普通用户" value="user" />
-              <el-option label="访客" value="guest" />
+          <el-form-item label="用户角色" prop="role_id">
+            <el-select v-model="form.role_id" placeholder="请选择" class="w-full !rounded-button">
+              <el-option v-for="role in roleOptions" :key="role.value" :label="role.label" :value="role.value" />
             </el-select>
           </el-form-item>
 
-          <el-form-item label="所在部门" prop="department">
-            <el-select v-model="form.department" placeholder="可选择" class="w-full !rounded-button">
-              <el-option label="技术部" value="tech" />
-              <el-option label="市场部" value="market" />
-              <el-option label="运营部" value="operation" />
+          <el-form-item label="所在部门" prop="dept_id">
+            <el-select v-model="form.dept_id" placeholder="可选择" class="w-full !rounded-button">
+              <el-option
+                v-for="department in departmentOptions"
+                :key="department.value"
+                :label="department.label"
+                :value="department.value"
+              />
             </el-select>
           </el-form-item>
 
-          <el-form-item label="网间企业信息" prop="businessInfo">
-            <div class="flex items-center gap-2">
-              <el-upload class="upload-demo" action="#" :auto-upload="false" :show-file-list="false">
-                <el-button type="primary" class="!rounded-button whitespace-nowrap">
-                  <el-icon class="mr-1"><Plus /></el-icon>上传
-                </el-button>
-              </el-upload>
-              <span class="text-gray-400 text-sm">支持 jpg、png 格式，大小不超过 2M</span>
-            </div>
+          <el-form-item label="顾问企业微信号" prop="wechat_account">
+            <ImageUploader v-model:value="form.wechat_account" />
+            <span class="text-gray-400 text-sm">支持 jpg、png 格式，大小不超过 2M</span>
           </el-form-item>
         </el-form>
 
@@ -119,8 +110,9 @@
 <script lang="ts" setup>
 import { reactive, ref, onMounted } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import { getUserList, createRole } from '@/api/system/user'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { getUserList, getDepartmentList, getRoleList, deleteUsers, createPlatformUser } from '@/api/system/user'
+import ImageUploader from '@/components/ImageUploader/index.vue'
 
 const searchKeyword = ref('')
 const currentPage = ref(1)
@@ -134,15 +126,15 @@ const dialogVisible = ref(false)
 const formRef = ref<FormInstance>()
 
 const form = reactive({
-  username: '',
+  name: '',
   phone: '',
-  role: '',
-  department: '',
-  businessInfo: ''
+  role_id: '',
+  dept_id: '',
+  wechat_account: ''
 })
 
 const rules = reactive<FormRules>({
-  username: [
+  name: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
   ],
@@ -150,9 +142,22 @@ const rules = reactive<FormRules>({
     { required: true, message: '请输入手机号', trigger: 'blur' },
     { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
   ],
-  role: [{ required: true, message: '请选择用户角色', trigger: 'change' }],
-  department: [{ required: true, message: '请选择所在部门', trigger: 'change' }]
+  role_id: [{ required: true, message: '请选择用户角色', trigger: 'change' }],
+  dept_id: [{ required: true, message: '请选择所在部门', trigger: 'change' }]
 })
+
+interface RoleOption {
+  value: number
+  label: string
+}
+
+const roleOptions = ref<RoleOption[]>([])
+interface DepartmentOption {
+  value: number
+  label: string
+}
+
+const departmentOptions = ref<DepartmentOption[]>([])
 
 const handleSubmit = async () => {
   if (!formRef.value) return
@@ -160,17 +165,18 @@ const handleSubmit = async () => {
   await formRef.value.validate(async valid => {
     if (valid) {
       try {
-        await createRole({
-          type_id: 1, // 示例值，请根据实际情况修改
-          name: form.username,
-          sort: 1, // 示例值，请根据实际情况修改
-          status: 1, // 示例值，请根据实际情况修改
-          rules: '' // 示例值，请根据实际情况修改
+        await createPlatformUser({
+          name: form.name,
+          phone: form.phone,
+          role_id: form.role_id,
+          dept_id: form.dept_id,
+          wechat_account: form.wechat_account
         })
         console.log('表单提交', form)
         dialogVisible.value = false
+        fetchUserList() // 重新获取用户列表
       } catch (error) {
-        console.error('创建角色失败', error)
+        console.error('创建平台账号失败', error)
       }
     }
   })
@@ -180,28 +186,31 @@ const handleCancel = () => {
   dialogVisible.value = false
 }
 
+// 实现搜索逻辑
 const handleSearch = () => {
-  // 实现搜索逻辑
+  fetchUserList({ name: searchKeyword.value })
 }
 
 const handleReset = () => {
   searchKeyword.value = ''
+  fetchUserList()
 }
 
-const handleAdd = () => {
-  // 实现新增逻辑
-}
+const handleBatchDelete = async () => {
+  if (selectedRows.value.length === 0) {
+    return
+  }
 
-const handleEdit = (row: any) => {
-  // 实现编辑逻辑
-}
-
-const handleDelete = (row: any) => {
-  // 实现删除逻辑
-}
-
-const handleBatchDelete = () => {
-  // 实现批量删除逻辑
+  const ids = selectedRows.value.map(row => row.id).join(',')
+  try {
+    const res = await deleteUsers({ ids })
+    if (res.code === 200) {
+      ElMessage.success('批量删除成功')
+      fetchUserList() // 重新获取用户列表
+    }
+  } catch (error) {
+    console.error('批量删除失败', error)
+  }
 }
 
 const handleSelectionChange = (rows: any[]) => {
@@ -220,14 +229,32 @@ const onAdd = () => {
   dialogVisible.value = true
 }
 
-const fetchUserList = async () => {
-  const response = await getUserList({ page: currentPage.value, pageSize: pageSize.value })
-  tableData.value = response.data
-  total.value = response.total
+const fetchUserList = async (params = {}) => {
+  const response = await getUserList({ page: currentPage.value, pageSize: pageSize.value, ...params })
+  tableData.value = response.data.list
+  total.value = response.data.total
+}
+
+const fetchDepartmentList = async () => {
+  const response = await getDepartmentList()
+  departmentOptions.value = response.data.map((item: any) => ({
+    value: item.id,
+    label: item.name
+  }))
+}
+
+const fetchRoleList = async () => {
+  const response = await getRoleList()
+  roleOptions.value = response.data.list.map((item: any) => ({
+    value: item.id,
+    label: item.name
+  }))
 }
 
 onMounted(() => {
   fetchUserList()
+  fetchDepartmentList()
+  fetchRoleList()
 })
 </script>
 

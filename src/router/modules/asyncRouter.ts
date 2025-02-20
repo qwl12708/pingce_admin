@@ -257,8 +257,8 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
     },
     children: [
       {
-        path: 'list',
-        component: () => import('@/views/system/user.vue'),
+        path: 'userlist',
+        component: () => import('@/views/system/userlist.vue'),
         meta: {
           title: '用户列表',
           icon: 'none',

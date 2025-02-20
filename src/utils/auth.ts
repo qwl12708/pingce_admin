@@ -1,7 +1,7 @@
 // 操作token get/set/remove
 import Cookies from 'js-cookie'
 
-const TokenKey = 'bk_token' // 自定义修改
+const TokenKey = 'ycpc_token' // 自定义修改
 
 export function getToken() {
   return Cookies.get(TokenKey)

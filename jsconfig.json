@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./",
+    "paths": {
+      "api/*": ["src/api/*"],
+      "assets/*": ["src/assets/*"],
+      "components/*": ["src/components/*"],
+      "directives/*": ["src/directives/*"],
+      "hooks/*": ["src/hooks/*"],
+      "layout/*": ["src/layout/*"],
+      "plugins/*": ["src/plugins/*"],
+      "router/*": ["src/router/*"],
+      "store/*": ["src/store/*"],
+      "style/*": ["src/style/*"],
+      "utils/*": ["src/utils/*"],
+      "views/*": ["src/views/*"],
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

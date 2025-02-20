@@ -66,7 +66,8 @@ instance.interceptors.request.use(
     // 在发送请求之前执行处理操作
     const token = getToken()
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      // config.headers.Authorization = `Bearer ${token}`
+      config.headers.token = token
     }
     if (config._headers) {
       config.headers = {

@@ -76,7 +76,7 @@
 </template>
 
 <script lang="ts" setup>
-import api from '@/api'
+import { login } from '@/api/login'
 import { setToken } from '@/utils/auth'
 import { getTimeState } from '@/utils/index'
 import { ElNotification } from 'element-plus'
@@ -161,21 +161,13 @@ function handleLogin() {
     if (valid) {
       loading.value = true
       try {
-        const { username } = loginForm.value
-        let resp = null
-        if (username === 'admin') {
-          resp = await api.UserApi.adminLoginApi()
-        } else if (['zjh', 'zanjiahao'].includes(username)) {
-          resp = await api.UserApi.zjhLoginApi()
-        } else {
-          resp = await api.UserApi.visitorLoginApi()
-        }
+        const { username: phone, password: pwd } = loginForm.value
+        const resp = await login({ phone, pwd })
         const resData = resp?.data
         if (resData) {
-          const { token, tokenHead } = resData
+          const { token } = resData
           // 设置token
-          let bkToken = `${tokenHead}-${token}`
-          setToken(bkToken)
+          setToken(token)
           // 路由跳转
           await router.push({
             path: initData.redirect || '/',

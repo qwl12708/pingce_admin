@@ -3,27 +3,27 @@ import request from '@/plugins/request'
 const PATH = '/platformApi/banner'
 
 // 平台/网站-banner - 创建banner
-export const createBanner = (params: { type?: number; sort?: number; img?: string; content?: string }) =>
+export const createBanner = (data: { type?: number; sort?: number; img?: string; content?: string }) =>
   request({
     url: PATH + '/add',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/网站-banner - 编辑banner
-export const editBanner = (params: { type?: number; sort?: number; img?: string; content?: string; id?: number }) =>
+export const editBanner = (data: { type?: number; sort?: number; img?: string; content?: string; id?: number }) =>
   request({
     url: PATH + '/edit',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/网站-banner - 删除banner
-export const deleteBanner = (params: { ids: string }) =>
+export const deleteBanner = (data: { ids: string }) =>
   request({
     url: PATH + '/del',
     method: 'POST',
-    params
+    data
   })
 
 // 平台/网站-banner - 获取banner详情

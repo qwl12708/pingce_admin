@@ -43,44 +43,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
-import { deleteSolution } from '@/api/website/index'
+import { getSolutionList, deleteSolution } from '@/api/website/index'
 
-const tableData = ref([
-  {
-    id: 1,
-    icon: 'https://ai-public.mastergo.com/ai/img_res/c7fe00e9801f961e1d625fc00f964eff.jpg',
-    title: '科验人才评测系统',
-    content: '专业的人才测评解决方案，助力企业精准选才',
-    sort: 1,
-    creator: '张经理',
-    status: '显示',
-    createTime: '2024-04-12 13:00'
-  },
-  {
-    id: 2,
-    icon: 'https://ai-public.mastergo.com/ai/img_res/f46b32617d1202d9e5755bd5424a2810.jpg',
-    title: '智能招聘系统',
-    content: '智能化的招聘流程管理，提升招聘效率',
-    sort: 2,
-    creator: '李总监',
-    status: '隐藏',
-    createTime: '2024-04-12 13:00'
-  },
-  {
-    id: 3,
-    icon: 'https://ai-public.mastergo.com/ai/img_res/c42e1e91f69e8eb9411a73f3e92115f4.jpg',
-    title: '企业管理系统',
-    content: '全方位的企业管理解决方案',
-    sort: 3,
-    creator: '王主管',
-    status: '隐藏',
-    createTime: '2024-04-12 13:00'
-  }
-])
+const tableData = reactive([])
 
 const selectedItems = ref([])
 
@@ -124,8 +93,17 @@ const handleBatchDelete = async () => {
 }
 
 const fetchSolutionList = async () => {
-  // 实现获取解决方案列表的逻辑
+  try {
+    const res = await getSolutionList()
+    tableData.splice(0, tableData.length, ...res.data)
+  } catch (error) {
+    ElMessage.error('获取解决方案列表失败')
+  }
 }
+
+onMounted(() => {
+  fetchSolutionList()
+})
 </script>
 
 <style scoped>

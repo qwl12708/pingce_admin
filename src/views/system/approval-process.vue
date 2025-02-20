@@ -40,12 +40,12 @@
         </el-table-column>
       </el-table>
       <div class="flex justify-between items-center mt-4">
-        <span class="text-gray-600">共 999 条</span>
+        <span class="text-gray-600">共 {{ total }} 条</span>
         <div class="flex items-center space-x-2">
           <el-pagination
             v-model:current-page="currentPage"
             v-model:page-size="pageSize"
-            :total="999"
+            :total="total"
             :page-sizes="[10, 20, 30, 40]"
             layout="sizes, prev, pager, next, jumper"
             @size-change="handleSizeChange"
@@ -57,11 +57,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import router from '@/router'
+import { getApprovalTypeList } from '@/api/system/user'
+import dayjs from 'dayjs'
 
 const roleValue = ref('1')
+const total = ref(0)
 const roleOptions = [
   {
     value: '1',
@@ -78,36 +81,22 @@ const roleOptions = [
 ]
 const currentPage = ref(1)
 const pageSize = ref(10)
-const tableData = ref([
-  {
-    name: '设备审批流1',
-    scope: 'shi适用范围1',
-    description: '非必填项，看情况',
-    createTime: '2023-04-22 11:00-11:30',
-    status: true
-  },
-  {
-    name: '设备审批测试',
-    scope: 'shi适用范围3',
-    description: '非必填项，看情况',
-    createTime: '2023-04-22 11:00-11:30',
-    status: false
-  },
-  {
-    name: '设备审批流2',
-    scope: 'shi适用范围2',
-    description: '非必填项，看情况',
-    createTime: '2023-04-22 11:00-11:30',
-    status: true
-  },
-  {
-    name: '设备审批流3',
-    scope: 'shi适用范围444',
-    description: '非必填项，看情况',
-    createTime: '2023-04-22 11:00-11:30',
-    status: false
-  }
-])
+const tableData = ref<any[]>([])
+
+const fetchApprovalTypeList = async () => {
+  const response = await getApprovalTypeList()
+  tableData.value = response.data.map((item: any) => ({
+    ...item,
+    createTime: dayjs(item.create_time).format('YYYY-MM-DD HH:mm:ss')
+  }))
+
+  total.value = response.data.length
+}
+
+onMounted(() => {
+  fetchApprovalTypeList()
+})
+
 const handleAdd = () => {
   console.log('添加')
   router.push('/system/approval-process-update')
