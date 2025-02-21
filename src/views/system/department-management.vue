@@ -33,7 +33,11 @@
         <el-table-column prop="name" label="部门名称" />
         <el-table-column prop="sort" label="排序" />
         <el-table-column prop="creater" label="创建人" />
-        <el-table-column prop="director_username" label="部门负责人" />
+        <el-table-column prop="director_username" label="部门负责人">
+          <template #default="{ row }">
+            {{ row.director_username || row.directorInfo.name }}
+          </template>
+        </el-table-column>
         <el-table-column prop="create_time" label="创建时间" />
         <el-table-column prop="update_time" label="更新时间" />
         <el-table-column label="操作" fixed="right">
@@ -117,8 +121,8 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import { getDepartmentList, createDepartment, editDepartment, getUserList } from '@/api/system/user'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { getDepartmentList, createDepartment, editDepartment, getUserList, deleteDepartment } from '@/api/system/user'
 import dayjs from 'dayjs'
 
 interface directorOptions {
@@ -134,6 +138,29 @@ const directorOptions = ref<directorOptions[]>([])
 
 const tableData = ref<any[]>([])
 const departmentOptions = ref<any[]>([])
+const dialogVisible = ref(false)
+const formRef = ref<FormInstance>()
+const form = reactive({
+  id: null,
+  name: '',
+  pid: null,
+  sort: '',
+  director_id: ''
+})
+
+const rules = reactive<FormRules>({
+  name: [
+    { required: true, message: '请输入部门名称', trigger: 'blur' },
+    { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+  ],
+  sort: [{ required: true, message: '请输入排序', trigger: 'blur' }],
+  director_id: [{ required: true, message: '请选择部门负责人', trigger: 'change' }]
+})
+
+onMounted(() => {
+  fetchDepartmentList()
+  fetchUserList()
+})
 
 const fetchDepartmentList = async (params = {}) => {
   const response = await getDepartmentList({ ...params })
@@ -142,10 +169,12 @@ const fetchDepartmentList = async (params = {}) => {
     create_time: dayjs(item.create_time).format('YYYY-MM-DD HH:mm:ss'),
     update_time: dayjs(item.update_time).format('YYYY-MM-DD HH:mm:ss')
   }))
-  departmentOptions.value = flatData.map((item: any) => ({
-    value: item.id,
-    label: item.name
-  }))
+  departmentOptions.value = flatData
+    .map((item: any) => ({
+      value: item.id,
+      label: item.name
+    }))
+    .concat({ label: '暂无', value: 0 })
   tableData.value = convertToTree(flatData)
   total.value = flatData.length
 }
@@ -170,11 +199,6 @@ const convertToTree = (data: any[]) => {
   return roots
 }
 
-onMounted(() => {
-  fetchDepartmentList()
-  fetchUserList()
-})
-
 const fetchUserList = async () => {
   const response = await getUserList()
   directorOptions.value = response.data.list.map((item: any) => ({
@@ -182,26 +206,6 @@ const fetchUserList = async () => {
     label: item.name
   }))
 }
-
-const dialogVisible = ref(false)
-const formRef = ref<FormInstance>()
-
-const form = reactive({
-  id: null,
-  name: '',
-  pid: null,
-  sort: '',
-  director_id: ''
-})
-
-const rules = reactive<FormRules>({
-  name: [
-    { required: true, message: '请输入部门名称', trigger: 'blur' },
-    { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
-  ],
-  sort: [{ required: true, message: '请输入排序', trigger: 'blur' }],
-  director_id: [{ required: true, message: '请选择部门负责人', trigger: 'change' }]
-})
 
 const handleSubmit = async () => {
   if (!formRef.value) return
@@ -226,7 +230,6 @@ const handleSubmit = async () => {
           })
         }
         console.log('表单提交', form)
-        formRef.value.resetFields()
         dialogVisible.value = false
         fetchDepartmentList() // 重新获取部门列表
       } catch (error) {
@@ -258,12 +261,19 @@ const handleEdit = (row: any) => {
   form.name = row.name
   form.pid = row.pid
   form.sort = row.sort
-  form.director_id = row.director_id
+  form.director_id = row.directorInfo.id
   dialogVisible.value = true
 }
 
-const handleDelete = (row: any) => {
+const handleDelete = async (row: any) => {
   // 实现删除逻辑
+  const res = await deleteDepartment({ id: row.id })
+  if (!res) return
+  if (res.code === 200) {
+    ElMessage.success('删除成功')
+    return
+  }
+  ElMessage.error('删除失败')
 }
 
 const handleBatchDelete = () => {
@@ -284,6 +294,7 @@ const handleCurrentChange = (val: number) => {
 
 const onAdd = () => {
   dialogVisible.value = true
+  formRef.value?.resetFields()
 }
 </script>
 
