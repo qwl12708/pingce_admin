@@ -9,7 +9,7 @@
             <el-icon class="mr-1"></el-icon>新增
           </el-button>
           <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
-            <el-icon class="mr-1"><Delete /></el-icon>删除
+            <el-icon class="mr-1"><Delete /></el-icon>批量删除
           </el-button>
         </div>
       </div>
@@ -17,12 +17,12 @@
       <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
         <el-table-column type="selection" width="55" />
         <el-table-column label="序号" prop="id" width="100" />
-        <el-table-column label="公告图片" prop="name" />
-        <el-table-column label="公告内容" prop="tel" />
-        <el-table-column label="排序" prop="role" />
-        <el-table-column label="公告状态" prop="department" sortable />
-        <el-table-column label="发布时间" prop="area" sortable />
-        <el-table-column label="发布人" prop="createdTime" sortable />
+        <el-table-column label="公告图片" prop="img" />
+        <el-table-column label="公告内容" prop="content" />
+        <el-table-column label="排序" prop="sort" />
+        <el-table-column label="公告状态" prop="status" sortable />
+        <el-table-column label="发布时间" prop="publish_time" sortable />
+        <el-table-column label="发布人" prop="publisher" sortable />
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -103,46 +103,19 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import router from '@/router'
+import { getNoticeList, deleteNotice } from '@/api/system/user'
 
 const searchKeyword = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(999)
+const total = ref(0)
 const selectedRows = ref<any[]>([])
 
-const tableData = ref([
-  {
-    id: 1,
-    name: '张三',
-    tel: '13800138000',
-    role: '管理员',
-    department: '技术部',
-    area: '北京市',
-    createdTime: '2021-09-01 12:00:00'
-  },
-  {
-    id: 2,
-    name: '李四',
-    tel: '13800138001',
-    role: 'HR',
-    department: '人力资源部',
-    area: '上海市',
-    createdTime: '2021-09-02 12:00:00'
-  },
-  {
-    id: 3,
-    name: '王五',
-    tel: '13800138002',
-    role: '员工',
-    department: '技术部',
-    area: '广州市',
-    createdTime: '2021-09-03 12:00:00'
-  }
-])
+const tableData = ref([])
 
 const dialogVisible = ref(false)
 const formRef = ref<FormInstance>()
@@ -168,6 +141,12 @@ const rules = reactive<FormRules>({
   department: [{ required: true, message: '请选择所在部门', trigger: 'change' }]
 })
 
+const fetchNotices = async () => {
+  const { data } = await getNoticeList({ page: currentPage.value, pageSize: pageSize.value })
+  tableData.value = data.list
+  total.value = data.total
+}
+
 const handleSubmit = async () => {
   if (!formRef.value) return
 
@@ -189,10 +168,12 @@ const handleAdd = () => {
 
 const handleEdit = (row: any) => {
   // 实现编辑逻辑
+  router.push(`/system/notice-add?id=${row.id}`)
 }
 
-const handleDelete = (row: any) => {
-  // 实现删除逻辑
+const handleDelete = async (row: any) => {
+  await deleteNotice({ id: row.id })
+  fetchNotices()
 }
 
 const handleBatchExport = () => {
@@ -209,15 +190,21 @@ const handleSelectionChange = (rows: any[]) => {
 
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  fetchNotices()
 }
 
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
+  fetchNotices()
 }
 
 const onAdd = () => {
   dialogVisible.value = true
 }
+
+onMounted(() => {
+  fetchNotices()
+})
 </script>
 
 <style scoped>

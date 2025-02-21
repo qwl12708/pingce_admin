@@ -1,27 +1,53 @@
 <template>
   <el-upload
     class="image-uploader flex items-center justify-center"
+    :class="customClass"
     :show-file-list="false"
     :before-upload="beforeUpload"
     :http-request="uploadImage"
+    :list-type="listType"
     v-model:file-list="fileList"
   >
-    <div v-if="!imageUrl" class="upload-placeholder">
-      <el-icon><Plus /></el-icon>
-      <div class="text-xs mt-1">上传</div>
+    <div>
+      <div v-if="!imageUrl" class="upload-placeholder">
+        <el-icon><Plus /></el-icon>
+        <div class="text-xs mt-1">上传</div>
+      </div>
+      <img v-else :src="imageUrl" class="uploaded-image" />
+      <p v-if="tip">{{ tip }}</p>
     </div>
-    <img v-else :src="imageUrl" class="uploaded-image" />
   </el-upload>
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps, defineEmits } from 'vue'
+import { ref, defineProps, defineEmits, watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { uploadImg } from '@/api/modules/UploadApi'
 
 const props = defineProps({
-  value: String
+  value: String,
+  width: {
+    type: String,
+    default: '180px'
+  },
+  height: {
+    type: String,
+    default: '180px'
+  },
+  customClass: {
+    type: String,
+    default: ''
+  },
+  tip: {
+    type: String,
+    default: ''
+  },
+  listType: {
+    type: String,
+    default: 'picture-card',
+    validator: (value: string) => ['text', 'picture', 'picture-card'].includes(value)
+  }
 })
 
 const emits = defineEmits(['update:value'])
@@ -29,22 +55,25 @@ const emits = defineEmits(['update:value'])
 const imageUrl = ref(props.value)
 const fileList = ref([])
 
-const beforeUpload = (file: File) => {
-  const isImage = file.type.startsWith('image/')
-  const isLt2M = file.size / 1024 / 1024 < 2
-
-  if (!isImage) {
-    ElMessage.error('上传文件只能是图片格式!')
-    return false
+watch(
+  () => props.value,
+  newValue => {
+    imageUrl.value = newValue
   }
-  if (!isLt2M) {
-    ElMessage.error('上传图片大小不能超过 2MB!')
+)
+
+const beforeUpload = (file: File) => {
+  // const isImage = file.type.startsWith('image/')
+  const isLt10M = file.size / 1024 / 1024 < 10
+
+  if (!isLt10M) {
+    ElMessage.error('上传图片大小不能超过 10MB!')
     return false
   }
   return true
 }
 
-const uploadImage = async e => {
+const uploadImage = async (e: any) => {
   const formData = new FormData()
   formData.append('file', e.file)
   try {
@@ -59,8 +88,6 @@ const uploadImage = async e => {
 
 <style scoped>
 .image-uploader {
-  width: 360px;
-  height: 180px;
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
   cursor: pointer;
@@ -85,5 +112,10 @@ const uploadImage = async e => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.image-uploader {
+  width: var(--width);
+  height: var(--height);
 }
 </style>

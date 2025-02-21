@@ -60,7 +60,7 @@
 import { onMounted, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import router from '@/router'
-import { getApprovalTypeList } from '@/api/system/user'
+import { getApprovalFlowList } from '@/api/system/user'
 import dayjs from 'dayjs'
 
 const roleValue = ref('1')
@@ -84,7 +84,7 @@ const pageSize = ref(10)
 const tableData = ref<any[]>([])
 
 const fetchApprovalTypeList = async () => {
-  const response = await getApprovalTypeList()
+  const response = await getApprovalFlowList()
   tableData.value = response.data.map((item: any) => ({
     ...item,
     createTime: dayjs(item.create_time).format('YYYY-MM-DD HH:mm:ss')

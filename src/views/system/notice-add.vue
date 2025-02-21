@@ -4,33 +4,23 @@
       <el-form-item
         label="公告标题"
         prop="title"
-        :rules="[{ required: true, message: '请输入公共标题', trigger: 'blur' }]"
+        :rules="[{ required: true, message: '请输入公告标题', trigger: 'blur' }]"
       >
-        <el-input v-model="form.name" placeholder="请输入公告标题" clearable />
+        <el-input v-model="form.title" placeholder="请输入公告标题" clearable />
       </el-form-item>
 
       <el-form-item
         label="公告图片"
-        prop="image"
+        prop="img"
         :rules="[{ required: true, message: '请上传公告图片', trigger: 'blur' }]"
       >
-        <el-upload
-          class="upload-demo"
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :on-success="handleSuccess"
-          :on-remove="handleRemove"
-          :limit="1"
-          :file-list="fileList"
-          list-type="picture-card"
-        >
-          <i class="el-icon-plus"></i>
-        </el-upload>
+        <ImageUploader v-model:value="form.img" />
       </el-form-item>
 
       <el-form-item
         label="公告内容"
         prop="content"
-        :rules="[{ required: true, message: '请输入详情内容', trigger: 'blur' }]"
+        :rules="[{ required: true, message: '请输入公告内容', trigger: 'blur' }]"
       >
         <WangEditor height="300px" v-model:value="form.content" class="w-full border rounded-md" />
       </el-form-item>
@@ -43,36 +33,57 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
-// import type { FormInstance } from 'element-plus'
+import { reactive, ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { createNotice, editNotice, getNoticeInfo } from '@/api/system/user'
 import WangEditor from '@/components/WangEditor/index.vue'
+import ImageUploader from '@/components/ImageUploader/index.vue'
 
+const route = useRoute()
+const router = useRouter()
 const formRef = ref()
 
-const form = ref({
-  name: '',
-  requireNameStatus: false,
-  requireTelStatus: false,
-  requireNoteStatus: false
+const form = reactive({
+  id: null,
+  title: '',
+  img: '',
+  content: ''
 })
 
 const rules = {
-  requireNoteStatus: [{ required: true, message: '请选择是否必填', trigger: 'blur' }],
-  requireTelStatus: [{ required: true, message: '请选择是否必填', trigger: 'blur' }],
-  requireNameStatus: [{ required: true, message: '请选择是否必填', trigger: 'blur' }],
-  content: [{ required: true, message: '请输入详情内容', trigger: 'blur' }]
+  title: [{ required: true, message: '请输入公告标题', trigger: 'blur' }],
+  img: [{ required: true, message: '请上传公告图片', trigger: 'blur' }],
+  content: [{ required: true, message: '请输入公告内容', trigger: 'blur' }]
 }
 
 const onSubmit = async () => {
   if (!formRef.value) return
 
-  await formRef.value.validate(valid => {
+  await formRef.value.validate(async valid => {
     if (valid) {
-      console.log('submit form', form.value)
+      if (form.id) {
+        await editNotice(form)
+      } else {
+        await createNotice(form)
+      }
+      router.push('/system/notice')
     }
   })
 }
+
+const fetchNoticeInfo = async id => {
+  const { data } = await getNoticeInfo({ id })
+  Object.assign(form, data)
+}
+
+onMounted(() => {
+  const id = route.query.id
+  console.log('%c [ id ]-81', 'font-size:13px; background:pink; color:#bf2c9f;', id)
+  if (id) {
+    form.id = id
+    fetchNoticeInfo(id)
+  }
+})
 </script>
 
 <style scoped>

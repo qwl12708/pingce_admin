@@ -2,15 +2,15 @@
   <div class="main-content min-h-screen bg-white p-6">
     <div class="flex justify-between items-center mb-6">
       <div class="flex items-center">
-        <el-input v-model="searchText" placeholder="请输入" class="w-64 mr-4">
+        <el-input v-model="searchKeyword" placeholder="请输入" class="w-64 mr-4">
           <template #prefix>
             <el-icon class="text-gray-400">
               <Search />
             </el-icon>
           </template>
         </el-input>
-        <el-button type="primary" class="!rounded-button">查询</el-button>
-        <el-button class="ml-2 !rounded-button">重置</el-button>
+        <el-button type="primary" class="!rounded-button" @click="handleSearch">查询</el-button>
+        <el-button class="ml-2 !rounded-button" @click="handleReset">重置</el-button>
       </div>
       <div>
         <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleAdd">
@@ -29,9 +29,9 @@
     <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
       <el-table-column type="selection" width="55" />
       <el-table-column label="序号" prop="id" width="80" />
-      <el-table-column label="角色类型" prop="roleType" sortable width="120" />
-      <el-table-column label="角色名称" prop="roleName" sortable width="120" />
-      <el-table-column label="显示顺序" prop="order" width="100" />
+      <el-table-column label="角色类型" prop="roleType.name" sortable width="120" />
+      <el-table-column label="角色名称" prop="name" sortable width="120" />
+      <el-table-column label="显示顺序" prop="sort" width="100" />
       <el-table-column label="状态" width="100">
         <template #default="{ row }">
           <el-tag :type="row.status ? 'success' : 'danger'" class="whitespace-nowrap">
@@ -40,7 +40,7 @@
         </template>
       </el-table-column>
       <el-table-column label="创建人" prop="creator" width="120" />
-      <el-table-column label="创建时间" prop="createTime" sortable width="180">
+      <el-table-column label="创建时间" prop="create_time" sortable width="180">
         <template #header>
           <span>创建时间</span>
           <el-icon class="ml-1"><ArrowDown /></el-icon>
@@ -80,17 +80,17 @@
       <div class="form-content">
         <el-form :model="form" label-width="80px">
           <el-form-item label="角色类型" required>
-            <el-select v-model="form.roleType" class="w-full">
-              <el-option label="请选择" value="" />
+            <el-select v-model="form.type_id" class="w-full">
+              <el-option v-for="type in roleTypeOptions" :key="type.value" :label="type.label" :value="type.value" />
             </el-select>
           </el-form-item>
 
           <el-form-item label="角色名称" required>
-            <el-input v-model="form.roleName" placeholder="请输入" />
+            <el-input v-model="form.name" placeholder="请输入" />
           </el-form-item>
 
           <el-form-item label="显示顺序" required>
-            <el-input-number v-model="form.order" :min="0" class="w-full" />
+            <el-input-number v-model="form.sort" :min="0" class="w-full" />
           </el-form-item>
 
           <el-form-item label="状态">
@@ -129,27 +129,79 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Search, Plus, ArrowDown } from '@element-plus/icons-vue'
+import { getRoleList, deleteRoleType, getRoleTypeList } from '@/api/system/user'
 
-const searchText = ref('')
+const searchKeyword = ref('')
 const selectedRows = ref<any[]>([])
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(999)
+const total = ref(0)
+const tableData = ref<any[]>([])
 
-import type { TreeProps } from 'element-plus'
+const fetchRoleList = async (params = {}) => {
+  const response = await getRoleList(params)
+  tableData.value = response.data.list
+  total.value = response.data.total
+}
 
-const dialogVisible = ref(true)
+onMounted(() => {
+  fetchRoleList()
+  fetchRoleTypeList()
+})
+
+const handleSearch = () => {
+  fetchRoleList({ name: searchKeyword.value })
+}
+
+const handleReset = () => {
+  searchKeyword.value = ''
+  fetchRoleList()
+}
+
+const handleSelectionChange = (rows: any[]) => {
+  selectedRows.value = rows
+}
+
+const handleAdd = () => {
+  // 处理新增
+  roleDialogVisible.value = true
+}
+
+const handleBatchDelete = async () => {
+  if (selectedRows.value.length === 0) {
+    return
+  }
+
+  const ids = selectedRows.value.map(row => row.id).join(',')
+  try {
+    await deleteRoleType({ id: ids })
+    fetchRoleList() // 重新获取角色列表
+  } catch (error) {
+    console.error('批量删除失败', error)
+  }
+}
+
 const roleDialogVisible = ref(false)
 
 const form = ref({
-  roleType: '',
-  roleName: '',
-  order: 0,
+  type_id: '',
+  name: '',
+  sort: 0,
   status: '1',
   isAdmin: false
 })
+
+const roleTypeOptions = ref<any[]>([])
+
+const fetchRoleTypeList = async () => {
+  const response = await getRoleTypeList()
+  roleTypeOptions.value = response.data.map((item: any) => ({
+    value: item.id,
+    label: item.name
+  }))
+}
 
 const menuData = [
   {
@@ -198,65 +250,13 @@ const menuData = [
   }
 ]
 
-const defaultProps = ref<TreeProps>({
+const defaultProps = ref({
   children: 'children',
   label: 'label'
 })
 
 const handleSubmit = () => {
-  dialogVisible.value = false
-}
-
-const tableData = ref([
-  {
-    id: 1,
-    roleType: '管理员',
-    roleName: '管理员',
-    order: 1,
-    status: true,
-    creator: 'admin',
-    createTime: '2024-04-12 13:00'
-  },
-  {
-    id: 2,
-    roleType: '测评顾问',
-    roleName: '普通员工1',
-    order: 2,
-    status: false,
-    creator: 'admin',
-    createTime: '2024-04-12 13:00'
-  },
-  {
-    id: 3,
-    roleType: '普通角色',
-    roleName: '普通员工2',
-    order: 3,
-    status: false,
-    creator: 'admin',
-    createTime: '2024-04-12 13:00'
-  },
-  {
-    id: 4,
-    roleType: '普通角色',
-    roleName: '普通员工3',
-    order: 4,
-    status: true,
-    creator: 'admin',
-    createTime: '2024-04-12 13:00'
-  }
-])
-
-const handleSelectionChange = (rows: any[]) => {
-  selectedRows.value = rows
-}
-
-const handleAdd = () => {
-  // 处理新增
-  roleDialogVisible.value = true
-}
-
-const handleBatchDelete = () => {
-  // 处理批量删除
+  roleDialogVisible.value = false
 }
 </script>
 

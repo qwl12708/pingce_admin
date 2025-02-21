@@ -20,7 +20,7 @@ export const getUserList = (params: { name?: string; page?: number; pageSize?: n
   })
 
 // 平台/用户角色 - 获取角色列表
-export const getRoleList = (params: { page?: number; pageSize?: number }) =>
+export const getRoleList = (params: { name?: string; page?: number; pageSize?: number }) =>
   request({
     url: '/platformApi/role/lst',
     method: 'GET',
@@ -191,7 +191,13 @@ export const editUserInfo = (data: { avatar?: string; nickname?: string; dept_id
   })
 
 // 平台/自定义审批流程设置 - 新增审批流程
-export const createApprovalFlow = (data: { name?: string; cc_user_id?: number; info?: string; type_id?: number }) =>
+export const createApprovalFlow = (data: {
+  name?: string
+  cc_user_id?: number
+  info?: string
+  type_id?: number
+  contents?: Array<{ name: string; type: number; uids?: string; role_id?: string }>
+}) =>
   request({
     url: '/platformApi/approval/flow/add',
     method: 'POST',
@@ -202,6 +208,14 @@ export const createApprovalFlow = (data: { name?: string; cc_user_id?: number; i
 export const getApprovalFlowInfo = (params: { id?: number }) =>
   request({
     url: '/platformApi/approval/flow/info',
+    method: 'GET',
+    params
+  })
+
+// 平台/自定义审批流程设置 - 获取流程列表
+export const getApprovalFlowList = (params: { page?: number; pageSize?: number }) =>
+  request({
+    url: '/platformApi/approval/flow/lst',
     method: 'GET',
     params
   })

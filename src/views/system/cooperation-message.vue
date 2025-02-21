@@ -7,13 +7,13 @@
         <el-table-column type="selection" width="55" />
         <el-table-column label="序号" prop="id" width="100" />
         <el-table-column label="留言者姓名" prop="name" sortable />
-        <el-table-column label="留言者电话" prop="name" sortable />
-        <el-table-column label="留言时间" prop="messageTime" sortable />
-        <el-table-column label="回复时间" prop="replyTime" sortable />
-        <el-table-column label="留言内容" prop="replyContent" sortable />
-        <el-table-column label="回复状态" prop="replyStatus" sortable />
+        <el-table-column label="留言者电话" prop="phone" sortable />
+        <el-table-column label="留言时间" prop="create_time" sortable />
+        <el-table-column label="回复时间" prop="reply_time" sortable />
+        <el-table-column label="留言内容" prop="content" sortable />
+        <el-table-column label="回复状态" prop="reply_status" sortable />
         <el-table-column label="回复人" prop="replier" sortable />
-        <el-table-column label="回复记录" prop="replyRecord" sortable />
+        <el-table-column label="回复记录" prop="reply_record" sortable />
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <el-button type="text" size="small" @click="handleEdit(row)">回复</el-button>
@@ -43,18 +43,18 @@
         class="rounded-lg"
       >
         <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" class="mt-4">
-          <el-form-item label="回复记录" prop="replyRecord">
+          <el-form-item label="回复记录" prop="reply_record">
             <el-input
               type="textarea"
-              v-model="form.replyRecord"
+              v-model="form.reply_record"
               placeholder="请输入回复记录"
               class="w-full !rounded-button"
             />
           </el-form-item>
 
-          <el-form-item label="回复时间" prop="replyTime">
+          <el-form-item label="回复时间" prop="reply_time">
             <el-date-picker
-              v-model="form.replyTime"
+              v-model="form.reply_time"
               type="datetime"
               placeholder="选择日期时间"
               class="w-full !rounded-button"
@@ -74,69 +74,59 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import { reactive, ref, onMounted } from 'vue'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { getSupplierMessages, replySupplierMessage } from '@/api/system/user'
 
-const searchKeyword = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(999)
+const total = ref(0)
 const selectedRows = ref<any[]>([])
 
-const tableData = ref([
-  {
-    id: 1,
-    name: '张三',
-    messageTime: '2025-02-10 10:00:00',
-    replyTime: '2025-02-10 12:00:00',
-    replyContent: '感谢您的留言，我们会尽快处理。',
-    replyStatus: '已回复',
-    replier: '管理员',
-    replyRecord: '2025-02-10 12:00:00 管理员: 感谢您的留言，我们会尽快处理。'
-  },
-  {
-    id: 2,
-    name: '李四',
-    messageTime: '2025-02-11 09:00:00',
-    replyTime: '',
-    replyContent: '',
-    replyStatus: '未回复',
-    replier: '',
-    replyRecord: ''
-  },
-  {
-    id: 3,
-    name: '王五',
-    messageTime: '2025-02-11 11:00:00',
-    replyTime: '2025-02-11 13:00:00',
-    replyContent: '您的问题已解决，请查看。',
-    replyStatus: '已回复',
-    replier: '管理员',
-    replyRecord: '2025-02-11 13:00:00 管理员: 您的问题已解决，请查看。'
-  }
-])
+const tableData = ref([])
 
 const dialogVisible = ref(false)
 const formRef = ref<FormInstance>()
 
 const form = reactive({
-  replyRecord: '',
-  replyTime: ''
+  id: null,
+  reply_record: '',
+  reply_time: ''
 })
 
 const rules: FormRules = {
-  replyRecord: [{ required: true, message: '请输入回复记录', trigger: 'blur' }],
-  replyTime: [{ required: true, message: '请选择回复时间', trigger: 'change' }]
+  reply_record: [{ required: true, message: '请输入回复记录', trigger: 'blur' }],
+  reply_time: [{ required: true, message: '请选择回复时间', trigger: 'change' }]
+}
+
+const fetchMessages = async () => {
+  try {
+    const { data } = await getSupplierMessages({ page: currentPage.value, pageSize: pageSize.value })
+    tableData.value = data.list
+    total.value = data.total
+  } catch (error) {
+    ElMessage.error('获取留言列表失败')
+    console.log('getSupplierMessages', error)
+  }
 }
 
 const handleSubmit = async () => {
   if (!formRef.value) return
 
-  await formRef.value.validate(valid => {
+  await formRef.value.validate(async valid => {
     if (valid) {
-      console.log('表单提交', form)
-      dialogVisible.value = false
+      try {
+        await replySupplierMessage({
+          id: form.id,
+          replay_content: form.reply_record,
+          replay_time: form.reply_time
+        })
+        dialogVisible.value = false
+        fetchMessages()
+      } catch (error) {
+        console.log('replySupplierMessage', error)
+        ElMessage.error('回复失败')
+      }
     }
   })
 }
@@ -146,8 +136,9 @@ const handleCancel = () => {
 }
 
 const handleEdit = (row: any) => {
-  form.replyRecord = row.replyRecord
-  form.replyTime = row.replyTime
+  form.id = row.id
+  form.reply_record = row.reply_record
+  form.reply_time = row.reply_time
   dialogVisible.value = true
 }
 
@@ -157,11 +148,17 @@ const handleSelectionChange = (rows: any[]) => {
 
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  fetchMessages()
 }
 
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
+  fetchMessages()
 }
+
+onMounted(() => {
+  fetchMessages()
+})
 </script>
 
 <style scoped>
