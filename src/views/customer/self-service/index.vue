@@ -19,7 +19,9 @@
           <el-icon class="mr-2 text-blue-500">
             <img src="../../../assets/image/icons/one.png" />
           </el-icon>
-          <span>您有 <span class="text-blue-500 font-medium">2</span> 个自助客户一周内新注册</span>
+          <span
+            >您有 <span class="text-blue-500 font-medium">{{ week_total }}</span> 个自助客户一周内新注册</span
+          >
         </div>
       </div>
       <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="onAddCustomer">
@@ -31,20 +33,26 @@
       <el-table :data="tableData" style="width: 100%" class="custom-table">
         <el-table-column type="selection" />
         <el-table-column label="序号" type="index" />
-        <el-table-column prop="customerCode" label="客户编号" sortable />
-        <el-table-column prop="customerName" label="客户名称" sortable />
-        <el-table-column prop="registerDate" label="注册日期" sortable />
-        <el-table-column prop="projectCount" label="累计项目数" sortable />
-        <el-table-column prop="evaluationCount" label="累计评估人次" sortable />
-        <el-table-column prop="contact" label="联系人" sortable />
+        <el-table-column prop="id" label="客户编号" sortable />
+        <el-table-column prop="org_name" label="客户名称" sortable />
+        <el-table-column prop="create_time" label="注册日期" sortable>
+          <template #default="{ row }">
+            <span>{{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="project_num" label="累计项目数" sortable />
+        <el-table-column prop="answer_num" label="累计评估人次" sortable />
+        <el-table-column prop="contacts" label="联系人" sortable />
         <el-table-column label="操作" fixed="right" width="300" align="center">
           <template #default="scope">
             <div class="flex gap-2">
               <el-button type="primary" link class="!rounded-button whitespace-nowrap"> 查询 </el-button>
-              <el-button type="primary" link class="!rounded-button whitespace-nowrap"> 修改客户信息 </el-button>
+              <el-button @click="goDetail(scope.row.id)" type="primary" link class="!rounded-button whitespace-nowrap">
+                修改客户信息
+              </el-button>
               <el-button type="primary" link class="!rounded-button whitespace-nowrap"> 新增订单 </el-button>
-              <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="toggleFreeze(scope.row)">
-                {{ scope.row.isFreezed ? '解冻' : '冻结' }}
+              <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="updataStatus(scope.row)">
+                {{ scope.row.status ? '解冻' : '冻结' }}
               </el-button>
             </div>
           </template>
@@ -52,14 +60,14 @@
       </el-table>
       <!-- 分页 -->
       <div class="flex justify-between items-center p-4">
-        <span class="text-gray-600">共 999 条</span>
+        <span class="text-gray-600">共 {{ total }} 条</span>
         <div class="flex items-center gap-4">
           <el-pagination
             v-model:current-page="currentPage"
             v-model:page-size="pageSize"
             :page-sizes="[10, 20, 30, 40]"
             layout="sizes, prev, pager, next, jumper"
-            :total="999"
+            :total="total"
             class="!rounded-button"
           />
         </div>
@@ -71,83 +79,63 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import router from '@/router'
+import { getInstitutionList, updateInstitutionStatus } from '@/api/customer'
+import dayjs from 'dayjs'
+import { ElMessage } from 'element-plus'
+
 interface TableItem {
-  customerCode: string
-  customerName: string
-  registerDate: string
-  projectCount: number
-  evaluationCount: number
-  contact: string
+  org_code: string
+  org_name: string
+  created_at: string
+  project_count: number
+  evaluation_count: number
+  contact_name: string
   isFreezed: boolean
 }
+
 const activeTab = ref('all')
 const currentPage = ref(1)
 const pageSize = ref(10)
-const tableData = ref<TableItem[]>([
-  {
-    customerCode: 'KH20240001',
-    customerName: '深圳市科技创新有限公司',
-    registerDate: '2024-04-12 13:00',
-    projectCount: 5,
-    evaluationCount: 5,
-    contact: '陈经理',
-    isFreezed: false
-  },
-  {
-    customerCode: 'KH20240002',
-    customerName: '广州智慧科技股份有限公司',
-    registerDate: '2024-04-12 13:00',
-    projectCount: 5,
-    evaluationCount: 5,
-    contact: '林总监',
-    isFreezed: false
-  },
-  {
-    customerCode: 'KH20240003',
-    customerName: '北京未来科技发展有限公司',
-    registerDate: '2024-04-12 13:00',
-    projectCount: 5,
-    evaluationCount: 5,
-    contact: '王经理',
-    isFreezed: true
-  },
-  {
-    customerCode: 'KH20240004',
-    customerName: '上海创新科技有限公司',
-    registerDate: '2024-04-12 13:00',
-    projectCount: 5,
-    evaluationCount: 5,
-    contact: '张总监',
-    isFreezed: false
-  },
-  {
-    customerCode: 'KH20240005',
-    customerName: '杭州数字科技有限公司',
-    registerDate: '2024-04-12 13:00',
-    projectCount: 5,
-    evaluationCount: 5,
-    contact: '李经理',
-    isFreezed: false
-  },
-  {
-    customerCode: 'KH20240006',
-    customerName: '成都创新科技有限公司',
-    registerDate: '2024-04-12 13:00',
-    projectCount: 5,
-    evaluationCount: 5,
-    contact: '刘总监',
-    isFreezed: true
+const total = ref(0)
+const week_total = ref(0)
+const tableData = ref<TableItem[]>([])
+
+const fetchTableData = async () => {
+  try {
+    const { data } = await getInstitutionList({
+      page: [currentPage.value.toString()],
+      pageSize: pageSize.value.toString()
+    })
+    tableData.value = data.list
+    total.value = data.total
+    week_total.value = data.week_total
+  } catch (error) {
+    console.error('获取客户列表失败', error)
   }
-])
-const toggleFreeze = (row: TableItem) => {
-  row.isFreezed = !row.isFreezed
+}
+
+onMounted(() => {
+  fetchTableData()
+})
+
+const goDetail = id => {
+  router.push(`/customer/add?type=1&id=${id}`)
 }
 
 const onAddCustomer = () => {
   router.push('/customer/add')
+}
+const updataStatus = async id => {
+  const res = await updateInstitutionStatus({ id })
+  if (!res) return
+  if (res.code !== 200) {
+    ElMessage.error('更新失败！')
+    return
+  }
+  ElMessage.success('更新成功！')
 }
 </script>
 

@@ -60,67 +60,69 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
 import router from '@/router'
+import { getInviteTemplateList, deleteInviteTemplate } from '@/api/product'
+import { ElMessage } from 'element-plus'
 
 const searchKeyword = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(999)
+const total = ref(0)
 const selectedRows = ref<any[]>([])
+const tableData = ref([])
 
-const tableData = ref([
-  {
-    id: 1,
-    name: '模版名称示例',
-    remark: '模版内容示例模版内容示例模版内容示例模版内容示例模版内容示例'
-  },
-  {
-    id: 2,
-    name: '入职评估模版',
-    remark: '用于新员工入职评估的标准模版'
-  },
-  {
-    id: 3,
-    name: '技能测评模版',
-    remark: '针对不同岗位的专业技能评估模版'
-  },
-  {
-    id: 4,
-    name: '绩效考核模版',
-    remark: '季度绩效考核标准评估模版'
-  },
-  {
-    id: 5,
-    name: '晋升评估模版',
-    remark: '员工晋升评估专用模版'
+const fetchTableData = async (name = '') => {
+  try {
+    const { data } = await getInviteTemplateList({ name, page: currentPage.value, pageSize: pageSize.value })
+    tableData.value = data.list || data
+    total.value = data.total || data.length
+  } catch (error) {
+    console.error('获取邀请函模板列表失败', error)
   }
-])
+}
+
+onMounted(() => {
+  fetchTableData()
+})
 
 const handleSearch = () => {
-  // 实现搜索逻辑
+  fetchTableData(searchKeyword.value)
 }
 
 const handleReset = () => {
   searchKeyword.value = ''
-}
-
-const handleAdd = () => {
-  // 实现新增逻辑
+  fetchTableData()
 }
 
 const handleEdit = (row: any) => {
-  // 实现编辑逻辑
   router.push(`/product/invite-guide-add?id=${row.id}`)
 }
 
-const handleDelete = (row: any) => {
-  // 实现删除逻辑
+const handleDelete = async (row: any) => {
+  try {
+    await deleteInviteTemplate({ ids: row.id.toString() })
+    ElMessage.success('删除成功')
+    fetchTableData()
+  } catch (error) {
+    ElMessage.error('删除失败')
+  }
 }
 
-const handleBatchDelete = () => {
-  // 实现批量删除逻辑
+const handleBatchDelete = async () => {
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请先选择要删除的模板')
+    return
+  }
+  try {
+    const ids = selectedRows.value.map(row => row.id).join(',')
+    await deleteInviteTemplate({ ids })
+    ElMessage.success('批量删除成功')
+    fetchTableData()
+  } catch (error) {
+    ElMessage.error('批量删除失败')
+  }
 }
 
 const handleSelectionChange = (rows: any[]) => {
@@ -128,15 +130,18 @@ const handleSelectionChange = (rows: any[]) => {
 }
 
 const handleSizeChange = (val: number) => {
+  console.log('%c [ size ]-133', 'font-size:13px; background:pink; color:#bf2c9f;', val)
   pageSize.value = val
+  fetchTableData()
 }
 
 const handleCurrentChange = (val: number) => {
+  console.log('%c [ current ]-139', 'font-size:13px; background:pink; color:#bf2c9f;', val)
   currentPage.value = val
+  fetchTableData()
 }
 
 const onAdd = () => {
-  // 跳转到新增页面
   router.push('/product/invite-guide-add')
 }
 </script>

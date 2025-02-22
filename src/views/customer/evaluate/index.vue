@@ -1,4 +1,3 @@
-
 <template>
   <div class="main-content min-h-screen bg-white p-6">
     <!-- 顶部提示区域 -->
@@ -49,9 +48,11 @@
         <template #default="scope">
           <div class="flex items-center gap-2">
             <el-button type="primary" link>查询</el-button>
-            <el-button type="primary" link>修改客户信息</el-button>
+            <el-button @click="goDetail(scope.row.id)" type="primary" link>修改客户信息</el-button>
             <el-button type="primary" link>新增订单</el-button>
-            <el-button type="primary" link>活动/解冻</el-button>
+            <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="updataStatus(scope.row)">
+              {{ scope.row.status ? '解冻' : '冻结' }}
+            </el-button>
             <el-button @click="onSeeRecord" type="primary" link>查看客户使用记录</el-button>
           </div>
         </template>
@@ -74,6 +75,8 @@
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import router from '@/router'
+import { ElMessage } from 'element-plus'
+import { updateInstitutionStatus } from '@/api/customer'
 
 const activeTab = ref('three') // one: 一周内, three: 三个月内, all: 全部
 const currentPage = ref(1)
@@ -135,7 +138,20 @@ const onSeeRecord = () => {
 }
 
 const onAddCustomer = () => {
-  router.push({ path: '/customer/add', query: { type: 'evaluate' } })
+  router.push({ path: '/customer/add', query: { type: 2 } })
+}
+
+const goDetail = id => {
+  router.push({ path: '/customer/add', query: { type: 2, id } })
+}
+const updataStatus = async id => {
+  const res = await updateInstitutionStatus({ id })
+  if (!res) return
+  if (res.code !== 200) {
+    ElMessage.error('更新失败！')
+    return
+  }
+  ElMessage.success('更新成功！')
 }
 </script>
 <style scoped>

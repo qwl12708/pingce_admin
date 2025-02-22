@@ -3,55 +3,45 @@
     <h2 class="text-2xl font-bold mb-6">编辑测评顾问执行区域</h2>
 
     <div style="width: 500px" class="bg-white rounded-lg shadow p-6">
-      <div class="space-y-6">
-        <!-- 顾问名称 -->
-        <div class="flex items-center">
-          <label class="w-24 text-gray-600">顾问名称</label>
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
+        <el-form-item label="顾问名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入顾问名称" class="w-64" />
-        </div>
+        </el-form-item>
 
-        <!-- 手机号码 -->
-        <div class="flex items-center">
-          <label class="w-24 text-gray-600">手机号码</label>
+        <el-form-item label="手机号码" prop="phone">
           <el-input v-model="form.phone" placeholder="请输入手机号码" class="w-64" />
-        </div>
+        </el-form-item>
 
-        <!-- 所属部门 -->
-        <div class="flex items-center">
-          <label class="w-24 text-gray-600">所属部门</label>
+        <el-form-item label="所属部门" prop="department">
           <el-input v-model="form.department" placeholder="请输入所属部门" class="w-64" />
-        </div>
+        </el-form-item>
 
-        <!-- 所属区域 -->
-        <div class="flex">
-          <label class="w-24 text-gray-600 pt-1">所属区域</label>
-          <div class="flex-1">
-            <el-tree-select
-              v-model="form.regions"
-              :data="regionData"
-              show-checkbox
-              multiple
-              node-key="id"
-              :props="defaultProps"
-              placeholder="请选择所属区域"
-              class="w-full"
-            />
-          </div>
-        </div>
+        <el-form-item label="所属区域" prop="regions">
+          <el-tree-select
+            v-model="form.regions"
+            :data="regionData"
+            show-checkbox
+            multiple
+            node-key="id"
+            :props="defaultProps"
+            placeholder="请选择所属区域"
+            class="w-full"
+          />
+        </el-form-item>
 
-        <!-- 按钮组 -->
         <div class="flex justify-center space-x-4 mt-8">
           <el-button type="primary" class="!rounded-button" @click="handleSubmit">确认</el-button>
           <el-button class="!rounded-button" @click="handleCancel">取消</el-button>
         </div>
-      </div>
+      </el-form>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import type { TreeNode } from 'element-plus'
+import { ref, reactive } from 'vue'
+import { ElMessage } from 'element-plus'
+import { bindUserArea } from '@/api/customer'
 
 interface FormState {
   name: string
@@ -60,11 +50,19 @@ interface FormState {
   regions: string[]
 }
 
-const form = ref<FormState>({
+const formRef = ref()
+const form = reactive<FormState>({
   name: '',
   phone: '',
   department: '',
   regions: []
+})
+
+const rules = ref({
+  name: [{ required: true, message: '请输入顾问名称', trigger: 'blur' }],
+  phone: [{ required: true, message: '请输入手机号码', trigger: 'blur' }],
+  department: [{ required: true, message: '请输入所属部门', trigger: 'blur' }],
+  regions: [{ required: true, message: '请选择所属区域', trigger: 'change' }]
 })
 
 const defaultProps = {
@@ -101,17 +99,23 @@ const regionData = [
   }
 ]
 
-const handleSubmit = () => {
-  console.log('提交表单', form.value)
+const handleSubmit = async () => {
+  if (!formRef.value) return
+
+  try {
+    await formRef.value.validate()
+    await bindUserArea({ id: form.id, area: form.regions.join(',') })
+    ElMessage.success('提交成功')
+  } catch (error) {
+    ElMessage.error('提交失败')
+  }
 }
 
 const handleCancel = () => {
-  form.value = {
-    name: '',
-    phone: '',
-    department: '',
-    regions: []
-  }
+  form.name = ''
+  form.phone = ''
+  form.department = ''
+  form.regions = []
 }
 </script>
 

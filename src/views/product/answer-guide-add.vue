@@ -1,49 +1,79 @@
 <template>
   <div class="main-content min-h-screen bg-white p-6">
-    <h2 class="text-xl font-medium mb-8">新增/编辑作答指引模版</h2>
+    <h2 class="text-xl font-medium mb-8">{{ form.id ? '编辑' : '新增' }}作答指引模版</h2>
 
     <div class="space-y-6">
-      <div class="form-item">
-        <label class="required-label">模版名称</label>
-        <el-input v-model="form.name" placeholder="请输入模版名称" class="input" />
-      </div>
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
+        <el-form-item label="模版名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入模版名称" class="input" />
+        </el-form-item>
 
-      <div class="form-item">
-        <label class="required-label">模版内容</label>
-        <WangEditor height="400px" v-model:value="form.content" />
-      </div>
+        <el-form-item label="模版内容" prop="content">
+          <WangEditor height="400px" v-model:value="form.content" />
+        </el-form-item>
 
-      <div class="flex justify-center gap-4 mt-8">
-        <el-button type="primary" class="!rounded-button" @click="handleSubmit">保存</el-button>
-        <el-button class="!rounded-button" @click="handleCancel">另存为新模板</el-button>
-      </div>
+        <div class="flex justify-center gap-4 mt-8">
+          <el-button type="primary" class="!rounded-button" @click="handleSubmit">保存</el-button>
+          <el-button class="!rounded-button" @click="handleCancel">取消</el-button>
+        </div>
+      </el-form>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
-// import { QuillEditor } from '@vueup/vue-quill'
-// import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { addAnswerTemplate, editAnswerTemplate, getAnswerTemplateInfo } from '@/api/product'
+import { ElMessage } from 'element-plus'
 import WangEditor from '@/components/WangEditor/index.vue'
 
 const router = useRouter()
+const route = useRoute()
+const formRef = ref()
 
 const form = reactive({
   name: '',
-  content: ''
+  content: '',
+  id: null
 })
 
-const handleSubmit = () => {
-  // 处理表单提交
-  console.log('提交表单', form)
-  // 提交后跳转回列表页面
-  router.push('/product/answer-guide')
+const rules = ref({
+  name: [{ required: true, message: '请输入模版名称', trigger: 'blur' }],
+  content: [{ required: true, message: '请输入模版内容', trigger: 'blur' }]
+})
+
+onMounted(async () => {
+  const id = route.query.id
+  if (id) {
+    form.id = Number(id)
+    try {
+      const { data } = await getAnswerTemplateInfo({ id: form.id })
+      Object.assign(form, data)
+    } catch (error) {
+      ElMessage.error('获取模版详情失败')
+    }
+  }
+})
+
+const handleSubmit = async () => {
+  if (!formRef.value) return
+
+  try {
+    await formRef.value.validate()
+    if (form.id) {
+      await editAnswerTemplate(form)
+    } else {
+      await addAnswerTemplate(form)
+    }
+    ElMessage.success('提交成功')
+    router.push('/product/answer-guide')
+  } catch (error) {
+    ElMessage.error('提交失败')
+  }
 }
 
 const handleCancel = () => {
-  // 处理返回操作
   router.push('/product/answer-guide')
 }
 </script>
