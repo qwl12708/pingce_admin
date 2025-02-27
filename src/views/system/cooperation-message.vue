@@ -8,15 +8,23 @@
         <el-table-column label="序号" prop="id" width="100" />
         <el-table-column label="留言者姓名" prop="name" sortable />
         <el-table-column label="留言者电话" prop="phone" sortable />
-        <el-table-column label="留言时间" prop="create_time" sortable />
-        <el-table-column label="回复时间" prop="reply_time" sortable />
+        <el-table-column label="留言时间" prop="create_time" sortable>
+          <template #default="{ row }">
+            {{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+        </el-table-column>
+        <el-table-column label="回复时间" prop="replay_time" sortable>
+          <template #default="{ row }">
+            {{ dayjs(row.replay_time).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+        </el-table-column>
         <el-table-column label="留言内容" prop="content" sortable />
         <el-table-column label="回复状态" prop="reply_status" sortable />
-        <el-table-column label="回复人" prop="replier" sortable />
-        <el-table-column label="回复记录" prop="reply_record" sortable />
+        <el-table-column label="回复人" prop="reply_user" sortable />
+        <el-table-column label="回复记录" prop="replay_content" sortable />
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
-            <el-button type="text" size="small" @click="handleEdit(row)">回复</el-button>
+            <el-button type="primary" link size="small" @click="handleEdit(row)">回复</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -43,10 +51,10 @@
         class="rounded-lg"
       >
         <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" class="mt-4">
-          <el-form-item label="回复记录" prop="reply_record">
+          <el-form-item label="回复记录" prop="replay_content">
             <el-input
               type="textarea"
-              v-model="form.reply_record"
+              v-model="form.replay_content"
               placeholder="请输入回复记录"
               class="w-full !rounded-button"
             />
@@ -77,6 +85,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { getSupplierMessages, replySupplierMessage } from '@/api/system/user'
+import dayjs from 'dayjs'
 
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -90,12 +99,12 @@ const formRef = ref<FormInstance>()
 
 const form = reactive({
   id: null,
-  reply_record: '',
+  replay_content: '',
   reply_time: ''
 })
 
 const rules: FormRules = {
-  reply_record: [{ required: true, message: '请输入回复记录', trigger: 'blur' }],
+  replay_content: [{ required: true, message: '请输入回复记录', trigger: 'blur' }],
   reply_time: [{ required: true, message: '请选择回复时间', trigger: 'change' }]
 }
 
@@ -118,7 +127,7 @@ const handleSubmit = async () => {
       try {
         await replySupplierMessage({
           id: form.id,
-          replay_content: form.reply_record,
+          replay_content: form.replay_content,
           replay_time: form.reply_time
         })
         dialogVisible.value = false
@@ -137,7 +146,7 @@ const handleCancel = () => {
 
 const handleEdit = (row: any) => {
   form.id = row.id
-  form.reply_record = row.reply_record
+  form.replay_content = row.replay_content
   form.reply_time = row.reply_time
   dialogVisible.value = true
 }

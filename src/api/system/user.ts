@@ -213,7 +213,7 @@ export const getApprovalFlowInfo = (params: { id?: number }) =>
   })
 
 // 平台/自定义审批流程设置 - 获取流程列表
-export const getApprovalFlowList = (params: { page?: number; pageSize?: number }) =>
+export const getApprovalFlowList = (params: { page: number; pageSize: number }) =>
   request({
     url: '/platformApi/approval/flow/lst',
     method: 'GET',
@@ -227,6 +227,7 @@ export const editApprovalFlow = (data: {
   cc_user_id?: number
   info?: string
   type_id?: number
+  contents?: Array<{ name: string; type: number; uids?: string; role_id?: string }>
 }) =>
   request({
     url: '/platformApi/approval/flow/edit',
@@ -521,4 +522,51 @@ export const getIndustryList = (params: { id?: string }) =>
     url: INDUSTRY_PATH + '/lst',
     method: 'GET',
     params
+  })
+
+// 获取日志列表
+export const getLoglist = (params: { page: number; pageSize: number }) =>
+  request({
+    url: '/platformApi/log/lst',
+    method: 'GET',
+    params
+  })
+
+// 获取日志详情
+export const getLogInfo = (params: { id: number }) =>
+  request({
+    url: '/platformApi/log/info',
+    method: 'GET',
+    params
+  })
+
+// 数据统计/测评问卷统计
+export const getEvaluationTotal = (params: { page: number; pageSize: number }) =>
+  request({
+    url: '/platformApi/user/evaluation/total',
+    method: 'GET',
+    params
+  })
+
+// 数据统计/自助问卷统计
+export const getSelfTotal = (params: { page: number; pageSize: number }) =>
+  request({
+    url: '/platformApi/user/self/total',
+    method: 'GET',
+    params
+  })
+
+// 备份配置获取
+export const getBackupConfig = () =>
+  request({
+    url: '/platformApi/backup/config',
+    method: 'GET'
+  })
+
+// 备份配置设置
+export const setBackupConfig = (data: { content: string }) =>
+  request({
+    url: '/platformApi/backup/config/set',
+    method: 'POST',
+    data
   })

@@ -16,11 +16,21 @@
     <div class="bg-white rounded-lg shadow-sm">
       <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
         <el-table-column type="selection" width="55" />
-        <el-table-column label="序号" prop="id" width="100" />
-        <el-table-column label="日志类型" prop="name" />
-        <el-table-column label="日志信息" prop="tel" sortable />
-        <el-table-column label="操作用户" prop="role" />
-        <el-table-column label="记录时间" prop="createdTime" sortable />
+        <el-table-column label="ID" prop="id" width="100" />
+        <el-table-column label="用户名" prop="username" />
+        <el-table-column label="标题" prop="title" />
+        <el-table-column label="URL" prop="url" sortable />
+        <el-table-column label="IP" prop="ip" sortable />
+        <el-table-column label="记录时间" prop="create_time" sortable>
+          <template #default="{ row }">
+            {{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" fixed="right" width="120">
+          <template #default="{ row }">
+            <el-button type="primary" link class="!rounded-button" @click="handleDetail(row)"> 详情 </el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <div class="flex justify-between items-center p-4">
@@ -35,166 +45,46 @@
           @current-change="handleCurrentChange"
         />
       </div>
-
-      <el-dialog
-        v-model="dialogVisible"
-        title="新增用户"
-        width="500px"
-        :close-on-click-modal="false"
-        :show-close="true"
-        class="rounded-lg"
-      >
-        <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" class="mt-4">
-          <el-form-item label="用户名" prop="username">
-            <el-input v-model="form.username" placeholder="请输入" class="w-full !rounded-button" />
-          </el-form-item>
-
-          <el-form-item label="预留登录手机号" prop="phone">
-            <el-input v-model="form.phone" placeholder="请输入" class="w-full !rounded-button" />
-          </el-form-item>
-
-          <el-form-item label="用户角色" prop="role">
-            <el-select v-model="form.role" placeholder="请选择" class="w-full !rounded-button">
-              <el-option label="管理员" value="admin" />
-              <el-option label="普通用户" value="user" />
-              <el-option label="访客" value="guest" />
-            </el-select>
-          </el-form-item>
-
-          <el-form-item label="所在部门" prop="department">
-            <el-select v-model="form.department" placeholder="可选择" class="w-full !rounded-button">
-              <el-option label="技术部" value="tech" />
-              <el-option label="市场部" value="market" />
-              <el-option label="运营部" value="operation" />
-            </el-select>
-          </el-form-item>
-
-          <el-form-item label="网间企业信息" prop="businessInfo">
-            <div class="flex items-center gap-2">
-              <el-upload class="upload-demo" action="#" :auto-upload="false" :show-file-list="false">
-                <el-button type="primary" class="!rounded-button whitespace-nowrap">
-                  <el-icon class="mr-1"><Plus /></el-icon>上传
-                </el-button>
-              </el-upload>
-              <span class="text-gray-400 text-sm">支持 jpg、png 格式，大小不超过 2M</span>
-            </div>
-          </el-form-item>
-        </el-form>
-
-        <template #footer>
-          <div class="flex justify-end gap-4">
-            <el-button @click="handleCancel" class="!rounded-button whitespace-nowrap">取消</el-button>
-            <el-button type="primary" @click="handleSubmit" class="!rounded-button whitespace-nowrap">确定</el-button>
-          </div>
-        </template>
-      </el-dialog>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
-import { Delete, Plus } from '@element-plus/icons-vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import router from '@/router'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { getLoglist } from '@/api/system/user'
+import dayjs from 'dayjs'
 
+const router = useRouter()
 const searchKeyword = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(999)
+const total = ref(0)
 const selectedRows = ref<any[]>([])
 
-const tableData = ref([
-  {
-    id: 1,
-    name: '张三',
-    tel: '13800138000',
-    role: '管理员',
-    department: '技术部',
-    area: '北京市',
-    createdTime: '2021-09-01 12:00:00'
-  },
-  {
-    id: 2,
-    name: '李四',
-    tel: '13800138001',
-    role: 'HR',
-    department: '人力资源部',
-    area: '上海市',
-    createdTime: '2021-09-02 12:00:00'
-  },
-  {
-    id: 3,
-    name: '王五',
-    tel: '13800138002',
-    role: '员工',
-    department: '技术部',
-    area: '广州市',
-    createdTime: '2021-09-03 12:00:00'
-  }
-])
+const tableData = ref([])
 
-const dialogVisible = ref(false)
-const formRef = ref<FormInstance>()
-
-const form = reactive({
-  username: '',
-  phone: '',
-  role: '',
-  department: '',
-  businessInfo: ''
-})
-
-const rules = reactive<FormRules>({
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
-  ],
-  phone: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
-  ],
-  role: [{ required: true, message: '请选择用户角色', trigger: 'change' }],
-  department: [{ required: true, message: '请选择所在部门', trigger: 'change' }]
-})
-
-const handleSubmit = async () => {
-  if (!formRef.value) return
-
-  await formRef.value.validate(valid => {
-    if (valid) {
-      console.log('表单提交', form)
-      dialogVisible.value = false
-    }
-  })
+const fetchLogList = async () => {
+  const { data } = await getLoglist({ page: currentPage.value, pageSize: pageSize.value })
+  tableData.value = data.list
+  total.value = data.total
 }
 
-const handleCancel = () => {
-  dialogVisible.value = false
-}
+onMounted(() => {
+  fetchLogList()
+})
 
 const handleSearch = () => {
-  // 实现搜索逻辑
+  fetchLogList()
 }
 
 const handleReset = () => {
   searchKeyword.value = ''
+  fetchLogList()
 }
 
-const handleAdd = () => {
-  // 实现新增逻辑
-}
-
-const handleEdit = (row: any) => {
-  // 实现编辑逻辑
-}
-
-const handleDelete = (row: any) => {
-  // 实现删除逻辑
-}
-
-const handleBatchDelete = () => {
-  // 实现批量删除逻辑
+const handleDetail = (row: any) => {
+  router.push({ path: '/system/log/detail', query: { id: row.id } })
 }
 
 const handleSelectionChange = (rows: any[]) => {
@@ -203,14 +93,12 @@ const handleSelectionChange = (rows: any[]) => {
 
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  fetchLogList()
 }
 
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
-}
-
-const onAdd = () => {
-  dialogVisible.value = true
+  fetchLogList()
 }
 </script>
 

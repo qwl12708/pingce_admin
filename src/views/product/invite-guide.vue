@@ -20,7 +20,11 @@
           <el-button @click="onAdd" type="primary" class="!rounded-button whitespace-nowrap">
             <el-icon class="mr-1"><Plus /></el-icon>新增模版
           </el-button>
-          <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+          <el-button
+            :disabled="!selectedRows.length"
+            class="!rounded-button whitespace-nowrap"
+            @click="handleBatchDelete"
+          >
             <el-icon class="mr-1"><Delete /></el-icon>删除模版
           </el-button>
         </div>

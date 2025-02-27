@@ -3,50 +3,54 @@
     <el-form ref="formRef" :model="form" :rules="rules" label-width="140px" class="space-y-10">
       <el-form-item
         label="选择备份数据"
-        prop="title"
+        prop="selectedItems"
         :rules="[{ required: true, message: '选择备份数据', trigger: 'blur' }]"
       >
-        <el-checkbox-group class="flex flex-col" v-model="form.title">
-          <el-checkbox v-for="item in checkData" :label="item.value" :key="item.value">
-            {{ item.label }}
+        <el-checkbox-group class="flex flex-col" v-model="form.selectedItems">
+          <el-checkbox v-for="item in checkData" :label="item.name" :key="item.name">
+            {{ item.name }}
           </el-checkbox>
         </el-checkbox-group>
       </el-form-item>
     </el-form>
 
     <div class="flex justify-center gap-4 mt-8">
-      <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="onSubmit">保 存</el-button>
+      <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="onSubmit">确认备份</el-button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { getBackupConfig, setBackupConfig } from '@/api/system/user'
 
 const formRef = ref()
+const checkData = ref([])
 
 const form = ref({
-  name: ''
+  selectedItems: []
 })
 
-const checkData = [
-  { label: '当期客户汇总表', value: 'backup' },
-  { label: '产品套餐汇总表', value: 'backup-1' },
-  { label: '公告项目测评汇总表', value: 'backup-2' },
-  { label: '合同汇总表', value: 'backup-3' },
-  { label: '系统管理员汇总表', value: 'backup-4' },
-  { label: '系统测评问卷汇总表', value: 'backup-5' }
-]
-
 const rules = {
-  name: [{ required: true, message: '请选择是否必填', trigger: 'blur' }]
+  selectedItems: [{ required: true, message: '请选择备份数据', trigger: 'blur' }]
 }
+
+const fetchBackupConfig = async () => {
+  const { data } = await getBackupConfig()
+  checkData.value = data
+}
+
+onMounted(() => {
+  fetchBackupConfig()
+})
 
 const onSubmit = async () => {
   if (!formRef.value) return
 
-  await formRef.value.validate(valid => {
+  await formRef.value.validate(async valid => {
     if (valid) {
+      const content = checkData.value.filter(e => form.value.selectedItems.includes(e.name))
+      await setBackupConfig({ content: JSON.stringify(content) })
       console.log('submit form', form.value)
     }
   })

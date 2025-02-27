@@ -15,30 +15,37 @@
 
       <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="packageCode" label="套餐编号" width="120" />
-        <el-table-column prop="packageName" label="套餐名称" width="150" sortable />
+        <el-table-column prop="product_no" label="套餐编号" width="120" />
+        <el-table-column prop="name" label="套餐名称" width="150" sortable />
         <el-table-column prop="type" label="类别" width="100" sortable />
-        <el-table-column prop="availableSurveys" label="可使用问卷" width="180" sortable />
-        <el-table-column prop="region" label="限制区域" width="120" sortable />
+        <el-table-column prop="evaluation_name" label="可使用问卷" width="180" sortable />
+        <el-table-column prop="limit_area" label="限制区域" width="120" sortable />
         <el-table-column prop="price" label="产品价格(元)" width="120" />
-        <el-table-column prop="duration" label="使用周期" width="100" />
+        <el-table-column prop="day" label="使用周期" width="100" />
         <el-table-column label="状态" width="80">
           <template #default="{ row }">
             <div class="flex items-center">
-              <div :class="['w-2 h-2 rounded-full mr-2', row.status === '在用' ? 'bg-blue-500' : 'bg-red-500']"></div>
-              {{ row.status }}
+              <div :class="['w-2 h-2 rounded-full mr-2', row.status === 1 ? 'bg-blue-500' : 'bg-red-500']"></div>
+              {{ row.status === 1 ? '在用' : '冻结' }}
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="160" sortable />
-        <el-table-column prop="creator" label="创建人" width="100" />
-        <el-table-column prop="freezeTime" label="冻结时间" width="160" sortable />
-        <el-table-column prop="unfreezeTime" label="解冻时间" width="160" sortable />
+        <el-table-column prop="create_time" label="创建时间" width="160" sortable>
+          <template #default="{ row }">
+            {{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="creater" label="创建人" width="100" />
+        <el-table-column prop="status_time" label="状态时间" width="160" sortable>
+          <template #default="{ row }">
+            {{ dayjs(row.status_time).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" fixed="right" width="120">
           <template #default="{ row }">
             <el-button type="primary" link class="!rounded-button" @click="handleEdit(row)"> 编辑 </el-button>
             <el-button type="primary" link class="!rounded-button" @click="handleFreeze(row)">
-              {{ row.status === '在用' ? '冻结' : '解冻' }}
+              {{ row.status === 1 ? '冻结' : '解冻' }}
             </el-button>
           </template>
         </el-table-column>
@@ -61,59 +68,40 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Plus, Refresh } from '@element-plus/icons-vue'
 import router from '@/router'
+import { getProductList, updateProductStatus } from '@/api/product'
+import dayjs from 'dayjs'
 
 interface TableItem {
-  packageCode: string
-  packageName: string
-  type: string
-  availableSurveys: string
-  region: string
+  product_no: string
+  name: string
+  type: number
+  evaluation_name: string
+  limit_area: string[]
   price: number
-  duration: string
-  status: string
-  createTime: string
-  creator: string
-  freezeTime: string
-  unfreezeTime: string
+  day: number
+  status: number
+  create_time: number
+  creater: string
+  status_time: number
 }
 
-const tableData = ref<TableItem[]>([
-  {
-    packageCode: 'TCBH-001',
-    packageName: '校园通用测评包年',
-    type: '包年/月',
-    availableSurveys: '校园招聘通用测评问卷',
-    region: '杭州',
-    price: 5000.0,
-    duration: '365天',
-    status: '在用',
-    createTime: '2024-04-12 13:00',
-    creator: 'admin',
-    freezeTime: '2024-04-12 13:00',
-    unfreezeTime: '2024-04-12 13:00'
-  },
-  {
-    packageCode: 'TCBH-002',
-    packageName: '企业通用测评包月',
-    type: '包年/月',
-    availableSurveys: '企业通用测评问卷',
-    region: '上海',
-    price: 3000.0,
-    duration: '365天',
-    status: '冻结',
-    createTime: '2024-04-12 13:00',
-    creator: 'admin',
-    freezeTime: '2024-04-12 13:00',
-    unfreezeTime: '-'
-  }
-])
-
+const tableData = ref<TableItem[]>([])
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(999)
+const total = ref(0)
+
+const fetchProductList = async () => {
+  const { data } = await getProductList({ page: currentPage.value, pageSize: pageSize.value })
+  tableData.value = data.list
+  total.value = data.total
+}
+
+onMounted(() => {
+  fetchProductList()
+})
 
 const handleSelectionChange = (val: TableItem[]) => {
   console.log('selection change:', val)
@@ -124,20 +112,25 @@ const handleEdit = (row: TableItem) => {
   router.push({ path: '/product/add', query: { id: row.id } })
 }
 
-const handleFreeze = (row: TableItem) => {
+const handleFreeze = async (row: TableItem) => {
   console.log('freeze/unfreeze row:', row)
+  await updateProductStatus({ id: row.id })
+  fetchProductList()
 }
 
 const handleRefresh = () => {
   console.log('refresh table')
+  fetchProductList()
 }
 
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  fetchProductList()
 }
 
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
+  fetchProductList()
 }
 
 const onAddProduct = () => {

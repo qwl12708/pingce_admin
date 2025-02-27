@@ -19,7 +19,6 @@
         <el-button type="primary" @click="handleSubmit" class="!rounded-button whitespace-nowrap">
           保存并发布
         </el-button>
-        <el-button @click="handleCancel" class="!rounded-button whitespace-nowrap"> 返回 </el-button>
       </div>
     </el-form>
   </div>
@@ -80,15 +79,10 @@ const handleSubmit = async () => {
       await addCustomer(formData)
     }
     ElMessage.success('保存成功')
-    router.push('/system/customer-list')
+    router.push('/system/website-config')
   } catch (error) {
     ElMessage.error('保存失败')
   }
-}
-
-const handleCancel = () => {
-  // 返回上一页
-  history.back()
 }
 </script>
 

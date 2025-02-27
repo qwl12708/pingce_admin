@@ -35,7 +35,7 @@
         <el-table-column prop="creater" label="创建人" />
         <el-table-column prop="director_username" label="部门负责人">
           <template #default="{ row }">
-            {{ row.director_username || row.directorInfo.name }}
+            {{ row.director_username || row.directorInfo?.name }}
           </template>
         </el-table-column>
         <el-table-column prop="create_time" label="创建时间" />
@@ -184,6 +184,9 @@ const convertToTree = (data: any[]) => {
   const roots: any[] = []
 
   data.forEach(item => {
+    if (item.id === item.pid) {
+      item.pid = null
+    }
     map.set(item.id, { ...item, children: [] })
   })
 
@@ -271,13 +274,10 @@ const handleDelete = async (row: any) => {
   if (!res) return
   if (res.code === 200) {
     ElMessage.success('删除成功')
+    fetchDepartmentList()
     return
   }
   ElMessage.error('删除失败')
-}
-
-const handleBatchDelete = () => {
-  // 实现批量删除逻辑
 }
 
 const handleSelectionChange = (rows: any[]) => {

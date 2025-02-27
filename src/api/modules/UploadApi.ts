@@ -12,10 +12,11 @@ export const uploadImg = (data: FormData) =>
     _headers: { 'Content-Type': 'multipart/form-data' }
   })
 
-// 视频上传
-export const uploadVideo = (params: FormData) =>
+// 文件上传
+export const uploadFile = (data: FormData) =>
   request({
-    url: '/platformApi/upload/video',
+    url: '/platformApi/upload/file',
     method: 'POST',
-    params
+    data,
+    _headers: { 'Content-Type': 'multipart/form-data' }
   })

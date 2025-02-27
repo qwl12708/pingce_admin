@@ -8,20 +8,20 @@
       <el-form :model="form" label-width="120px">
         <div class="space-y-8">
           <!-- 服务协议 -->
-          <el-form-item label="服务协议">
-            <ImageUploader v-model:file="form.service_protocol_file" />
+          <el-form-item label="服务协议" class="!w-[400px]">
+            <FileUploader v-model:value="form.service_protocol_file" />
           </el-form-item>
           <!-- 隐私政策 -->
           <el-form-item label="隐私政策">
-            <ImageUploader v-model:file="form.privacy_protocol_file" />
+            <FileUploader v-model:value="form.privacy_protocol_file" />
           </el-form-item>
           <!-- 客户端管理使用说明文件 -->
           <el-form-item label="客户端管理使用说明文件">
-            <ImageUploader v-model:file="form.client_use_file" />
+            <FileUploader v-model:value="form.client_use_file" />
           </el-form-item>
           <!-- 首页"微信咨询"链接二维码上传 -->
           <el-form-item label="首页微信咨询二维码">
-            <ImageUploader v-model:file="form.wechat_file" />
+            <FileUploader v-model:value="form.wechat_file" />
           </el-form-item>
           <!-- 客服电话 -->
           <el-form-item label="客服电话">
@@ -49,7 +49,7 @@
 import { ref, onMounted } from 'vue'
 import { getOtherConfig, setOtherConfig } from '@/api/system/user'
 import WangEditor from '@/components/WangEditor/index.vue'
-import ImageUploader from '@/components/ImageUploader/index.vue'
+import FileUploader from '@/components/FileUploader/index.vue'
 
 const form = ref({
   service_protocol_file: '',
@@ -80,5 +80,8 @@ onMounted(() => {
 .el-textarea :deep(.el-textarea__inner) {
   min-height: 120px !important;
   resize: none;
+}
+.el-upload-list__item :deep {
+  width: 200px !important;
 }
 </style>

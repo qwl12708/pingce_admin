@@ -2,18 +2,13 @@
   <el-upload
     class="image-uploader flex items-center justify-center"
     :class="customClass"
-    :show-file-list="false"
     :before-upload="beforeUpload"
-    :http-request="uploadImage"
-    :list-type="listType"
+    :http-request="_uploadFile"
     v-model:file-list="fileList"
+    :on-remove="handleRemove"
   >
     <div>
-      <div v-if="!imageUrl" class="upload-placeholder">
-        <el-icon><Plus /></el-icon>
-        <div class="text-xs mt-1">上传</div>
-      </div>
-      <img v-else :src="imageUrl" class="uploaded-image" />
+      <el-button v-if="!fileUrl" type="primary">上传</el-button>
       <p v-if="tip">{{ tip }}</p>
     </div>
   </el-upload>
@@ -21,9 +16,8 @@
 
 <script lang="ts" setup>
 import { ref, defineProps, defineEmits, watch } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { uploadImg } from '@/api/modules/UploadApi'
+import { uploadFile } from '@/api/modules/UploadApi'
 
 const props = defineProps({
   value: String,
@@ -42,57 +36,65 @@ const props = defineProps({
   tip: {
     type: String,
     default: ''
-  },
-  listType: {
-    type: String,
-    default: 'picture-card',
-    validator: (value: string) => ['text', 'picture', 'picture-card'].includes(value)
   }
 })
 
 const emits = defineEmits(['update:value'])
 
-const imageUrl = ref(props.value)
+const fileUrl = ref(props.value)
 const fileList = ref([])
 
 watch(
   () => props.value,
   newValue => {
-    imageUrl.value = newValue
+    fileUrl.value = newValue
+    fileList.value = [{ name: newValue?.split('/').at(-1), url: newValue }]
   }
 )
 
 const beforeUpload = (file: File) => {
   const isImage = file.type.startsWith('image/')
-  if (!isImage) {
+  if (isImage) {
     ElMessage.error('文件类型错误！')
     return false
   }
-  const isLt10M = file.size / 1024 / 1024 < 10
 
-  if (!isLt10M) {
-    ElMessage.error('上传图片大小不能超过 10MB!')
+  const isLt3M = file.size / 1024 / 1024 < 3
+
+  if (!isLt3M) {
+    ElMessage.error('上传文件大小不能超过 3MB!')
     return false
   }
   return true
 }
 
-const uploadImage = async (e: any) => {
+const _uploadFile = async (e: any) => {
   const formData = new FormData()
   formData.append('file', e.file)
   try {
-    const response = await uploadImg(formData)
-    imageUrl.value = response.data.url
+    const response = await uploadFile(formData)
+    fileUrl.value = response.data.url
+    const filename = response.data.url.split('/').at(-1)
+    fileList.value = [
+      {
+        name: filename,
+        url: response.data.url
+      }
+    ]
     emits('update:value', response.data.url)
   } catch (error) {
-    ElMessage.error('图片上传失败')
+    ElMessage.error('文件上传失败')
   }
+}
+
+const handleRemove = (uploadFile, uploadFiles) => {
+  fileList.value = []
+  fileUrl.value = ''
 }
 </script>
 
 <style scoped>
 .image-uploader {
-  border: 1px dashed #d9d9d9;
   border-radius: 6px;
   cursor: pointer;
   position: relative;

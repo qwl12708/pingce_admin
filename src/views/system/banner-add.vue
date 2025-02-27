@@ -56,7 +56,6 @@
           <el-button v-if="!isDetailPage" type="primary" class="!rounded-button" @click="handleSubmit(formRef)">
             保存并发布
           </el-button>
-          <el-button class="!rounded-button" @click="handleCancel">返回</el-button>
         </div>
       </el-form>
     </div>
@@ -70,6 +69,7 @@ import { useRoute } from 'vue-router'
 import { getBannerInfo, createBanner, editBanner } from '@/api/website/banner'
 import ImageUploader from '@/components/ImageUploader/index.vue'
 import type { FormInstance } from 'element-plus'
+import router from '@/router'
 
 const typeEnum = {
   1: 'image',
@@ -131,13 +131,10 @@ const handleSubmit = async (formEl: FormInstance | undefined) => {
       await createBanner(form.value)
     }
     ElMessage.success('保存成功')
+    router.push('/system/website-config')
   } catch (error) {
     console.error('保存失败', error)
   }
-}
-
-const handleCancel = () => {
-  history.back()
 }
 </script>
 

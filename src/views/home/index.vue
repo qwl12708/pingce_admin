@@ -1,5 +1,3 @@
-
-
 <template>
   <div class="bg-gray-50">
     <div class="flex min-h-screen">
@@ -38,7 +36,7 @@
             <el-card>
               <div class="flex items-center mb-4">
                 <el-icon class="text-red-500">
-                  <img class="" src="../../assets/image/icons/icon-hetong.png" />
+                  <img class="" src="../../assets/image/icons/icon-contract.png" />
                 </el-icon>
                 <span class="ml-2 font-medium">待处理合同</span>
               </div>
@@ -197,7 +195,7 @@ const handleCustomerTaskClick = (item: any) => {
 
 const handleCustomerContractsClick = (item: any) => {
   console.log(item)
-  router.push({ path: '/hetong/list' })
+  router.push({ path: '/contract/list' })
 }
 </script>
 

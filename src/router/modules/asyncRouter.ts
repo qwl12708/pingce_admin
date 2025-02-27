@@ -80,8 +80,8 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
   },
   // 合同管理
   {
-    path: '/hetong',
-    name: 'hetong',
+    path: '/contract',
+    name: 'contract',
     component: Layout,
     meta: {
       title: '合同管理',
@@ -93,7 +93,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
     children: [
       {
         path: 'list',
-        component: () => import('@/views/hetong/index.vue'),
+        component: () => import('@/views/contract/index.vue'),
         meta: {
           title: '合同列表',
           icon: 'none',
@@ -103,7 +103,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
       },
       {
         path: 'add',
-        component: () => import('@/views/hetong/add.vue'),
+        component: () => import('@/views/contract/add.vue'),
         meta: {
           title: '新增合同',
           icon: 'none',
@@ -114,7 +114,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
       },
       {
         path: 'detail',
-        component: () => import('@/views/hetong/detail.vue'),
+        component: () => import('@/views/contract/detail.vue'),
         meta: {
           title: '合同详情',
           icon: 'none',
@@ -306,7 +306,16 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           isKeepAlive: true
         }
       },
-
+      {
+        path: 'log/detail',
+        component: () => import('@/views/system/log-detail.vue'),
+        meta: {
+          title: '操作日志详情',
+          icon: 'none',
+          roles: ['admin', 'visitor'],
+          hidden: true
+        }
+      },
       {
         path: 'config',
         component: () => import('@/views/system/config.vue'),

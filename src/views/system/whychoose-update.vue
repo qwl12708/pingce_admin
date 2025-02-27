@@ -71,7 +71,7 @@ const handleSubmit = async () => {
       await addAdvantage(form)
     }
     ElMessage.success('保存成功')
-    router.push('/system/home')
+    router.push('/website-config')
   } catch (error) {
     ElMessage.error('保存失败')
   }

@@ -8,7 +8,11 @@
             <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleAdd">
               <el-icon class="mr-1"><Plus /></el-icon>新增
             </el-button>
-            <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+            <el-button
+              :disabled="!selectedItems.length"
+              class="!rounded-button whitespace-nowrap"
+              @click="handleBatchDelete"
+            >
               <el-icon class="mr-1"><Delete /></el-icon>批量删除
             </el-button>
           </div>
@@ -57,7 +61,11 @@
             <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleAddClient">
               <el-icon class="mr-1"><Plus /></el-icon>新增
             </el-button>
-            <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDeleteClient">
+            <el-button
+              :disabled="!selectedClients.length"
+              class="!rounded-button whitespace-nowrap"
+              @click="handleBatchDeleteClient"
+            >
               <el-icon class="mr-1"><Delete /></el-icon>批量删除
             </el-button>
           </div>
@@ -153,12 +161,10 @@ const handleClientSelectionChange = (val: any[]) => {
 }
 
 const handleAdd = () => {
-  ElMessage.success('触发新增操作')
   router.push('/system/whychoose-update')
 }
 
 const handleEdit = (row: any) => {
-  ElMessage.success('触发编辑操作')
   router.push(`/system/whychoose-update?id=${row.id}`)
 }
 
@@ -188,12 +194,10 @@ const handleBatchDelete = async () => {
 }
 
 const handleAddClient = () => {
-  ElMessage.success('触发新增客户操作')
   router.push('/system/logo-add')
 }
 
 const handleEditClient = (row: any) => {
-  ElMessage.success('触发编辑客户操作')
   router.push(`/system/logo-add?id=${row.id}`)
 }
 

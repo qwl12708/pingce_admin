@@ -50,6 +50,33 @@ export const deleteProduct = (data: { ids?: string }) =>
   })
 
 // 获取产品套餐
+// [
+//     {
+//         "id": 1,
+//         "product_no": "TCBH20250217093948629",
+//         "name": "顶顶顶顶",
+//         "type": 1,
+//         "score": 1,
+//         "is_limit_area": 1,
+//         "limit_area": [
+//             [
+//                 1,
+//                 2,
+//                 3
+//             ]
+//         ],
+//         "day": 1,
+//         "price": "1.10",
+//         "evaluation_type": 1,
+//         "job_type_id": 1,
+//         "evaluation_id": 1,
+//         "status": 1,
+//         "status_time": 0,
+//         "creater": "admin",
+//         "create_time": 1739756388,
+//         "evaluation_name": ""
+//     }
+// ]
 export const getProductList = (params: { page?: number; pageSize?: number }) =>
   request({
     url: PRODUCT_PATH + '/lst',
@@ -64,6 +91,54 @@ export const getProductInfo = (params: { id?: number }) =>
     method: 'GET',
     params
   })
+
+// ------start
+
+// 更新产品状态 TODO:
+export const updateProductStatus = (data: { id?: number }) =>
+  request({
+    url: PRODUCT_PATH + '/status',
+    method: 'POST',
+    data
+  })
+
+// 获取评估报告列表
+export const getEvaluationReportList = (params: { tab?: string; keyword?: string; page?: number; pageSize?: number }) =>
+  request({
+    url: PRODUCT_PATH + '/evaluation-report/list',
+    method: 'GET',
+    params
+  })
+
+// 导出报告
+export const exportReport = () =>
+  request({
+    url: PRODUCT_PATH + '/evaluation-report/export',
+    method: 'POST'
+  })
+
+// 下载结果
+export const downloadResult = () =>
+  request({
+    url: PRODUCT_PATH + '/evaluation-report/download-result',
+    method: 'POST'
+  })
+
+// 上传报告
+export const uploadReport = () =>
+  request({
+    url: PRODUCT_PATH + '/evaluation-report/upload-report',
+    method: 'POST'
+  })
+
+// 上传对比表
+export const uploadComparison = () =>
+  request({
+    url: PRODUCT_PATH + '/evaluation-report/upload-comparison',
+    method: 'POST'
+  })
+
+// ------end
 
 // 添加作答指引模板
 export const addAnswerTemplate = (data: { name?: string; content?: string }) =>

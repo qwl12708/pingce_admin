@@ -55,9 +55,9 @@
           :page-sizes="[10, 20, 30, 40]"
           :total="total"
           layout="sizes, prev, pager, next"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
         />
-        <!-- @size-change="handleSizeChange" -->
-        <!-- @current-change="handleCurrentChange" -->
       </div>
     </div>
   </div>
@@ -135,7 +135,7 @@ const fetchBannerList = async () => {
   try {
     const response = await getBannerList()
     tableData.value = response.data
-    total.value = response.total || 999 // TODO: total
+    total.value = response.total || response.data.length
   } catch (error) {
     console.error('获取Banner列表失败', error)
   }
@@ -148,6 +148,14 @@ const formatDate = (timestamp: number) => {
 onMounted(() => {
   fetchBannerList()
 })
+
+const handleSizeChange = (val: number) => {
+  pageSize.value = val
+}
+
+const handleCurrentChange = (val: number) => {
+  currentPage.value = val
+}
 </script>
 
 <style scoped>

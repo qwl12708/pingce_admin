@@ -2,7 +2,7 @@
   <div class="main-content min-h-screen bg-white p-6">
     <!-- 合同详情头部 -->
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-medium">HTBH-001</h1>
+      <h1 class="text-2xl font-medium">{{ contractInfo.contract_no }}</h1>
       <div class="flex items-center gap-4">
         <el-button @click="goBack" type="default" class="!rounded-button whitespace-nowrap">返回</el-button>
       </div>
@@ -12,15 +12,15 @@
       <div class="flex items-center mb-4">
         <div class="flex items-center mr-8">
           <span class="text-gray-500">创建人：</span>
-          <span>admin</span>
+          <span>{{ contractInfo.creater }}</span>
         </div>
         <div class="flex items-center mr-8">
           <span class="text-gray-500">创建时间：</span>
-          <span>2022-01-19 10:37</span>
+          <span>{{ dayjs(contractInfo.create_time).format('YYYY-MM-DD HH:mm:ss') }}</span>
         </div>
         <div class="flex items-center mr-8">
           <span class="text-gray-500">状态：</span>
-          <span class="text-blue-500">待审核</span>
+          <span class="text-blue-500">{{ statusMap[contractInfo.status] }}</span>
         </div>
         <div class="flex items-center">
           <el-button type="primary" @click="showApprovalRecordDialog = true">审批记录</el-button>
@@ -44,23 +44,23 @@
       <div class="grid grid-cols-3 gap-6">
         <div class="flex items-center">
           <span class="text-gray-500 w-24">客户编号：</span>
-          <span>001</span>
+          <span>{{ contractInfo.customer_id }}</span>
         </div>
         <div class="flex items-center">
           <span class="text-gray-500 w-24">客户名称：</span>
-          <span>软件开发</span>
+          <span>{{ contractInfo.name }}</span>
         </div>
         <div class="flex items-center">
           <span class="text-gray-500 w-24">客户管理员：</span>
-          <span>小吴</span>
+          <span>{{ contractInfo.updater }}</span>
         </div>
         <div class="flex items-center">
           <span class="text-gray-500 w-24">合同编号：</span>
-          <span>HTBH-001</span>
+          <span>{{ contractInfo.contract_no }}</span>
         </div>
         <div class="flex items-center">
           <span class="text-gray-500 w-24">购买日期：</span>
-          <span>2024年05月07日13时</span>
+          <span>{{ dayjs(contractInfo.buy_time).format('YYYY-MM-DD HH:mm:ss') }} </span>
         </div>
       </div>
     </div>
@@ -73,23 +73,23 @@
         </h2>
         <div class="flex items-center space-x-4">
           <span class="text-gray-500">合计金额：</span>
-          <span class="text-blue-500 text-lg">¥ 24000.00</span>
+          <span class="text-blue-500 text-lg">¥ {{ contractInfo.money }}</span>
           <span class="text-gray-500">成交金额：</span>
-          <span class="text-red-500 text-lg">¥ 24000.00</span>
+          <span class="text-red-500 text-lg">¥ {{ contractInfo.real_money }}</span>
         </div>
       </div>
       <el-table :data="tableData" border>
         <el-table-column type="selection" width="55" />
         <el-table-column label="类别" prop="type" />
-        <el-table-column label="产品套餐" prop="package" />
-        <el-table-column label="可使用问卷" prop="usableQuestionnaire" />
-        <el-table-column label="金额(元)" prop="amount" />
-        <el-table-column label="使用期限" prop="period" />
-        <el-table-column label="限制地区" prop="area" />
+        <el-table-column label="产品套餐" prop="name" />
+        <el-table-column label="可使用问卷" prop="evaluation_name" />
+        <el-table-column label="金额(元)" prop="money" />
+        <el-table-column label="使用期限" prop="day" />
+        <el-table-column label="限制地区" prop="limit_area" />
         <el-table-column label="备注" prop="remark" />
-        <el-table-column label="成交金额(元)" prop="dealAmount" />
-        <el-table-column label="开通时间" prop="startTime" />
-        <el-table-column label="截止日期" prop="endTime" />
+        <el-table-column label="成交金额(元)" prop="real_money" />
+        <el-table-column label="开通时间" prop="open_time" />
+        <el-table-column label="截止日期" prop="end_time" />
       </el-table>
     </div>
 
@@ -140,66 +140,38 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getContractInfo, approvalContract } from '@/api/contract'
 import { Document, Tickets } from '@element-plus/icons-vue'
-import router from '@/router'
+import dayjs from 'dayjs'
 
-interface TableItem {
-  type: string
-  package: string
-  usableQuestionnaire: string
-  amount: number
-  period: string
-  area: string
-  remark: string
-  dealAmount: number
-  startTime: string
-  endTime: string
+const route = useRoute()
+const router = useRouter()
+
+const contractId = ref(route.query.id)
+const contractInfo = ref<any>({})
+const tableData = ref([])
+
+const statusMap = {
+  3: '已通过', // 3
+  2: '待审批', // 2
+  1: '未审批', // 1
+  0: '草稿' // 0
 }
-const tableData = ref<TableItem[]>([
-  {
-    type: '点数',
-    package: '8000',
-    usableQuestionnaire: '所有问卷',
-    amount: 8000.0,
-    period: '365天',
-    area: '杭州',
-    remark: '这是备注内容',
-    dealAmount: 8000.0,
-    startTime: '2024-04-12 13:00',
-    endTime: '2024-04-12 13:00'
-  },
-  {
-    type: '包年/月',
-    package: '不限问卷包年',
-    usableQuestionnaire: '所有问卷',
-    amount: 8000.0,
-    period: '365天',
-    area: '杭州',
-    remark: '这是备注内容',
-    dealAmount: 8000.0,
-    startTime: '2024-04-12 13:00',
-    endTime: '2024-04-12 13:00'
-  },
-  {
-    type: '点数',
-    package: '校园招聘通用测评包年',
-    usableQuestionnaire: '校园招聘通用测评问卷',
-    amount: 8000.0,
-    period: '365天',
-    area: '杭州',
-    remark: '这是备注内容',
-    dealAmount: 8000.0,
-    startTime: '2024-04-12 13:00',
-    endTime: '2024-04-12 13:00'
-  }
-])
+
+const fetchContractInfo = async () => {
+  const { data } = await getContractInfo({ id: Number(contractId.value) })
+  contractInfo.value = data
+  tableData.value = data.contract_content || []
+}
+
+onMounted(() => {
+  fetchContractInfo()
+})
 
 const showApprovalRecordDialog = ref(false)
-const approvalRecords = ref([
-  { approver: '张三15246372929（发起人）', time: '2024-04-12 13:00', result: '发起' },
-  { approver: '李四17817817888（审批人）', time: '2024-04-13 14:00', result: '驳回' }
-])
+const approvalRecords = ref(contractInfo.value.approvalRecords || [])
 
 const showApprovalDialog = ref(false)
 const approvalForm = ref({
@@ -207,13 +179,14 @@ const approvalForm = ref({
   comment: ''
 })
 
-const handleApprovalSubmit = () => {
-  console.log('审批结果', approvalForm.value)
+const handleApprovalSubmit = async () => {
+  await approvalContract({ ids: contractId.value })
   showApprovalDialog.value = false
+  fetchContractInfo()
 }
 
 const goBack = () => {
-  router.push('/hetong/list')
+  router.push('/contract/list')
 }
 </script>
 

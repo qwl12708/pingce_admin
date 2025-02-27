@@ -161,6 +161,7 @@ import {
   editApprovalFlow
 } from '@/api/system/user'
 import { Plus, User, UserFilled, Delete } from '@element-plus/icons-vue'
+import router from '@/router'
 
 interface FormData {
   name: string
@@ -212,17 +213,19 @@ const roleOptions = ref<any[]>([])
 const fetchRoleList = async () => {
   const response = await getRoleList()
   roleOptions.value = response.data.list.map((item: any) => ({
-    value: item.id,
+    value: item.id + '',
     label: item.name
   }))
+  console.log('roleOptions', roleOptions)
 }
 
 const fetchApprovalFlowInfo = async (id: string) => {
   const response = await getApprovalFlowInfo({ id: Number(id) })
   const data = response.data
+  console.log('%c [ data ]-224', 'font-size:13px; background:pink; color:#bf2c9f;', data)
   formData.name = data.name
   formData.description = data.info
-  nodes.value = JSON.parse(data.content).map((node: any) => ({
+  nodes.value = data.content.map((node: any) => ({
     ...node,
     approver: {
       ...node.approver,
@@ -230,6 +233,7 @@ const fetchApprovalFlowInfo = async (id: string) => {
       role_id: node.approver.role_id ? node.approver.role_id.split(',') : []
     }
   }))
+  console.log('nodes', nodes)
 }
 
 onMounted(() => {
@@ -334,6 +338,7 @@ const handlePublish = async () => {
       await createApprovalFlow(payload)
       ElMessage.success('发布成功')
     }
+    router.push('/system/approval-process')
   } catch (error) {
     ElMessage.error('操作失败')
   }

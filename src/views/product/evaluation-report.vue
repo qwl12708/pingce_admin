@@ -37,22 +37,22 @@
           <div class="space-x-2">
             <el-button @click="onAdd" type="primary" class="!rounded-button whitespace-nowrap"> 导出 </el-button>
             <template v-if="activeTab === 'pending'">
-              <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+              <el-button class="!rounded-button whitespace-nowrap" @click="handleDownloadResult">
                 测评结果批量下载
               </el-button>
-              <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+              <el-button class="!rounded-button whitespace-nowrap" @click="handleUploadReport">
                 线上测评报告批量上传
               </el-button>
-              <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+              <el-button class="!rounded-button whitespace-nowrap" @click="handleUploadComparison">
                 横向对比上传表批量上传
               </el-button>
             </template>
 
             <template v-if="activeTab === 'uploaded'">
-              <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+              <el-button class="!rounded-button whitespace-nowrap" @click="handleDownloadResult">
                 测评结果批量下载
               </el-button>
-              <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+              <el-button class="!rounded-button whitespace-nowrap" @click="handleDownloadResult">
                 测评报告批量下载
               </el-button>
             </template>
@@ -99,14 +99,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { Delete, Plus } from '@element-plus/icons-vue'
-import router from '@/router'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { getEvaluationReportList, exportReport, downloadResult, uploadReport, uploadComparison } from '@/api/product'
 
+const router = useRouter()
 const searchKeyword = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(999)
+const total = ref(0)
 const selectedRows = ref<any[]>([])
 const activeTab = ref('pending')
 
@@ -116,140 +117,30 @@ const tabs = [
   { key: 'uploaded', name: '已上传报告汇总' }
 ]
 
-const pendingTableData = ref([
-  {
-    id: 1,
-    name: '张三',
-    tel: '17890905656',
-    paper: '试卷A',
-    submitDate: '2025-11-27',
-    customerName: '客户名称',
-    productName: '项目名称',
-    result: '答题结果'
-  },
-  {
-    id: 1,
-    name: '张三',
-    tel: '17890905656',
-    paper: '试卷A',
-    submitDate: '2025-11-27',
-    customerName: '客户名称',
-    productName: '项目名称'
-  },
-  {
-    id: 2,
-    name: '李四',
-    tel: '17890905656',
-    paper: '试卷A',
-    submitDate: '2025-11-27',
-    customerName: '客户名称',
-    productName: '项目名称'
-  },
-  {
-    id: 3,
-    name: '张三丰',
-    tel: '17890905656',
-    paper: '试卷A',
-    submitDate: '2025-11-27',
-    customerName: '客户名称',
-    productName: '项目名称'
-  },
-  {
-    id: 4,
-    name: '李四鹏',
-    tel: '17890905656',
-    paper: '试卷A',
-    submitDate: '2025-11-27',
-    customerName: '客户名称',
-    productName: '项目名称'
-  }
-])
+const tableData = ref([])
 
-const waitingTableData = ref([
-  {
-    index: 1,
-    name: '李明阳',
-    phone: '15236236236',
-    questionnaire: '2023年校园招聘测评',
-    customer: '科技创新有限公司',
-    project: '2024春季校招',
-    endDate: '2024-04-12 13:00',
-    sendDate: '2024-04-12 13:00',
-    status: '未过期'
-  },
-  {
-    index: 2,
-    name: '王雅琪',
-    phone: '15236236237',
-    questionnaire: '校园招聘通用测评问卷',
-    customer: '未来科技有限公司',
-    project: '技术岗位招聘',
-    endDate: '2024-04-12 13:00',
-    sendDate: '2024-04-12 13:00',
-    status: '已过期'
-  }
-])
+const fetchTableData = async () => {
+  const { data } = await getEvaluationReportList({
+    tab: activeTab.value,
+    keyword: searchKeyword.value,
+    page: currentPage.value,
+    pageSize: pageSize.value
+  })
+  tableData.value = data.list
+  total.value = data.total
+}
 
-const uploadedTableData = ref([
-  {
-    id: 1,
-    name: '张三',
-    tel: '17890905656',
-    paper: '试卷A',
-    submitDate: '2025-11-27',
-    customerName: '客户名称',
-    productName: '项目名称',
-    result: '答题结果',
-    reportCategory: '报告类别',
-    evaluateReport: '测评报告',
-    uploadDate: '上传日期'
-  },
-  {
-    id: 1,
-    name: '张三',
-    tel: '17890905656',
-    paper: '试卷A',
-    submitDate: '2025-11-27',
-    customerName: '客户名称',
-    productName: '项目名称'
-  },
-  {
-    id: 2,
-    name: '李四',
-    tel: '17890905656',
-    paper: '试卷A',
-    submitDate: '2025-11-27',
-    customerName: '客户名称',
-    productName: '项目名称'
-  },
-  {
-    id: 3,
-    name: '张三丰',
-    tel: '17890905656',
-    paper: '试卷A',
-    submitDate: '2025-11-27',
-    customerName: '客户名称',
-    productName: '项目名称'
-  },
-  {
-    id: 4,
-    name: '李四鹏',
-    tel: '17890905656',
-    paper: '试卷A',
-    submitDate: '2025-11-27',
-    customerName: '客户名称',
-    productName: '项目名称'
-  }
-])
-
-const tableData = ref(pendingTableData.value) // 通过activeTab来切换不同的表格数据
+onMounted(() => {
+  fetchTableData()
+})
 
 const handleSearch = () => {
-  // 实现搜索逻辑
+  fetchTableData()
 }
 
 const handleReset = () => {
   searchKeyword.value = ''
+  fetchTableData()
 }
 
 const handleAdd = () => {
@@ -274,22 +165,33 @@ const handleSelectionChange = (rows: any[]) => {
 
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  fetchTableData()
 }
 
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
+  fetchTableData()
 }
 
-const onAdd = () => {
-  // 跳转到新增页面
-  router.push('/product/invite-guide-add')
+const onAdd = async () => {
+  await exportReport()
 }
 
 const onTabClick = (key: string) => {
   activeTab.value = key
-  // TODO: 根据key切换不同的表格数据
-  tableData.value =
-    key === 'pending' ? pendingTableData.value : key === 'waiting' ? waitingTableData.value : uploadedTableData.value
+  fetchTableData()
+}
+
+const handleDownloadResult = async () => {
+  await downloadResult()
+}
+
+const handleUploadReport = async () => {
+  await uploadReport()
+}
+
+const handleUploadComparison = async () => {
+  await uploadComparison()
 }
 </script>
 

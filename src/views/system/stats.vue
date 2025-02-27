@@ -32,26 +32,63 @@
             <el-icon class="mr-1"></el-icon>批量导出
           </el-button>
 
-          <el-button v-if="currentTab === 'home'" class="!rounded-button whitespace-nowrap" @click="handleBatchExport">
+          <el-button v-if="currentTab === '2'" class="!rounded-button whitespace-nowrap" @click="handleBatchExport">
             <el-icon class="mr-1"></el-icon>问卷下载
           </el-button>
-          <el-button v-if="currentTab === 'home'" class="!rounded-button whitespace-nowrap" @click="handleBatchExport">
+          <el-button v-if="currentTab === '2'" class="!rounded-button whitespace-nowrap" @click="handleBatchExport">
             <el-icon class="mr-1"></el-icon>统计报告下载
           </el-button>
         </div>
       </div>
 
-      <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
+      <el-table v-if="currentTab === '1'" :data="tableData" @selection-change="handleSelectionChange" class="w-full">
         <el-table-column type="selection" width="55" />
         <el-table-column label="问卷编号" prop="id" />
         <el-table-column label="问卷类别" prop="type" sortable />
-        <el-table-column label="问卷名称" prop="name" sortable />
-        <el-table-column label="问卷状态" prop="status" sortable />
-        <el-table-column label="题目总数" prop="total" />
-        <el-table-column label="总分" prop="point" />
-        <el-table-column label="标准答题时间（分钟）" prop="time" />
-        <el-table-column label="未提交试卷人数" prop="notSubmitTotal" sortable />
-        <el-table-column label="累计测评人数" prop="accuTime" sortable />
+        <el-table-column label="问卷名称" prop="questionnaire_name" sortable />
+        <el-table-column label="问卷状态" prop="questionnaire_status" sortable />
+        <el-table-column label="题目总数" prop="questions_num" />
+        <el-table-column label="总分" prop="questions_score" />
+        <el-table-column label="标准答题时间（分钟）" prop="answer_time" />
+        <el-table-column label="未提交试卷人数" prop="notSubmitTotal">
+          <template #default="{ row }">
+            {{ row.evaluation_num - row.answer_num }}
+          </template>
+        </el-table-column>
+        <el-table-column label="累计测评人数" prop="answer_num" sortable />
+      </el-table>
+
+      <el-table v-else :data="selfTableData" @selection-change="handleSelectionChange" class="w-full">
+        <el-table-column type="selection" width="55" />
+        <el-table-column label="客户编号" prop="id" />
+        <el-table-column label="客户名称" prop="name" sortable />
+        <el-table-column label="项目名称" prop="org_name" sortable />
+        <el-table-column label="项目类型" prop="type" sortable />
+        <el-table-column label="是否切屏" prop="is_change_screen" />
+        <el-table-column label="切屏次数" prop="change_screen_num" />
+        <el-table-column label="答题人数" prop="answer_num" sortable />
+        <el-table-column label="已生成报告数量" prop="report_num" sortable />
+        <el-table-column label="未读报告个人数" prop="no_read_report_num" sortable />
+        <el-table-column label="已过期人数" prop="expire_num" sortable />
+
+        <el-table-column label="问卷名称" prop="questionnaire_name" />
+        <el-table-column label="项目状态" prop="status" sortable />
+        <el-table-column label="是否查找答案" prop="is_seek_answer" />
+        <el-table-column label="创建时间" prop="create_time">
+          <template #default="{ row }">
+            {{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+        </el-table-column>
+        <el-table-column label="开始时间" prop="start_time">
+          <template #default="{ row }">
+            {{ dayjs(row.start_time).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+        </el-table-column>
+        <el-table-column label="结束时间" prop="end_time">
+          <template #default="{ row }">
+            {{ dayjs(row.end_time).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+        </el-table-column>
       </el-table>
 
       <div class="flex justify-between items-center p-4">
@@ -66,170 +103,55 @@
           @current-change="handleCurrentChange"
         />
       </div>
-
-      <el-dialog
-        v-model="dialogVisible"
-        title="新增用户"
-        width="500px"
-        :close-on-click-modal="false"
-        :show-close="true"
-        class="rounded-lg"
-      >
-        <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" class="mt-4">
-          <el-form-item label="用户名" prop="username">
-            <el-input v-model="form.username" placeholder="请输入" class="w-full !rounded-button" />
-          </el-form-item>
-
-          <el-form-item label="预留登录手机号" prop="phone">
-            <el-input v-model="form.phone" placeholder="请输入" class="w-full !rounded-button" />
-          </el-form-item>
-
-          <el-form-item label="用户角色" prop="role">
-            <el-select v-model="form.role" placeholder="请选择" class="w-full !rounded-button">
-              <el-option label="管理员" value="admin" />
-              <el-option label="普通用户" value="user" />
-              <el-option label="访客" value="guest" />
-            </el-select>
-          </el-form-item>
-
-          <el-form-item label="所在部门" prop="department">
-            <el-select v-model="form.department" placeholder="可选择" class="w-full !rounded-button">
-              <el-option label="技术部" value="tech" />
-              <el-option label="市场部" value="market" />
-              <el-option label="运营部" value="operation" />
-            </el-select>
-          </el-form-item>
-
-          <el-form-item label="网间企业信息" prop="businessInfo">
-            <div class="flex items-center gap-2">
-              <el-upload class="upload-demo" action="#" :auto-upload="false" :show-file-list="false">
-                <el-button type="primary" class="!rounded-button whitespace-nowrap">
-                  <el-icon class="mr-1"><Plus /></el-icon>上传
-                </el-button>
-              </el-upload>
-              <span class="text-gray-400 text-sm">支持 jpg、png 格式，大小不超过 2M</span>
-            </div>
-          </el-form-item>
-        </el-form>
-
-        <template #footer>
-          <div class="flex justify-end gap-4">
-            <el-button @click="handleCancel" class="!rounded-button whitespace-nowrap">取消</el-button>
-            <el-button type="primary" @click="handleSubmit" class="!rounded-button whitespace-nowrap">确定</el-button>
-          </div>
-        </template>
-      </el-dialog>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import { ref, onMounted } from 'vue'
+import { getEvaluationTotal, getSelfTotal } from '@/api/system/user'
+import dayjs from 'dayjs'
 
 const searchKeyword = ref('')
-const currentTab = ref('banner')
+const currentTab = ref('1')
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(999)
+const total = ref(0)
 const selectedRows = ref<any[]>([])
 const tabs = [
-  { key: 'banner', label: '测评问卷统计' },
-  { key: 'home', label: '自助项目统计' }
+  { key: '1', label: '测评问卷统计' },
+  { key: '2', label: '自助项目统计' }
 ]
 
-const tableData = ref([
-  {
-    id: 1,
-    name: '张三',
-    tel: '13800138000',
-    role: '管理员',
-    department: '技术部',
-    area: '北京市',
-    createdTime: '2021-09-01 12:00:00'
-  },
-  {
-    id: 2,
-    name: '李四',
-    tel: '13800138001',
-    role: 'HR',
-    department: '人力资源部',
-    area: '上海市',
-    createdTime: '2021-09-02 12:00:00'
-  },
-  {
-    id: 3,
-    name: '王五',
-    tel: '13800138002',
-    role: '员工',
-    department: '技术部',
-    area: '广州市',
-    createdTime: '2021-09-03 12:00:00'
+const tableData = ref([])
+const selfTableData = ref([])
+
+const fetchTableData = async () => {
+  const api = currentTab.value === '1' ? getEvaluationTotal : getSelfTotal
+  const { data } = await api({ page: currentPage.value, pageSize: pageSize.value })
+  if (currentTab.value === '1') {
+    tableData.value = data.list
+  } else {
+    selfTableData.value = data.list
   }
-])
-
-const dialogVisible = ref(false)
-const formRef = ref<FormInstance>()
-
-const form = reactive({
-  username: '',
-  phone: '',
-  role: '',
-  department: '',
-  businessInfo: ''
-})
-
-const rules = reactive<FormRules>({
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
-  ],
-  phone: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
-  ],
-  role: [{ required: true, message: '请选择用户角色', trigger: 'change' }],
-  department: [{ required: true, message: '请选择所在部门', trigger: 'change' }]
-})
-
-const handleSubmit = async () => {
-  if (!formRef.value) return
-
-  await formRef.value.validate(valid => {
-    if (valid) {
-      console.log('表单提交', form)
-      dialogVisible.value = false
-    }
-  })
+  total.value = data.total
 }
 
-const handleCancel = () => {
-  dialogVisible.value = false
-}
+onMounted(() => {
+  fetchTableData()
+})
 
 const handleSearch = () => {
-  // 实现搜索逻辑
+  fetchTableData()
 }
 
 const handleReset = () => {
   searchKeyword.value = ''
-}
-
-const handleAdd = () => {
-  // 实现新增逻辑
-}
-
-const handleEdit = (row: any) => {
-  // 实现编辑逻辑
-}
-
-const handleDelete = (row: any) => {
-  // 实现删除逻辑
+  fetchTableData()
 }
 
 const handleBatchExport = () => {
-  // 实现批量删除逻辑
+  // 实现批量导出逻辑
 }
 
 const handleSelectionChange = (rows: any[]) => {
@@ -238,19 +160,17 @@ const handleSelectionChange = (rows: any[]) => {
 
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  fetchTableData()
 }
 
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
-}
-
-const onAdd = () => {
-  dialogVisible.value = true
+  fetchTableData()
 }
 
 const handleTabChange = (tab: string) => {
-  alert(tab)
   currentTab.value = tab
+  fetchTableData()
 }
 </script>
 

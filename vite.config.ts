@@ -63,7 +63,7 @@ export default defineConfig({
     //自定义代理规则
     proxy: {
       '/api': {
-        target: 'http://hzcpcs.qifudaren.net/',
+        target: 'http://117.72.37.29:801/',
         changeOrigin: true,
         rewrite: path => path.replace(new RegExp(`^/api`), '')
       }

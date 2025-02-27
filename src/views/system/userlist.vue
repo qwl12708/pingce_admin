@@ -20,7 +20,11 @@
           <el-button @click="onAdd" type="primary" class="!rounded-button whitespace-nowrap">
             <el-icon class="mr-1"><Plus /></el-icon>新增
           </el-button>
-          <el-button class="!rounded-button whitespace-nowrap" @click="handleBatchDelete">
+          <el-button
+            :disabled="!selectedRows.length"
+            class="!rounded-button whitespace-nowrap"
+            @click="handleBatchDelete"
+          >
             <el-icon class="mr-1"><Delete /></el-icon>批量删除
           </el-button>
         </div>
@@ -40,7 +44,11 @@
             }}
           </template>
         </el-table-column>
-        <el-table-column label="创建时间" prop="create_time" sortable />
+        <el-table-column label="创建时间" prop="create_time" sortable>
+          <template #default="scope">
+            {{ dayjs(scope.row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+        </el-table-column>
       </el-table>
 
       <div class="flex justify-between items-center p-4">
@@ -113,6 +121,7 @@ import { Delete, Plus } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { getUserList, getDepartmentList, getRoleList, deleteUsers, createPlatformUser } from '@/api/system/user'
 import ImageUploader from '@/components/ImageUploader/index.vue'
+import dayjs from 'dayjs'
 
 const searchKeyword = ref('')
 const currentPage = ref(1)
@@ -227,6 +236,7 @@ const handleCurrentChange = (val: number) => {
 
 const onAdd = () => {
   dialogVisible.value = true
+  formRef.value?.resetFields()
 }
 
 const fetchUserList = async (params = {}) => {

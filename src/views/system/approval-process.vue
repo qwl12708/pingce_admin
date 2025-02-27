@@ -63,8 +63,12 @@ import router from '@/router'
 import { getApprovalFlowList } from '@/api/system/user'
 import dayjs from 'dayjs'
 
+const page = ref(1)
+const pageSize = ref(10)
 const roleValue = ref('1')
 const total = ref(0)
+const tableData = ref<any[]>([])
+
 const roleOptions = [
   {
     value: '1',
@@ -79,18 +83,15 @@ const roleOptions = [
     label: '合同审批3'
   }
 ]
-const currentPage = ref(1)
-const pageSize = ref(10)
-const tableData = ref<any[]>([])
 
 const fetchApprovalTypeList = async () => {
-  const response = await getApprovalFlowList()
-  tableData.value = response.data.map((item: any) => ({
+  const response = await getApprovalFlowList({ page: page.value, pageSize: pageSize.value })
+  tableData.value = response.data.list.map((item: any) => ({
     ...item,
     createTime: dayjs(item.create_time).format('YYYY-MM-DD HH:mm:ss')
   }))
 
-  total.value = response.data.length
+  total.value = response.data.total
 }
 
 onMounted(() => {
@@ -113,9 +114,11 @@ const handleStatus = (row: any) => {
 }
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  fetchApprovalTypeList()
 }
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
+  fetchApprovalTypeList()
 }
 </script>
 <style scoped>

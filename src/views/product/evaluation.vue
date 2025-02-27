@@ -168,7 +168,6 @@ const handleCurrentChange = (val: number) => {
 }
 
 const handleAdd = () => {
-  ElMessage.success('触发新增问卷操作')
   router.push('/product/evaluation-add')
 }
 

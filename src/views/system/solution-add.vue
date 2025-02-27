@@ -5,10 +5,10 @@
     <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" class="space-y-6">
       <el-form-item
         label="方案名称"
-        prop="name"
+        prop="title"
         :rules="[{ required: true, message: '请输入方案名称', trigger: 'blur' }]"
       >
-        <el-input v-model="form.name" placeholder="请输入" maxlength="50" show-word-limit class="w-full" />
+        <el-input v-model="form.title" placeholder="请输入" maxlength="50" show-word-limit class="w-full" />
       </el-form-item>
 
       <el-form-item label="排序" prop="sort">
@@ -26,7 +26,6 @@
 
     <div class="flex justify-center gap-4 mt-8">
       <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleSubmit"> 保存并发布 </el-button>
-      <el-button @click="handleCancel">取消</el-button>
     </div>
   </div>
 </template>
@@ -86,14 +85,10 @@ const handleSubmit = async () => {
       await addSolution(form)
     }
     ElMessage.success('保存成功')
-    router.push('/system/solution-list')
+    router.push('/system/website-config')
   } catch (error) {
     ElMessage.error('保存失败')
   }
-}
-
-const handleCancel = () => {
-  router.back()
 }
 </script>
 
