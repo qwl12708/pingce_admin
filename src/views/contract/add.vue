@@ -5,26 +5,36 @@
     <el-form :model="form" ref="formRef" label-width="120px">
       <div class="bg-white rounded-lg p-6 mb-6 shadow-sm">
         <div class="grid grid-cols-4 gap-6">
-          <el-form-item label="合同编号" prop="contractNo" required>
-            <el-input v-model="form.contractNo" placeholder="请输入" class="w-full" />
+          <el-form-item label="合同编号" prop="name" required>
+            <el-input v-model="form.name" placeholder="请输入合同编号" class="w-full" />
           </el-form-item>
-          <el-form-item label="客户名称" prop="customerId" required>
-            <el-select v-model="form.customerId" placeholder="请输入或选择" class="w-full">
-              <el-option v-for="item in customerOptions" :key="item.value" :label="item.label" :value="item.value" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="客户类型" prop="customerType" required>
-            <el-select v-model="form.customerType" placeholder="请输入或选择" class="w-full">
+          <el-form-item label="客户编号" prop="customer_id" required>
+            <el-select
+              v-model="form.customer_id"
+              placeholder="请输入客户编号"
+              class="w-full"
+              @change="handleCustomerChange"
+            >
               <el-option
-                v-for="item in customerTypeOptions"
+                v-for="item in customerOptions"
                 :key="item.value"
-                :label="item.label"
+                :label="item.userNoLabel"
                 :value="item.value"
               />
             </el-select>
           </el-form-item>
+          <el-form-item label="客户名称" prop="customerName" required>
+            <el-select
+              v-model="form.customerName"
+              placeholder="请选择客户名称"
+              class="w-full"
+              @change="handleCustomerChange"
+            >
+              <el-option v-for="item in customerOptions" :key="item.value" :label="item.label" :value="item.label" />
+            </el-select>
+          </el-form-item>
           <el-form-item label="客户管理员" prop="customerManager" required>
-            <el-select v-model="form.customerManager" placeholder="请输入或选择" class="w-full">
+            <el-select v-model="form.customerManager" placeholder="请选择客户管理员" class="w-full">
               <el-option v-for="item in managerOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
@@ -32,7 +42,7 @@
       </div>
       <!-- 套餐按钮组 -->
       <div class="flex gap-4 mb-6">
-        <el-button type="primary" class="!rounded-button" @click="showPackageDialog = true">选择套餐</el-button>
+        <el-button type="primary" class="!rounded-button" @click="handleShowPackageDialog">选择套餐</el-button>
         <el-button class="!rounded-button" @click="deletePackage">删除套餐</el-button>
       </div>
       <!-- 金额统计 -->
@@ -48,11 +58,11 @@
       <el-table :data="tableData" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
         <el-table-column label="类别" prop="type" width="120" />
-        <el-table-column label="产品套餐" prop="package" width="180" />
-        <el-table-column label="可使用问卷" prop="terms" />
-        <el-table-column label="金额(元)" prop="amount" width="120" />
-        <el-table-column label="使用期限" prop="period" width="120" />
-        <el-table-column label="限售地区" prop="region" width="120" />
+        <el-table-column label="产品套餐" prop="name" width="180" />
+        <el-table-column label="可使用问卷" prop="evaluation_name" />
+        <el-table-column label="金额(元)" prop="price" width="120" />
+        <el-table-column label="使用期限" prop="day" width="120" />
+        <el-table-column label="限售地区" prop="limit_area" width="120" />
         <el-table-column label="备注" prop="remark" />
         <el-table-column label="成交金额(元)" width="120">
           <template #default="scope">
@@ -67,8 +77,8 @@
       </el-table>
       <!-- 购买日期 -->
       <div class="mt-6 mb-8">
-        <el-form-item label="购买日期" prop="purchaseDate" required>
-          <el-date-picker v-model="form.purchaseDate" type="date" placeholder="请选择日期" class="w-full" />
+        <el-form-item label="购买日期" prop="buy_time" required>
+          <el-date-picker v-model="form.buy_time" type="date" placeholder="请选择日期" class="w-full" />
         </el-form-item>
       </div>
       <!-- 底部按钮 -->
@@ -79,14 +89,20 @@
     </el-form>
     <!-- 选择套餐弹窗 -->
     <el-dialog title="选择套餐" v-model.value:visible="showPackageDialog" style="width: 1000px">
-      <el-table :data="packageData" @selection-change="handlePackageSelectionChange">
+      <el-table
+        ref="tableRef"
+        :data="packageData"
+        row-key="id"
+        @selection-change="handlePackageSelectionChange"
+        :default-selection="selectedPackages"
+      >
         <el-table-column type="selection" width="55" />
         <el-table-column label="类别" prop="type" width="120" />
-        <el-table-column label="产品套餐" prop="package" width="180" />
-        <el-table-column label="可使用问卷" prop="terms" />
-        <el-table-column label="金额(元)" prop="amount" width="120" />
-        <el-table-column label="使用期限" prop="period" width="120" />
-        <el-table-column label="限售地区" prop="region" width="120" />
+        <el-table-column label="产品套餐" prop="name" width="180" />
+        <el-table-column label="可使用问卷" prop="evaluation_name" />
+        <el-table-column label="金额(元)" prop="price" width="120" />
+        <el-table-column label="使用期限" prop="day" width="120" />
+        <el-table-column label="限售地区" prop="limit_area" width="120" />
         <el-table-column label="备注" prop="remark" />
       </el-table>
       <div class="flex justify-center pt-4">
@@ -98,77 +114,95 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, nextTick } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { getInstitutionList, getInstitutionInfo } from '@/api/customer'
 import { addContract } from '@/api/contract'
+import { getUserList } from '@/api/system/user'
+import { getProductList } from '@/api/product'
 
+const tableRef = ref()
 const router = useRouter()
+const route = useRoute()
 const formRef = ref(null)
 
 const form = ref({
-  contractNo: '',
-  customerId: '',
-  customerType: '',
+  name: '',
+  customer_id: '',
+  customerName: '',
   customerManager: '',
-  purchaseDate: ''
+  buy_time: ''
 })
 
-const customerOptions = ref([
-  { value: '1', label: '杭州科技有限公司' },
-  { value: '2', label: '上海智能科技有限公司' }
-])
+const customerOptions = ref([])
+const managerOptions = ref([])
 
-const customerTypeOptions = ref([
-  { value: '1', label: '企业客户' },
-  { value: '2', label: '个人客户' }
-])
-
-const managerOptions = ref([
-  { value: '1', label: '张文轩' },
-  { value: '2', label: '刘雨晴' },
-  { value: '3', label: '陈宇航' }
-])
-
-const tableData = ref([
-  {
-    type: '点数',
-    package: '8000',
-    terms: '所有问卷',
-    amount: 8000.0,
-    period: '365天',
-    region: '杭州',
-    remark: '',
-    dealAmount: 8000.0,
-    startTime: ''
-  },
-  {
-    type: '包年/月',
-    package: '不限问卷包年',
-    terms: '所有问卷',
-    amount: 8000.0,
-    period: '365天',
-    region: '杭州',
-    remark: '',
-    dealAmount: 8000.0,
-    startTime: ''
-  }
-])
-
+const tableData = ref([])
+const packageData = ref([])
+const showPackageDialog = ref(false)
 const totalAmount = ref(24000.0)
 const dealAmount = ref(24000.0)
 const selectedPackages = ref([])
+const selectedTableRows = ref([])
+
+const fetchCustomerOptions = async () => {
+  const { data } = await getInstitutionList({ page: 1, pageSize: 100 })
+  customerOptions.value = data.list.map((item: any) => ({
+    value: item.id,
+    label: item.org_name,
+    userNoLabel: item.user_no
+  }))
+}
+
+const handleCustomerChange = async (value: any) => {
+  const selectedCustomer = customerOptions.value.find((item: any) => item.value === value)
+  if (selectedCustomer) {
+    form.value.customer_id = selectedCustomer.value
+    form.value.customerName = selectedCustomer.label
+  }
+}
+
+const _getUserList = async () => {
+  const { data } = await getUserList({ page: 1, pageSize: 20 })
+  managerOptions.value = data.list.map((item: any) => ({
+    value: item.id,
+    label: item.name
+  }))
+}
+
+onMounted(async () => {
+  await fetchCustomerOptions()
+  fetchPackageData()
+  _getUserList()
+  const { id } = route.query
+  if (id) {
+    const { data } = await getInstitutionInfo({ id: Number(id) })
+    form.value.customer_id = data.id
+    form.value.customerName = data.org_name
+  }
+})
 
 const handleSelectionChange = (val: any) => {
-  selectedPackages.value = val
+  selectedTableRows.value = val
 }
 
 const deletePackage = () => {
-  tableData.value = tableData.value.filter(item => !selectedPackages.value.includes(item))
+  if (selectedTableRows.value.length === 0) {
+    return
+  }
+  const ids = selectedTableRows.value.map(e => e.id)
+  tableData.value = tableData.value.filter(item => !ids.includes(item.id))
+  packageData.value.forEach(e => {
+    if (ids.includes(e.id)) {
+      tableRef.value?.toggleRowSelection(e, false)
+    }
+  })
 }
 
 const submitForm = async () => {
   await formRef.value.validate(async (valid: boolean) => {
     if (valid) {
+      console.log('%c [ form.value ]-188', 'font-size:13px; background:pink; color:#bf2c9f;', form.value)
       await addContract(form.value)
       router.push('/contract')
     }
@@ -179,27 +213,10 @@ const cancelForm = () => {
   router.push('/contract')
 }
 
-const showPackageDialog = ref(false)
-const packageData = ref([
-  {
-    type: '点数',
-    package: '8000',
-    terms: '所有问卷',
-    amount: 8000.0,
-    period: '365天',
-    region: '杭州',
-    remark: ''
-  },
-  {
-    type: '包年/月',
-    package: '不限问卷包年',
-    terms: '所有问卷',
-    amount: 8000.0,
-    period: '365天',
-    region: '杭州',
-    remark: ''
-  }
-])
+const fetchPackageData = async () => {
+  const { data } = await getProductList({ page: 1, pageSize: 100 })
+  packageData.value = data.list
+}
 
 const handlePackageSelectionChange = (val: any) => {
   selectedPackages.value = val
@@ -208,6 +225,11 @@ const handlePackageSelectionChange = (val: any) => {
 const handlePackageConfirm = () => {
   tableData.value = [...tableData.value, ...selectedPackages.value]
   showPackageDialog.value = false
+}
+
+const handleShowPackageDialog = async () => {
+  selectedPackages.value = tableData.value
+  showPackageDialog.value = true
 }
 </script>
 

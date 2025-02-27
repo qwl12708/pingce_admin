@@ -10,7 +10,9 @@
           <el-icon class="mr-2 text-blue-500">
             <img src="../../../assets/image/icons/all.png" />
           </el-icon>
-          <span>您共为 <span class="text-blue-500 font-medium">6</span> 个自助客户提供专业服务</span>
+          <span
+            >您共为 <span class="text-blue-500 font-medium">{{ total }}</span> 个自助客户提供专业服务</span
+          >
         </div>
         <div
           :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'one' }]"
@@ -46,11 +48,20 @@
         <el-table-column label="操作" fixed="right" width="300" align="center">
           <template #default="scope">
             <div class="flex gap-2">
-              <el-button type="primary" link class="!rounded-button whitespace-nowrap"> 查询 </el-button>
+              <el-button type="primary" @click="goRecord(scope.row.id)" link class="!rounded-button whitespace-nowrap">
+                查询
+              </el-button>
               <el-button @click="goDetail(scope.row.id)" type="primary" link class="!rounded-button whitespace-nowrap">
                 修改客户信息
               </el-button>
-              <el-button type="primary" link class="!rounded-button whitespace-nowrap"> 新增订单 </el-button>
+              <el-button
+                @click="goContract(scope.row.id)"
+                type="primary"
+                link
+                class="!rounded-button whitespace-nowrap"
+              >
+                新增订单
+              </el-button>
               <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="updataStatus(scope.row)">
                 {{ scope.row.status ? '解冻' : '冻结' }}
               </el-button>
@@ -106,8 +117,8 @@ const tableData = ref<TableItem[]>([])
 const fetchTableData = async () => {
   try {
     const { data } = await getInstitutionList({
-      page: [currentPage.value.toString()],
-      pageSize: pageSize.value.toString()
+      page: currentPage.value,
+      pageSize: pageSize.value
     })
     tableData.value = data.list
     total.value = data.total
@@ -123,6 +134,14 @@ onMounted(() => {
 
 const goDetail = id => {
   router.push(`/customer/add?type=1&id=${id}`)
+}
+
+const goContract = id => {
+  router.push(`/contract/add?id=${id}`)
+}
+
+const goRecord = id => {
+  router.push(`/customer/use-record?id=${id}`)
 }
 
 const onAddCustomer = () => {

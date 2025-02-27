@@ -46,7 +46,6 @@ export const checkStatus = (status: number) => {
   }
 }
 
-// Full config:  https://github.com/axios/axios#request-config
 const instance = axios.create({
   // baseURL: import.meta.env.VITE_API_URL,
   baseURL: '/api',

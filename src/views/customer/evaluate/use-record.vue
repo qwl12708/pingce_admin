@@ -1,15 +1,15 @@
 <template>
   <div class="main-content min-h-screen bg-white p-6">
     <div>
-      <el-tabs v-model="activeTab">
+      <el-tabs v-model="activeTab" @tab-click="handleTabClick">
         <el-tab-pane label="账户信息" name="account">
           <div class="p-6" style="width: 548px">
             <div class="bg-gradient-to-r from-blue-900 to-blue-800 rounded-lg p-6 mb-8">
               <h2 class="text-xl text-white font-medium mb-3">校园招聘通用测评包年套餐</h2>
               <p class="text-blue-100 text-sm mb-4">2024 年 7 月 30 日到期</p>
               <div class="flex gap-8">
-                <span class="text-blue-100">剩余点数：10000</span>
-                <span class="text-blue-100">活动赠送点数：2000</span>
+                <span class="text-blue-100">剩余点数：{{ scoreInfo.score_num }}</span>
+                <span class="text-blue-100">活动赠送点数：{{ scoreInfo.freeze_score_num }}</span>
               </div>
             </div>
             <div class="mb-8">
@@ -17,10 +17,10 @@
                 <el-icon class="text-blue-500"><Tickets /></el-icon>
                 <h3 class="font-medium">点数到期明细</h3>
               </div>
-              <el-table :data="pointsData" style="width: 100%">
-                <el-table-column prop="points" label="点数" />
-                <el-table-column prop="expireDate" label="截止日期" />
-                <el-table-column prop="purchaseDate" label="购买时间" />
+              <el-table :data="expireScoreData" style="width: 100%">
+                <el-table-column prop="score" label="点数" />
+                <el-table-column prop="expire_time" label="截止日期" />
+                <el-table-column prop="buy_time" label="购买时间" />
               </el-table>
             </div>
             <div>
@@ -28,11 +28,11 @@
                 <el-icon class="text-blue-500"><Box /></el-icon>
                 <h3 class="font-medium">套餐明细</h3>
               </div>
-              <el-table :data="packageData" style="width: 100%">
+              <el-table :data="usedProductData" style="width: 100%">
                 <el-table-column prop="name" label="套餐名称" />
-                <el-table-column prop="survey" label="适用问卷" />
-                <el-table-column prop="expireDate" label="截止日期" />
-                <el-table-column prop="purchaseDate" label="购买时间" />
+                <el-table-column prop="evaluation_name" label="适用问卷" />
+                <el-table-column prop="end_time" label="截止日期" />
+                <el-table-column prop="buy_time" label="购买时间" />
               </el-table>
             </div>
           </div>
@@ -40,31 +40,31 @@
 
         <el-tab-pane label="测评产品使用记录" name="usage">
           <div class="p-6">
-            <el-table :data="pointsData" style="width: 100%">
-              <el-table-column prop="oints" label="测评项目" />
-              <el-table-column prop="expireDate1" label="使用问卷" />
-              <el-table-column prop="purchaseDate" label="标准点数" />
-              <el-table-column prop="urchaseDate3" label="邀请评测人数" />
-              <el-table-column prop="urchaseDate4" label="冻结点数" />
-              <el-table-column prop="urchaseDate5" label="消耗点数" />
-              <el-table-column prop="urchaseDate6" label="操作者" />
-              <el-table-column prop="urchaseDate7" label="使用时间" />
+            <el-table :data="scoreProductData" style="width: 100%">
+              <el-table-column prop="project" label="测评项目" />
+              <el-table-column prop="evaluation_name" label="使用问卷" />
+              <el-table-column prop="standard_score" label="标准点数" />
+              <el-table-column prop="invite_count" label="邀请评测人数" />
+              <el-table-column prop="freeze_score_num" label="冻结点数" />
+              <el-table-column prop="used_score" label="消耗点数" />
+              <el-table-column prop="operator" label="操作者" />
+              <el-table-column prop="use_time" label="使用时间" />
             </el-table>
           </div>
         </el-tab-pane>
 
         <el-tab-pane label="产品套餐购买记录" name="purchase">
           <div class="p-6">
-            <el-table :data="pointsData" style="width: 100%">
-              <el-table-column prop="points" label="类别" />
-              <el-table-column prop="expireDate1" label="点数" />
-              <el-table-column prop="purchaseDate2" label="套餐" />
-              <el-table-column prop="purchaseDate3" label="可使用问卷" />
-              <el-table-column prop="purchaseDate4" label="购买日期" />
-              <el-table-column prop="purchaseDate5" label="合同编号" />
-              <el-table-column prop="purchaseDate6" label="开通时间" />
-              <el-table-column prop="purchaseDate7" label="截止日期" />
-              <el-table-column prop="note" label="备注" />
+            <el-table :data="allProductData" style="width: 100%">
+              <el-table-column prop="type" label="类别" />
+              <el-table-column prop="score" label="点数" />
+              <el-table-column prop="package" label="套餐" />
+              <el-table-column prop="evaluation_name" label="可使用问卷" />
+              <el-table-column prop="buy_time" label="购买日期" />
+              <el-table-column prop="contract_no" label="合同编号" />
+              <el-table-column prop="open_time" label="开通时间" />
+              <el-table-column prop="end_time" label="截止日期" />
+              <el-table-column prop="remark" label="备注" />
             </el-table>
           </div>
         </el-tab-pane>
@@ -72,38 +72,62 @@
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { getScoreInfo, getExpireScore, getUsedProduct, getScoreProduct, getAllProduct } from '@/api/customer'
 import { Tickets, Box } from '@element-plus/icons-vue'
 
+const route = useRoute()
+const customerId = ref(route.query.id)
+
 const activeTab = ref('account')
-const pointsData = ref([
-  {
-    points: 8000,
-    expireDate: '2024-04-12',
-    purchaseDate: '2024-04-12'
-  },
-  {
-    points: 2000,
-    expireDate: '2024-04-12',
-    purchaseDate: '2024-04-12'
+const scoreInfo = ref({ score_num: 0, freeze_score_num: 0 })
+const expireScoreData = ref([])
+const usedProductData = ref([])
+const scoreProductData = ref([])
+const allProductData = ref([])
+
+const fetchScoreInfo = async () => {
+  const { data } = await getScoreInfo({ id: [customerId.value] })
+  scoreInfo.value = data
+}
+
+const fetchExpireScore = async () => {
+  const { data } = await getExpireScore({ id: Number(customerId.value), page: 1, pageSize: 10 })
+  expireScoreData.value = data.list
+}
+
+const fetchUsedProduct = async () => {
+  const { data } = await getUsedProduct({ id: Number(customerId.value), page: 1, pageSize: 10 })
+  usedProductData.value = data.list
+}
+
+const fetchScoreProduct = async () => {
+  const { data } = await getScoreProduct({ id: Number(customerId.value), page: 1, pageSize: 10 })
+  scoreProductData.value = data.list
+}
+
+const fetchAllProduct = async () => {
+  const { data } = await getAllProduct({ id: Number(customerId.value), page: 1, pageSize: 10 })
+  allProductData.value = data.list
+}
+
+onMounted(() => {
+  fetchScoreInfo()
+  fetchExpireScore()
+  fetchUsedProduct()
+  fetchScoreProduct()
+})
+
+const handleTabClick = (tab: any) => {
+  if (tab.name === 'purchase') {
+    fetchAllProduct()
   }
-])
-const packageData = ref([
-  {
-    name: '企业人才测评套餐',
-    survey: '职业性格测评问卷',
-    expireDate: '2024-04-12',
-    purchaseDate: '2024-04-12'
-  },
-  {
-    name: '校园招聘测评套餐',
-    survey: '综合能力测评问卷',
-    expireDate: '2024-04-12',
-    purchaseDate: '2024-04-12'
-  }
-])
+}
 </script>
+
 <style scoped>
 .el-table {
   --el-table-border-color: #f0f0f0;

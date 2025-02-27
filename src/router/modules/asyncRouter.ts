@@ -55,7 +55,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
         }
       },
       {
-        path: 'customer-use-history',
+        path: 'use-record',
         component: () => import('@/views/customer/evaluate/use-record.vue'),
         meta: {
           title: '查看客户使用记录',

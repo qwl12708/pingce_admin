@@ -59,44 +59,18 @@ export const updateInstitutionStatus = (data: { id?: number }) =>
     data
   })
 
-// 获取客户列表
-/**
- *
- * @param params
- * @returns {
-    "code": 0,
-    "data": {
-        "list": [
-            {
-                "id": 0,
-                "org_name": "string",
-                "email": "string",
-                "phone": "string",
-                "phone1": "string",
-                "phone2": "string",
-                "contacts": "string",
-                "approve_status": 0,
-                "approval_info": "string",
-                "status": 0,
-                "project_num": 0,
-                "answer_num": 0,
-                "create_time": 0,
-                "industry_name": "string",
-                "counsellor_name": "string",
-                "counsellor_phone": "string",
-                "province_name": "string",
-                "city_name": "string"
-            }
-        ],
-        "total": 0,
-        "week_total": 0
-    },
-    "msg": "string"
-}
- */
-export const getInstitutionList = (params: { page?: string[]; pageSize?: string }) =>
+// 获取自助客户列表
+export const getInstitutionList = (params: { page?: number; pageSize?: number }) =>
   request({
-    url: INSTITUTION_PATH + '/lst',
+    url: INSTITUTION_PATH + '/self/lst',
+    method: 'GET',
+    params
+  })
+
+// 获取测评客户列表
+export const getEvaluationList = (params: { page?: number; pageSize?: number }) =>
+  request({
+    url: INSTITUTION_PATH + '/evaluation/lst',
     method: 'GET',
     params
   })
@@ -130,4 +104,44 @@ export const bindConsultant = (data: { id?: number; consultant_id?: number }) =>
     url: INSTITUTION_PATH + '/bind/consultant',
     method: 'POST',
     data
+  })
+
+// 获取客户可使用积分和冻结积分
+export const getScoreInfo = (params: { id: string[] }) =>
+  request({
+    url: INSTITUTION_PATH + '/score/info',
+    method: 'GET',
+    params
+  })
+
+// 获取客户点数到期时间
+export const getExpireScore = (params: { id: number; page: number; pageSize: number }) =>
+  request({
+    url: INSTITUTION_PATH + '/expire/score',
+    method: 'GET',
+    params
+  })
+
+// 获取客户使用中的套餐
+export const getUsedProduct = (params: { id: number; page: number; pageSize: number }) =>
+  request({
+    url: INSTITUTION_PATH + '/use/product',
+    method: 'GET',
+    params
+  })
+
+// 获取客户点数的套餐
+export const getScoreProduct = (params: { id: number; page: number; pageSize: number }) =>
+  request({
+    url: INSTITUTION_PATH + '/score/product',
+    method: 'GET',
+    params
+  })
+
+// 获取客户所有的套餐
+export const getAllProduct = (params: { id: number; page: number; pageSize: number }) =>
+  request({
+    url: INSTITUTION_PATH + '/all/product',
+    method: 'GET',
+    params
   })

@@ -104,8 +104,8 @@ const selectedIds = ref<string[]>([])
 const fetchTableData = async () => {
   try {
     const { data } = await getInstitutionList({
-      page: [currentPage.value.toString()],
-      pageSize: pageSize.value.toString()
+      page: currentPage.value,
+      pageSize: pageSize.value
     })
     tableData.value = data.list
     total.value = data.total
