@@ -54,7 +54,7 @@
     </div>
 
     <!-- 表格区域 -->
-    <el-table :data="tableData" style="width: 100%" class="mb-4" @selection-change="handleSelectionChange">
+    <el-table :data="tableData" style="width: 100%" class="mb-4">
       <el-table-column type="selection" width="55" />
       <el-table-column prop="contract_no" label="合同编号" width="120" />
       <el-table-column prop="customer_id" label="客户编号" width="100" />
@@ -62,11 +62,14 @@
       <el-table-column prop="buy_time" label="购买时间" width="160" />
       <el-table-column prop="creater" label="创建人" width="120" />
       <el-table-column prop="money" label="合同金额(元)" width="120" />
-      <el-table-column prop="status" label="合同状态" width="120">
-        <template #default="scope">
-          <el-tag :type="getStatusType(scope.row.status)">
-            {{ scope.row.status }}
-          </el-tag>
+      <el-table-column prop="status_name" label="合同状态" width="120">
+        <template #default="{ row }">
+          <div>
+            <span>{{ row.status_name }}</span>
+            <el-button v-if="row.status === 1" @click="_readContract(row.id)" link type="primary" size="small"
+              >阅读合同</el-button
+            >
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="approve_user_current" label="审批人" width="120" />
@@ -77,11 +80,11 @@
           <div class="flex gap-2">
             <el-button @click="goDetail(scope.row)" link type="primary" size="small">合同详情</el-button>
             <el-button
-              v-if="scope.row.status === '待审批'"
+              v-if="scope.row.status === 1"
               link
               type="primary"
               size="small"
-              @click="showApprovalDialog = true"
+              @click="handleShowDialog(scope.row.id)"
               >审批合同</el-button
             >
             <el-button v-if="scope.row.status === 3" link type="primary" size="small">编辑合同</el-button>
@@ -92,11 +95,11 @@
 
     <!-- 审批合同弹窗 -->
     <el-dialog title="审批合同" v-model.value:visible="showApprovalDialog">
-      <el-form :model="approvalForm" label-width="120px">
+      <el-form ref="formRef" :model="approvalForm" label-width="120px">
         <el-form-item label="审批结果">
-          <el-radio-group v-model="approvalForm.result">
-            <el-radio label="通过">通过</el-radio>
-            <el-radio label="不通过">不通过</el-radio>
+          <el-radio-group v-model="approvalForm.type">
+            <el-radio :label="1">通过</el-radio>
+            <el-radio :label="2">不通过</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="审批意见">
@@ -104,7 +107,7 @@
         </el-form-item>
       </el-form>
       <div class="flex justify-end pt-4">
-        <el-button @click="showApprovalDialog = false">取消</el-button>
+        <el-button @click="handleCloseDialog">取消</el-button>
         <el-button type="primary" @click="handleApprovalSubmit">确认</el-button>
       </div>
     </el-dialog>
@@ -131,19 +134,21 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getContractList, approvalContract } from '@/api/contract'
+import { getContractList, approvalContract, readContract } from '@/api/contract'
 import {
   ElButton,
   ElTable,
   ElTableColumn,
-  ElTag,
   ElPagination,
   ElInput,
   ElDialog,
   ElForm,
   ElFormItem,
   ElRadioGroup,
-  ElRadio
+  ElRadio,
+  ElMessage,
+  type FormInstance,
+  type FormRules
 } from 'element-plus'
 
 const router = useRouter()
@@ -156,7 +161,9 @@ const pass_count = ref(0)
 const total = ref(0)
 const pending_count = ref(0)
 const tableData = ref([])
-const selectedRows = ref([])
+
+const id = ref('')
+const formRef = ref<FormInstance>()
 
 const fetchContractList = async () => {
   const { data } = await getContractList({ page: currentPage.value, pageSize: pageSize.value })
@@ -167,19 +174,19 @@ const fetchContractList = async () => {
   pending_count.value = data.pending_count
 }
 
+const _readContract = async id => {
+  const res = await readContract({ id })
+  const { code } = res
+  if (code === 200) {
+    ElMessage.success('操作成功')
+    return
+  }
+  ElMessage.error('操作失败')
+}
+
 onMounted(() => {
   fetchContractList()
 })
-
-const getStatusType = (status: string) => {
-  const statusMap: Record<string, string> = {
-    3: 'success', // 3
-    2: 'warning', // 2
-    1: 'danger', // 1
-    0: 'info' // 0
-  }
-  return statusMap[status] || 'info'
-}
 
 const onAddContract = () => {
   router.push('/contract/add')
@@ -191,18 +198,35 @@ const goDetail = (row: any) => {
 
 const showApprovalDialog = ref(false)
 const approvalForm = ref({
-  result: '',
+  type: 1,
   comment: ''
 })
 
 const handleApprovalSubmit = async () => {
-  await approvalContract({ ids: selectedRows.value.map(row => row.id).join(',') })
+  await approvalContract({
+    id: Number(id.value),
+    type: Number(approvalForm.value.type),
+    comment: approvalForm.value.comment
+  })
   showApprovalDialog.value = false
+  id.value = ''
+  formRef.value?.resetFields()
   fetchContractList()
 }
 
-const handleSelectionChange = (rows: any[]) => {
-  selectedRows.value = rows
+// const handleSelectionChange = (rows: any[]) => {
+//   selectedRows.value = rows
+// }
+
+const handleShowDialog = contractId => {
+  console.log('%c [ id ]-222', 'font-size:13px; background:pink; color:#bf2c9f;', id)
+  showApprovalDialog.value = true
+  id.value = contractId
+}
+const handleCloseDialog = () => {
+  formRef.value?.resetFields()
+  showApprovalDialog.value = false
+  id.value = ''
 }
 </script>
 

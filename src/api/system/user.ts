@@ -570,3 +570,10 @@ export const setBackupConfig = (data: { content: string }) =>
     method: 'POST',
     data
   })
+
+// 获取当前登录用户的信息
+export const getCurrentUserInfo = () =>
+  request({
+    url: '/platformApi/user/person/info',
+    method: 'GET'
+  })

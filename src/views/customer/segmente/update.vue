@@ -5,15 +5,15 @@
     <div style="width: 500px" class="bg-white rounded-lg shadow p-6">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
         <el-form-item label="顾问名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入顾问名称" class="w-64" />
+          <el-input v-model="form.name" disabled placeholder="请输入顾问名称" class="w-64" />
         </el-form-item>
 
         <el-form-item label="手机号码" prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入手机号码" class="w-64" />
+          <el-input v-model="form.phone" disabled placeholder="请输入手机号码" class="w-64" />
         </el-form-item>
 
         <el-form-item label="所属部门" prop="department">
-          <el-input v-model="form.department" placeholder="请输入所属部门" class="w-64" />
+          <el-input v-model="form.department" disabled placeholder="请输入所属部门" class="w-64" />
         </el-form-item>
 
         <el-form-item label="所属区域" prop="regions">
@@ -31,7 +31,6 @@
 
         <div class="flex justify-center space-x-4 mt-8">
           <el-button type="primary" class="!rounded-button" @click="handleSubmit">确认</el-button>
-          <el-button class="!rounded-button" @click="handleCancel">取消</el-button>
         </div>
       </el-form>
     </div>
@@ -39,9 +38,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { bindUserArea } from '@/api/customer'
+import { bindUserArea, getAreas, getInstitutionInfo } from '@/api/customer'
+
+const router = useRouter()
+const route = useRoute()
 
 interface FormState {
   name: string
@@ -59,9 +62,6 @@ const form = reactive<FormState>({
 })
 
 const rules = ref({
-  name: [{ required: true, message: '请输入顾问名称', trigger: 'blur' }],
-  phone: [{ required: true, message: '请输入手机号码', trigger: 'blur' }],
-  department: [{ required: true, message: '请输入所属部门', trigger: 'blur' }],
   regions: [{ required: true, message: '请选择所属区域', trigger: 'change' }]
 })
 
@@ -70,52 +70,61 @@ const defaultProps = {
   label: 'label'
 }
 
-const regionData = [
-  {
-    id: 1,
-    label: '河南省',
-    children: [
-      {
-        id: 2,
-        label: '郑州市',
-        children: [
-          { id: 3, label: '二七区' },
-          { id: 4, label: '金水区' },
-          { id: 5, label: '管城回族区' },
-          { id: 6, label: '中原区' },
-          { id: 7, label: '高新区' },
-          { id: 8, label: '郑东新区' }
-        ]
-      }
-    ]
-  },
-  {
-    id: 9,
-    label: '山东省'
-  },
-  {
-    id: 10,
-    label: '安徽省'
+const regionData = ref([])
+
+onMounted(async () => {
+  fetchAreas()
+  const { id } = route.query
+  if (id) {
+    const { data } = await getInstitutionInfo({ id: Number(id) })
+    form.name = data.org_name
+    form.phone = data.phone
+    form.department = data.contacts
+    // form.regions = []
   }
-]
+})
+
+const fetchAreas = async () => {
+  try {
+    const { data } = await getAreas()
+    regionData.value = transformToTree(data)
+  } catch (error) {
+    console.error('获取测评顾问列表失败', error)
+  }
+}
+
+const transformToTree = data => {
+  const tree = []
+  const map = {}
+
+  data.forEach(item => {
+    map[item.id] = { ...item, label: item.name, children: [] }
+  })
+
+  data.forEach(item => {
+    if (item.pid === 0) {
+      tree.push(map[item.id])
+    } else {
+      if (map[item.pid]) {
+        map[item.pid].children.push(map[item.id])
+      }
+    }
+  })
+
+  return tree
+}
 
 const handleSubmit = async () => {
+  console.log('form.regions', form.regions)
   if (!formRef.value) return
 
   try {
     await formRef.value.validate()
-    await bindUserArea({ id: form.id, area: form.regions.join(',') })
+    await bindUserArea({ id: route.query.id, area: form.regions.join(',') })
     ElMessage.success('提交成功')
   } catch (error) {
     ElMessage.error('提交失败')
   }
-}
-
-const handleCancel = () => {
-  form.name = ''
-  form.phone = ''
-  form.department = ''
-  form.regions = []
 }
 </script>
 

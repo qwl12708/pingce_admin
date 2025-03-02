@@ -101,7 +101,15 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getEvaluationReportList, exportReport, downloadResult, uploadReport, uploadComparison } from '@/api/product'
+import {
+  getEvaluationReportList,
+  exportReport,
+  downloadResult,
+  uploadReport,
+  uploadComparison,
+  getDoingReportList,
+  getNoAnswerReportList
+} from '@/api/product'
 
 const router = useRouter()
 const searchKeyword = ref('')
@@ -120,9 +128,13 @@ const tabs = [
 const tableData = ref([])
 
 const fetchTableData = async () => {
-  const { data } = await getEvaluationReportList({
-    tab: activeTab.value,
-    keyword: searchKeyword.value,
+  const actionMap = {
+    pending: getDoingReportList,
+    waiting: getNoAnswerReportList,
+    uploaded: getEvaluationReportList
+  }
+  const { data } = await actionMap[activeTab.value]({
+    name: searchKeyword.value,
     page: currentPage.value,
     pageSize: pageSize.value
   })

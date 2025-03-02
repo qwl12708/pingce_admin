@@ -67,6 +67,44 @@ export const getInstitutionList = (params: { page?: number; pageSize?: number })
     params
   })
 
+// 获取划分客户列表
+/**
+ *
+ * @param params
+ * @returns
+ * {
+    "id": 1,
+    "user_no": "2024",
+    "org_name": "测试qq机构22",
+    "province_id": 1,
+    "city_id": 2,
+    "create_time": 1739400248,
+    "project_num": 0,
+    "contract_moey": "0.00",
+    "type": 1,
+    "contacts": "dddd",
+    "phone": "1111111",
+    "employees_num": 1,
+    "email": "111@qq.com",
+    "counsellor_name": "管理员",
+    "counsellor_phone": "12345678911",
+    "industry_name": "ddd",
+    "province_name": "河南省",
+    "city_name": "河北省"
+}
+ */
+export const getSegmenteList = (params: {
+  city_ids?: string
+  customer_ids?: string
+  page?: number
+  pageSize?: number
+}) =>
+  request({
+    url: INSTITUTION_PATH + '/lst',
+    method: 'GET',
+    params
+  })
+
 // 获取测评客户列表
 export const getEvaluationList = (params: { page?: number; pageSize?: number }) =>
   request({
@@ -144,4 +182,41 @@ export const getAllProduct = (params: { id: number; page: number; pageSize: numb
     url: INSTITUTION_PATH + '/all/product',
     method: 'GET',
     params
+  })
+
+// 获取地区列表
+/**
+ *
+ * @returns [
+      {
+        id: 1,
+        pid: 0,
+        name: '北京市'
+      },
+      {
+        id: 2,
+        pid: 1,
+        name: '市辖区'
+      },
+      {
+        id: 3,
+        pid: 0,
+        name: '天津市'
+      },
+      {
+        id: 4,
+        pid: 3,
+        name: '市辖区'
+      },
+      {
+        id: 5,
+        pid: 0,
+        name: '河北省'
+      }
+    ]
+ */
+export const getAreas = () =>
+  request({
+    url: '/manageapi/area/lst',
+    method: 'GET'
   })

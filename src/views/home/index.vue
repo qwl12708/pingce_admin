@@ -106,8 +106,8 @@
                 </div>
               </div>
               <div class="space-y-4">
-                <div v-for="(item, itemIndex) in section.items" :key="itemIndex" class="p-3 bg-gray-50 rounded">
-                  {{ item }}
+                <div v-for="(item, itemIndex) in section.list" :key="itemIndex" class="p-3 bg-gray-50 rounded">
+                  {{ item.name }}
                 </div>
               </div>
             </el-card>
@@ -119,7 +119,7 @@
 </template>
 
 <script lang="ts" setup>
-// import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import taocan1 from '@/assets/image/icons/icon-taocan1.png'
 import taocan2 from '@/assets/image/icons/icon-taocan2.png'
 import taocan3 from '@/assets/image/icons/icon-taocan3.png'
@@ -127,66 +127,109 @@ import taocan4 from '@/assets/image/icons/icon-taocan4.png'
 import taocan5 from '@/assets/image/icons/icon-taocan5.png'
 import taocan6 from '@/assets/image/icons/icon-taocan6.png'
 import { useRouter } from 'vue-router'
+import { getTaskStats, getContractStats, getCustomerStats, getProductStats, getQuestionnaire } from '@/api/home/index'
+
 const router = useRouter()
 
-const todoTasks = [
-  { count: 54, label: '三个月内服务期满客户' },
-  { count: 415, label: '新客户一周内首次建立测评项目' },
-  { count: 12, label: '待人工编制报告数' }
-]
+const todoTasks = ref()
 
-const todoContracts = [
-  { count: 54, label: '合同被退回数量' },
-  { count: 415, label: '合同待审批' },
-  { count: 415, label: '审批通过未查阅' }
-]
+const todoContracts = ref()
 
-const customerStats = [
-  { count: 54, label: '自助客户' },
-  { count: 54, label: '一周内新注册自助客户' },
-  { count: 54, label: '测评客户' },
-  { count: 415, label: '历史客户' }
-]
+const customerStats = ref([])
 
-const surveyStats = [
-  { count: 54, label: '测评问卷', highlight: false, danwei: '份' },
-  { count: 54, label: '累计测评人数', highlight: false, danwei: '人' },
-  { count: 545341, label: '累计使用人次最多的测评问卷', highlight: true, papelName: '问卷名称', danwei: '人次' },
-  { count: 545341, label: '近15天使用人次最多的测评问卷', highlight: true, papelName: '问卷名称', danwei: '人次' }
-]
+const surveyStats = ref([])
 
-const productSections = [
+const productSections = ref([
   {
     title: '最近15天新上线产品套餐',
     icon: taocan1,
-    items: ['企业人才测评基础套餐', '领导力发展评估套餐', '团队效能提升方案', '职业发展规划套餐']
+    list: []
   },
   {
     title: '最近15天新屏蔽产品套餐',
     icon: taocan2,
-    items: ['组织文化诊断套餐', '人才甄选与发展套餐', '员工敬业度调研套餐', '管理者能力评估套餐']
+    list: []
   },
   {
     title: '最近15天新解除屏蔽产品套餐',
     icon: taocan3,
-    items: ['职业倾向分析问卷', '领导力潜质评估', '团队协作能力测评', '岗位胜任力评估']
+    list: []
   },
   {
     title: '客户购买数量最多的产品套餐',
     icon: taocan4,
-    items: ['企业人才测评基础套餐', '领导力发展评估套餐', '团队效能提升方案', '职业发展规划套餐']
+    list: []
   },
   {
     title: '最近30天客户购买数量最多的产品套餐',
     icon: taocan5,
-    items: ['组织文化诊断套餐', '人才甄选与发展套餐', '员工敬业度调研套餐', '管理者能力评估套餐']
+    list: []
   },
   {
     title: '最近15天新交付问卷',
     icon: taocan6,
-    items: ['职业倾向分析问卷', '领导力潜质评估', '团队协作能力测评', '岗位胜任力评估']
+    list: []
   }
-]
+])
+
+onMounted(async () => {
+  const {
+    data: { money_num, week_num }
+  } = await getTaskStats()
+  todoTasks.value = [
+    { count: money_num, label: '三个月内服务期满客户' },
+    { count: week_num, label: '新客户一周内首次建立测评项目' },
+    { count: 0, label: '待人工编制报告数' }
+  ]
+
+  const {
+    data: { back_count, pass_count, pending_count }
+  } = await getContractStats()
+  todoContracts.value = [
+    { count: back_count, label: '合同被退回数量' },
+    { count: pending_count, label: '合同待审批' },
+    { count: pass_count, label: '审批通过未查阅' }
+  ]
+
+  const {
+    data: { all_user, evaluation_user, self_user, self_week_user }
+  } = await getCustomerStats()
+  customerStats.value = [
+    { count: self_user, label: '自助客户' },
+    { count: self_week_user, label: '一周内新注册自助客户' },
+    { count: evaluation_user, label: '测评客户' },
+    { count: all_user, label: '历史客户' }
+  ]
+
+  const {
+    data: { evaluator_num, questionnaire_num, use_max_questionnaire, use_max_questionnaire_15 }
+  } = await getQuestionnaire()
+  surveyStats.value = [
+    { count: questionnaire_num, label: '测评问卷', highlight: false, danwei: '份' },
+    { count: evaluator_num, label: '累计测评人数', highlight: false, danwei: '人' },
+    {
+      count: use_max_questionnaire.count,
+      label: '累计使用人次最多的测评问卷',
+      highlight: true,
+      papelName: use_max_questionnaire.questionnaire_name,
+      danwei: '人次'
+    },
+    {
+      count: use_max_questionnaire_15.count,
+      label: '近15天使用人次最多的测评问卷',
+      highlight: true,
+      papelName: use_max_questionnaire_15.name,
+      danwei: '人次'
+    }
+  ]
+
+  const productRes = await getProductStats()
+  const icons = [taocan1, taocan2, taocan3, taocan4, taocan5, taocan6]
+  productSections.value = productRes.data.map((e, i) => ({
+    ...e,
+    icon: icons[i]
+  }))
+})
 
 const handleCustomerTaskClick = (item: any) => {
   console.log(item)

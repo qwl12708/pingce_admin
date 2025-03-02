@@ -1,36 +1,42 @@
 import request from '@/plugins/request'
 
 // 新增合同
-export const addContract = (data: {
+export const addContract = ({
   /**
    * 审批ID
    */
-  approve_id?: number
+  approve_id,
   /**
    * 购买时间
    */
-  buy_time?: number
+  buy_time,
   /**
    * 合同包含套餐
    */
-  contract_content?: string
+  contract_content,
   /**
    * 客户id
    */
-  customer_id?: number
+  customer_id,
   /**
    * 合同名称
    */
-  name?: string
+  name
   /**
    * 0：草稿，1：审批中，2：审批通过，3：驳回，4：撤回
    */
-  status?: number
+  // status?: number
 }) => {
   return request({
     url: '/platformApi/contract/add',
     method: 'POST',
-    data
+    data: {
+      approve_id,
+      buy_time,
+      contract_content,
+      customer_id,
+      name
+    }
   })
 }
 
@@ -73,7 +79,7 @@ export const editContract = (data: {
 }
 
 // 合同审批
-export const approvalContract = (data: { id: number }) => {
+export const approvalContract = (data: { id: number; type: string; comment?: string }) => {
   return request({
     url: '/platformApi/contract/approve',
     method: 'POST',
@@ -121,7 +127,7 @@ export const approvalContract = (data: { id: number }) => {
 export const getContractInfo = (params: { id: number }) => {
   return request({
     url: '/platformApi/contract/info',
-    method: 'get',
+    method: 'GET',
     params
   })
 }
@@ -167,7 +173,16 @@ export const getContractInfo = (params: { id: number }) => {
 export const getContractList = (params: { page?: number; pageSize?: number }) => {
   return request({
     url: '/platformApi/contract/lst',
-    method: 'get',
+    method: 'GET',
     params
+  })
+}
+
+// 改变合同状态
+export const readContract = (data: { id: number }) => {
+  return request({
+    url: '/platformApi/contract/read',
+    method: 'POST',
+    data
   })
 }

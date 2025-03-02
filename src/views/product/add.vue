@@ -41,23 +41,23 @@
       </el-form-item>
 
       <!-- 测评问卷配置 -->
-      <el-form-item label="选择测评问卷" prop="evaluation_id" required>
-        <el-radio-group v-model="form.evaluation_id">
-          <el-radio v-for="item in questionnaireOptions" :key="item.value" :label="item.value">{{
+      <el-form-item label="问卷类别" prop="evaluation_type" required>
+        <el-radio-group v-model="form.evaluation_type">
+          <el-radio v-for="item in questionnaireTypeOptions" :key="item.value" :label="item.value">{{
             item.label
           }}</el-radio>
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item v-if="form.evaluation_id !== 1" label="选择测评问卷" prop="evaluation_id" required>
-        <el-select v-model="form.evaluation_id" placeholder="请选择问卷">
+      <el-form-item v-if="form.evaluation_type !== 1" label="问卷名称" prop="evaluation_id" required>
+        <el-select v-model="form.evaluation_id" placeholder="选择测评问卷">
           <el-option v-for="item in questionnaireOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
 
-      <el-form-item v-if="form.evaluation_id === 3" label="选择岗位类别" prop="evaluation_id" required>
-        <el-select v-model="form.evaluation_id" placeholder="请选择问卷">
-          <el-option v-for="item in questionnaireOptions" :key="item.value" :label="item.label" :value="item.value" />
+      <el-form-item v-if="form.evaluation_type === 3" label="选择岗位类别" prop="job_type" required>
+        <el-select v-model="form.job_type" placeholder="选择岗位类别">
+          <el-option v-for="item in industryOptions" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
 
@@ -73,7 +73,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { addProduct, editProduct, getProductInfo } from '@/api/product'
+import { addProduct, editProduct, getJobTypeList, getProductInfo, getQuestionnaireList } from '@/api/product'
 
 const router = useRouter()
 const route = useRoute()
@@ -87,7 +87,9 @@ const form = reactive({
   limit_area: [],
   day: '',
   price: '',
-  evaluation_id: 1
+  evaluation_type: 1,
+  evaluation_id: 1,
+  job_type: ''
 })
 
 const areaOptions = [
@@ -104,12 +106,15 @@ const durationOptions = [
   { value: 365, label: '365天' }
 ]
 
-const questionnaireOptions = [
+const questionnaireTypeOptions = [
   { value: 1, label: '所有问卷（不含定制）' },
   { value: 2, label: '通用测评问卷' },
-  { value: 3, label: '岗位生日力测评问卷' },
+  { value: 3, label: '岗位胜任力测评问卷' },
   { value: 4, label: '定制问卷' }
 ]
+const questionnaireOptions = ref([])
+
+const industryOptions = ref([])
 
 onMounted(async () => {
   const { id } = route.query
@@ -118,17 +123,27 @@ onMounted(async () => {
     const { data } = await getProductInfo({ id: Number(id) })
     Object.assign(form, data)
   }
+
+  const { data } = await getJobTypeList()
+  industryOptions.value = data || []
+
+  const res = await getQuestionnaireList({ page: 1, pageSize: 100 })
+  questionnaireOptions.value = res.data.list.map(({ name, id }) => ({
+    label: name,
+    value: id
+  }))
 })
 
 const handleSubmit = async () => {
   await formRef.value.validate(async (valid: boolean) => {
     if (valid) {
+      const p = form.evaluation_type == 1 ? { ...form, evaluation_id: null } : form
       if (isEdit.value) {
-        await editProduct(form)
+        await editProduct(p)
       } else {
-        await addProduct(form)
+        await addProduct(p)
       }
-      router.push('/product')
+      router.push('/product/list')
     }
   })
 }

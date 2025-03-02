@@ -40,10 +40,10 @@
                 <!-- 题目内容 -->
                 <div class="question-content">
                   <el-form-item
-                    :prop="`${getQuestionIndex(q.id)}.title`"
+                    :prop="`${getQuestionIndex(q.id)}.name`"
                     :rules="[{ required: true, message: '请输入题目内容', trigger: 'blur' }]"
                   >
-                    <el-input v-model="q.title" placeholder="请输入题目内容" class="question-title" />
+                    <el-input v-model="q.name" placeholder="请输入题目内容" class="question-name" />
                   </el-form-item>
                 </div>
 
@@ -70,16 +70,23 @@
               <div class="question-body">
                 <div class="flex items-center space-x-4 mb-2">
                   <span class="text-gray-600 w-20">计分方式</span>
-                  <el-select v-model="q.scoreType" class="w-48">
+                  <el-select v-model="q.check_content.scoring_type" class="w-48">
                     <el-option
-                      v-for="option in scoreOptions"
+                      v-for="option in optionsMap[q.type]"
                       :key="option.value"
                       :label="option.label"
                       :value="option.value"
                     />
                   </el-select>
-                  <span class="text-gray-600 ml-4">总分</span>
-                  <el-input-number v-model="q.totalScore" :min="0" :max="100" class="w-24" />
+                  <el-input-number
+                    v-if="q.check_content.scoring_type === 7"
+                    v-model="q.check_content.num"
+                    :min="0"
+                    :max="100"
+                    class="w-24"
+                  />
+                  <span class="text-gray-600 ml-4">分值</span>
+                  <el-input-number v-model="q.score" :min="0" :max="100" class="w-24" />
                   <span>分</span>
                 </div>
 
@@ -90,11 +97,13 @@
                     :rules="[{ validator: validateOptions, trigger: 'blur' }]"
                   >
                     <div class="options-container">
+                      <el-button v-if="q.type !== 'judge'" @click="addOption(q)"> 添加选项 </el-button>
+
                       <div v-for="(opt, idx) in q.options" :key="idx" class="option-item">
-                        <el-input v-model="opt.label" :disabled="q.type === 'judge'" class="option-input" />
+                        <el-input v-model="opt.title" :disabled="q.type === 'judge'" class="option-input" />
                         <el-input-number v-model="opt.score" :min="0" :step="1" controls-position="right" />
-                        <div style="cursor: pointer" @click="onChangeRadio(q.type, q.id, idx)">
-                          {{ opt.isAnswer === true ? '✅' : '❌' }}
+                        <div style="cursor: pointer" @click="onChangeRadio(q, idx)">
+                          {{ opt.answer === 1 ? '✅' : '❌' }}
                         </div>
                         <el-button
                           v-if="q.type !== 'judge'"
@@ -103,7 +112,6 @@
                           @click="removeOption(q, idx)"
                         />
                       </div>
-                      <el-button v-if="q.type !== 'judge'" @click="addOption(q)"> 添加选项 </el-button>
                     </div>
                   </el-form-item>
                 </template>
@@ -115,12 +123,16 @@
                     :rules="[{ validator: validateFillOptions, trigger: 'blur' }]"
                   >
                     <div class="fill-container">
+                      <el-button @click="addFillOption(q)"> 添加填空项 </el-button>
                       <div v-for="(opt, idx) in q.options" :key="idx" class="fill-item">
-                        <el-input v-model="opt.label" placeholder="填空项内容" style="width: 200px" />
+                        <el-input
+                          v-model="opt.title"
+                          placeholder="如有多个标准答案，请用分号隔开"
+                          style="width: 200px"
+                        />
                         <el-input-number v-model="opt.score" :min="0" :step="1" controls-position="right" />
                         <el-button type="danger" icon="Delete" @click="removeOption(q, idx)" />
                       </div>
-                      <el-button @click="addFillOption(q)"> 添加填空项 </el-button>
                     </div>
                   </el-form-item>
                 </template>
@@ -128,21 +140,21 @@
                 <!-- 文本类题目 -->
                 <template v-else>
                   <el-form-item
-                    :prop="`${getQuestionIndex(q.id)}.answer`"
-                    :rules="[{ required: true, message: '请输入参考答案', trigger: 'blur' }]"
+                    :prop="`${getQuestionIndex(q.id)}.content`"
+                    :rules="[{ required: true, message: '请输入答案', trigger: 'blur' }]"
                   >
                     <el-input
-                      v-model="q.answer"
+                      v-model="q.content"
                       :rows="q.type === 'short' ? 3 : 5"
                       type="textarea"
-                      placeholder="请输入参考答案"
+                      placeholder="多个关键词之间请用分号隔开。 "
                     />
                   </el-form-item>
                 </template>
 
                 <!-- 通用设置 -->
 
-                <el-form-item label="附件">
+                <el-form-item label="附件" prop="attachment">
                   <el-upload
                     v-model:file-list="q.attachments"
                     multiple
@@ -156,16 +168,6 @@
                       <div class="upload-tip">支持图片、音频、视频文件，单个不超过100MB</div>
                     </template>
                   </el-upload>
-                  <div v-if="q.attachments.length" class="attachment-list">
-                    <div v-for="file in q.attachments" :key="file.uid" class="attachment-item">
-                      <el-link :href="file.url" target="_blank">
-                        {{ file.name }}
-                      </el-link>
-                      <el-icon @click="handleRemoveFile(file, q.attachments)">
-                        <Close />
-                      </el-icon>
-                    </div>
-                  </div>
                 </el-form-item>
               </div>
             </el-card>
@@ -179,7 +181,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Menu, Close } from '@element-plus/icons-vue'
+import { Menu } from '@element-plus/icons-vue'
 import draggable from 'vuedraggable'
 
 // 生成唯一ID
@@ -192,23 +194,60 @@ const formRef = ref()
 const currentPage = ref(1)
 const pageSize = ref(10)
 const rules = []
-const scoreOptions = [
-  { value: '1', label: '唯一正确答案得分' },
-  { value: '2', label: '人工判分' },
-  { value: '3', label: '每个选项对应不同分值' },
+const allOptions = [
+  { value: 1, label: '唯一正确答案得分' },
+  { value: 2, label: '人工判分' },
+  { value: 3, label: '每个选项对应不同分值' },
 
-  { value: '4', label: '全部答对得分' },
-  { value: '5', label: '答对x个得几分，答错不得分' },
+  { value: 4, label: '全部答对得分' },
+  { value: 5, label: '答对__个得几分，答错不得分' },
 
-  { value: '6', label: '答出全部关键词才得分' },
-  { value: '5', label: '答对x个关键词得几分' }
+  { value: 6, label: '答出全部关键词才得分' },
+  { value: 7, label: '答对x个关键词得几分' }
+]
+
+const radioOptions = [
+  { value: 1, label: '唯一正确答案得分' },
+  { value: 2, label: '人工判分' },
+  { value: 3, label: '每个选项对应不同分值' }
+]
+
+const checkboxOptions = [
+  { value: 2, label: '人工判分' },
+  { value: 3, label: '每个选项对应不同分值' },
+  { value: 4, label: '全部答对得分' },
+  { value: 7, label: '答对__个得几分，答错不得分' }
+]
+
+const judgeOptions = [
+  { value: 1, label: '唯一正确答案得分' },
+  { value: 2, label: '人工判分' },
+  { value: 3, label: '每个选项对应不同分值' }
+]
+const fillOptions = [
+  { value: 2, label: '人工判分' },
+  { value: 3, label: '每个选项对应不同分值' },
+  { value: 4, label: '全部答对得分' },
+  { value: 5, label: '答对__个得几分，答错不得分' }
+]
+const shortOptions = [
+  { value: 2, label: '人工判分' },
+  { value: 6, label: '答出全部关键词才得分' },
+  { value: 7, label: '答对__个关键词得几分' }
 ]
 
 const scoreStandard = [
-  { value: '1', label: '与答案完全相同' },
-  { value: '2', label: '包含关键词即可' }
+  { value: 'same', label: '与答案完全相同' },
+  { value: 'include', label: '包含关键词即可' }
 ]
-
+const optionsMap = {
+  radio: radioOptions,
+  checkbox: checkboxOptions,
+  judge: judgeOptions,
+  fill: fillOptions,
+  short: shortOptions,
+  essay: shortOptions
+}
 // 题型选项
 const questionTypes = [
   { label: '单选题', value: 'radio' },
@@ -219,36 +258,73 @@ const questionTypes = [
   { label: '论述题', value: 'essay' }
 ]
 
+const getOptions = type => {
+  switch (type) {
+    case 'radio':
+      return [
+        { label: '选项A', score: 1, answer: 1 },
+        { label: '选项B', score: 0, answer: 0 },
+        { label: '选项C', score: 0, answer: 0 },
+        { label: '选项D', score: 0, answer: 0 }
+      ]
+    case 'checkbox':
+      return [
+        { label: '选项A', score: 1, answer: 1 },
+        { label: '选项B', score: 0, answer: 1 },
+        { label: '选项C', score: 0, answer: 0 },
+        { label: '选项D', score: 0, answer: 0 }
+      ]
+    case 'judge':
+      return [
+        { label: '正确', score: 1, answer: 1 },
+        { label: '错误', score: 0, answer: 0 }
+      ]
+    case 'fill':
+      return [
+        { label: '空一答案', score: 1, answer: '' },
+        { label: '空二答案', score: 2, answer: '' },
+        { label: '空三答案', score: 2, answer: '' }
+      ]
+    case 'short':
+      return shortOptions
+    case 'essay':
+      return shortOptions
+    default:
+      return []
+  }
+}
+
 // 初始化题目模板
-const createQuestion = type => ({
+const createQuestion = (type = 'radio') => ({
   id: generateId(),
   type, // 题目类型
-  title: '', // 标题
-  description: '', // 描述
-  scoreType: 1, // 计分方式
-  totalScore: 5, // 分值
+  name: '', // 标题
+  score: 5, // 分值
+  check_content: {
+    scoring_type: 2, // 计分方式
+    num: 1, // 答出多少个关键词，得num分
+    check_standard: 1 // 评判标准
+  },
   options:
     type === 'judge'
       ? [
-          { label: '正确', score: 1, isAnswer: true },
-          { label: '错误', score: 0, isAnswer: false }
+          { title: '正确', score: 1, answer: 1 },
+          { title: '错误', score: 0, answer: 0 }
         ]
       : type === 'radio'
       ? [
-          { label: '答案1', score: 1, isAnswer: true },
-          { label: '答案2', score: 0, isAnswer: false },
-          { label: '答案3', score: 0, isAnswer: false },
-          { label: '答案4', score: 0, isAnswer: false }
+          { title: '选项A', score: 1, answer: 1 },
+          { title: '选项B', score: 0, answer: 0 },
+          { title: '选项C', score: 0, answer: 0 },
+          { title: '选项D', score: 0, answer: 0 }
         ]
       : [
-          { label: '答案1', score: 1, isAnswer: true },
-          { label: '答案2', score: 0, isAnswer: true },
-          { label: '答案3', score: 0, isAnswer: false },
-          { label: '答案4', score: 0, isAnswer: false }
+          { title: '选项A', score: 1, answer: 1 },
+          { title: '选项B', score: 0, answer: 1 },
+          { title: '选项C', score: 0, answer: 0 },
+          { title: '选项D', score: 0, answer: 0 }
         ], // 题目选项
-  answer: type === 'judge' ? '正确' : type === 'checkbox' ? [] : '',
-  attachments: [], // 附件
-  correctAnswers: [] // 正确答案
+  attachments: [] // 附件
 })
 
 // 分页处理
@@ -285,7 +361,7 @@ const removeQuestion = id => {
 const copyQuestion = original => {
   const copied = JSON.parse(JSON.stringify(original))
   copied.id = generateId()
-  copied.title += ' (副本)'
+  copied.name += ' (副本)'
   copied.attachments = copied.attachments.map(file => ({
     ...file,
     uid: Symbol('file').toString()
@@ -313,8 +389,8 @@ const handleDragEnd = ({ oldIndex, newIndex }) => {
 const handleTypeChange = q => {
   if (q.type === 'judge') {
     q.options = [
-      { label: '正确', score: 1 },
-      { label: '错误', score: 0 }
+      { title: '正确', score: 1 },
+      { title: '错误', score: 0 }
     ]
     q.answer = '正确'
   } else {
@@ -325,7 +401,7 @@ const handleTypeChange = q => {
 
 // 选项操作
 const addOption = q => {
-  q.options.push({ label: '', score: 0 })
+  q.options.push({ title: '', score: 0 })
 }
 
 const removeOption = (q, index) => {
@@ -333,14 +409,14 @@ const removeOption = (q, index) => {
 }
 
 const addFillOption = q => {
-  q.options.push({ label: '', score: 1 })
+  q.options.push({ title: '', score: 1 })
 }
 
 // 验证逻辑
 const validateOptions = (_, value, callback) => {
   if (value.length < 2) {
     callback(new Error('至少需要2个选项'))
-  } else if (value.some(opt => !opt.label.trim())) {
+  } else if (value.some(opt => !opt.title.trim())) {
     callback(new Error('选项内容不能为空'))
   } else {
     callback()
@@ -350,7 +426,7 @@ const validateOptions = (_, value, callback) => {
 const validateFillOptions = (_, value, callback) => {
   if (value.length === 0) {
     callback(new Error('至少需要1个填空项'))
-  } else if (value.some(opt => !opt.label.trim())) {
+  } else if (value.some(opt => !opt.title.trim())) {
     callback(new Error('填空项内容不能为空'))
   } else {
     callback()
@@ -396,6 +472,8 @@ const validateAndSave = async () => {
     await formRef.value.validate()
     const data = questions.value.map(q => ({
       ...q,
+      content: q.options,
+      options: null,
       attachments: q.attachments.map(f => ({
         name: f.name,
         url: f.url,
@@ -414,16 +492,18 @@ const getQuestionIndex = id => {
   return questions.value.findIndex(q => q.id === id)
 }
 
-const onChangeRadio = (qType, qId, idx) => {
+const onChangeRadio = ({ type: qType, score, id: qId }, idx) => {
   const options = questions.value.find(e => e.id === qId).options
   if (qType === 'checkbox') {
-    options[idx].isAnswer = true
+    options[idx].answer = options[idx].answer === 1 ? 0 : 1
     return
   }
   options.forEach(e => {
-    e.isAnswer = false
+    e.answer = 0
+    e.score = 0
   })
-  options[idx].isAnswer = true
+  options[idx].answer = 1
+  options[idx].score = score
   questions.value = [...questions.value]
 }
 

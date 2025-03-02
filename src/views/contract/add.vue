@@ -38,6 +38,17 @@
               <el-option v-for="item in managerOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
+
+          <el-form-item label="审批流名称" prop="approve_id" required>
+            <el-select v-model="form.approve_id" placeholder="请选择客户管理员" class="w-full">
+              <el-option
+                v-for="item in approvalFlowOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
         </div>
       </div>
       <!-- 套餐按钮组 -->
@@ -54,27 +65,31 @@
           >成交金额：<span class="text-red-500">¥{{ dealAmount.toFixed(2) }}</span></span
         >
       </div>
-      <!-- 表格区域 -->
-      <el-table :data="tableData" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" />
-        <el-table-column label="类别" prop="type" width="120" />
-        <el-table-column label="产品套餐" prop="name" width="180" />
-        <el-table-column label="可使用问卷" prop="evaluation_name" />
-        <el-table-column label="金额(元)" prop="price" width="120" />
-        <el-table-column label="使用期限" prop="day" width="120" />
-        <el-table-column label="限售地区" prop="limit_area" width="120" />
-        <el-table-column label="备注" prop="remark" />
-        <el-table-column label="成交金额(元)" width="120">
-          <template #default="scope">
-            <el-input v-model="scope.row.dealAmount" placeholder="请输入" class="!bg-white border rounded" />
-          </template>
-        </el-table-column>
-        <el-table-column label="开通时间" width="180">
-          <template #default="scope">
-            <el-date-picker v-model="scope.row.startTime" type="date" placeholder="选择日期" />
-          </template>
-        </el-table-column>
-      </el-table>
+
+      <el-form-item prop="contract_content">
+        <!-- 表格区域 -->
+        <el-table :data="tableData" @selection-change="handleSelectionChange">
+          <el-table-column type="selection" width="55" />
+          <el-table-column label="类别" prop="type" width="120" />
+          <el-table-column label="产品套餐" prop="name" width="180" />
+          <el-table-column label="可使用问卷" prop="evaluation_name" />
+          <el-table-column label="金额(元)" prop="price" width="120" />
+          <el-table-column label="使用期限" prop="day" width="120" />
+          <el-table-column label="限售地区" prop="limit_area" width="120" />
+          <el-table-column label="备注" prop="remark" />
+          <el-table-column label="成交金额(元)" width="120">
+            <template #default="scope">
+              <el-input v-model="scope.row.real_money" placeholder="请输入" class="!bg-white border rounded" />
+            </template>
+          </el-table-column>
+          <el-table-column label="开通时间" width="180">
+            <template #default="scope">
+              <el-date-picker v-model="scope.row.open_time" type="date" placeholder="选择日期" />
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-form-item>
+
       <!-- 购买日期 -->
       <div class="mt-6 mb-8">
         <el-form-item label="购买日期" prop="buy_time" required>
@@ -87,6 +102,7 @@
         <el-button class="!rounded-button w-32" @click="cancelForm">不保存</el-button>
       </div>
     </el-form>
+
     <!-- 选择套餐弹窗 -->
     <el-dialog title="选择套餐" v-model.value:visible="showPackageDialog" style="width: 1000px">
       <el-table
@@ -114,11 +130,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getInstitutionList, getInstitutionInfo } from '@/api/customer'
 import { addContract } from '@/api/contract'
-import { getUserList } from '@/api/system/user'
+import { getUserList, getApprovalFlowList } from '@/api/system/user'
 import { getProductList } from '@/api/product'
 
 const tableRef = ref()
@@ -131,11 +147,12 @@ const form = ref({
   customer_id: '',
   customerName: '',
   customerManager: '',
-  buy_time: ''
+  buy_time: 0
 })
 
 const customerOptions = ref([])
 const managerOptions = ref([])
+const approvalFlowOptions = ref([])
 
 const tableData = ref([])
 const packageData = ref([])
@@ -151,6 +168,14 @@ const fetchCustomerOptions = async () => {
     value: item.id,
     label: item.org_name,
     userNoLabel: item.user_no
+  }))
+}
+
+const fetchApprovalFlowOptions = async () => {
+  const { data } = await getApprovalFlowList({ page: 1, pageSize: 100 })
+  approvalFlowOptions.value = data.list.map((item: any) => ({
+    value: item.id,
+    label: item.name
   }))
 }
 
@@ -171,6 +196,7 @@ const _getUserList = async () => {
 }
 
 onMounted(async () => {
+  fetchApprovalFlowOptions()
   await fetchCustomerOptions()
   fetchPackageData()
   _getUserList()
@@ -200,10 +226,25 @@ const deletePackage = () => {
 }
 
 const submitForm = async () => {
+  console.log('%c [ form.value ]-188', 'font-size:13px; background:pink; color:#bf2c9f;', form.value)
+  const contract_content = JSON.stringify(
+    tableData.value.map(({ id, real_money, open_time }) => ({
+      id,
+      real_money,
+      open_time
+    }))
+  )
+  console.log('%c [ contract_content ]-227', 'font-size:13px; background:pink; color:#bf2c9f;', tableData.value)
+
   await formRef.value.validate(async (valid: boolean) => {
     if (valid) {
-      console.log('%c [ form.value ]-188', 'font-size:13px; background:pink; color:#bf2c9f;', form.value)
-      await addContract(form.value)
+      const buy_time = new Date(form.value.buy_time).getTime() / 1000
+
+      await addContract({
+        ...form.value,
+        buy_time,
+        contract_content
+      })
       router.push('/contract')
     }
   })

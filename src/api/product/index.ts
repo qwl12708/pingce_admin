@@ -15,6 +15,7 @@ export const addProduct = (data: {
   price?: number
   evaluation_type?: number
   evaluation_id?: number
+  job_type?: string
 }) =>
   request({
     url: PRODUCT_PATH + '/add',
@@ -34,6 +35,7 @@ export const editProduct = (data: {
   evaluation_type?: number
   evaluation_id?: number
   id?: number
+  job_type?: string
 }) =>
   request({
     url: PRODUCT_PATH + '/edit',
@@ -102,10 +104,26 @@ export const updateProductStatus = (data: { id?: number }) =>
     data
   })
 
-// 获取评估报告列表
-export const getEvaluationReportList = (params: { tab?: string; keyword?: string; page?: number; pageSize?: number }) =>
+// 测评报告 - 待编制报告汇总
+export const getDoingReportList = (params: { tab?: string; keyword?: string; page?: number; pageSize?: number }) =>
   request({
-    url: PRODUCT_PATH + '/evaluation-report/list',
+    url: '/platformApi/doing/report/statistics',
+    method: 'GET',
+    params
+  })
+
+// 测评报告 - 未作答受测者汇总
+export const getNoAnswerReportList = (params: { name?: string; page?: number; pageSize?: number }) =>
+  request({
+    url: '/platformApi/no/answer/statistics',
+    method: 'GET',
+    params
+  })
+
+// 测评报告 - 已上传报告汇总
+export const getEvaluationReportList = (params: { name?: string; page?: number; pageSize?: number }) =>
+  request({
+    url: '/platformApi/report/statistics',
     method: 'GET',
     params
   })
@@ -181,7 +199,7 @@ export const getAnswerTemplateList = (params: { name?: string; page?: number; pa
   })
 
 // 创建岗位类型
-export const addJobType = (data: { name?: string }) =>
+export const addjob_type = (data: { name?: string }) =>
   request({
     url: QUESTIONNAIRE_PATH + '/job/type/add',
     method: 'POST',
@@ -199,7 +217,7 @@ export const addJob = (data: { name?: string }) =>
 // 获取岗位类型列表
 export const getJobTypeList = () =>
   request({
-    url: QUESTIONNAIRE_PATH + '/job/type/lst',
+    url: '/platformApi/job/type/lst',
     method: 'GET'
   })
 
