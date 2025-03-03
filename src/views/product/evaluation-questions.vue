@@ -69,7 +69,7 @@
               <!-- 题目主体内容 -->
               <div class="question-body">
                 <div class="flex items-center space-x-4 mb-2">
-                  <span class="text-gray-600 w-20">计分方式</span>
+                  <span class="text-gray-600 w-20">计分方式：</span>
                   <el-select v-model="q.check_content.scoring_type" class="w-48">
                     <el-option
                       v-for="option in optionsMap[q.type]"
@@ -78,14 +78,12 @@
                       :value="option.value"
                     />
                   </el-select>
-                  <el-input-number
-                    v-if="q.check_content.scoring_type === 7"
-                    v-model="q.check_content.num"
-                    :min="0"
-                    :max="100"
-                    class="w-24"
-                  />
-                  <span class="text-gray-600 ml-4">分值</span>
+                  <template v-if="q.check_content.scoring_type === 7">
+                    <span class="text-gray-600 ml-4">答对</span>
+                    <el-input-number v-model="q.check_content.num" :min="0" :max="100" class="w-24" />
+                    <span class="text-gray-600">个</span>
+                  </template>
+                  <span class="text-gray-600 ml-4">分值：</span>
                   <el-input-number v-model="q.score" :min="0" :max="100" class="w-24" />
                   <span>分</span>
                 </div>
@@ -140,11 +138,11 @@
                 <!-- 文本类题目 -->
                 <template v-else>
                   <el-form-item
-                    :prop="`${getQuestionIndex(q.id)}.content`"
+                    :prop="`${getQuestionIndex(q.id)}._content`"
                     :rules="[{ required: true, message: '请输入答案', trigger: 'blur' }]"
                   >
                     <el-input
-                      v-model="q.content"
+                      v-model="q._content"
                       :rows="q.type === 'short' ? 3 : 5"
                       type="textarea"
                       placeholder="多个关键词之间请用分号隔开。 "
@@ -228,7 +226,7 @@ const fillOptions = [
   { value: 2, label: '人工判分' },
   { value: 3, label: '每个选项对应不同分值' },
   { value: 4, label: '全部答对得分' },
-  { value: 5, label: '答对__个得几分，答错不得分' }
+  { value: 7, label: '答对__个得几分，答错不得分' }
 ]
 const shortOptions = [
   { value: 2, label: '人工判分' },
@@ -392,10 +390,8 @@ const handleTypeChange = q => {
       { title: '正确', score: 1 },
       { title: '错误', score: 0 }
     ]
-    q.answer = '正确'
   } else {
     q.options = []
-    q.answer = q.type === 'checkbox' ? [] : ''
   }
 }
 
