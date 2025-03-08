@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 【组件】指导按钮
--->
 <template>
   <div class="guide-wrap" @click.prevent.stop="guideHandle">
     <svg-icon name="icon-guide" class="svg-icon" />
@@ -86,8 +81,5 @@ const steps = [
 .guide-wrap {
   height: 100%;
   cursor: pointer;
-}
-.zjh-class {
-  color: red;
 }
 </style>

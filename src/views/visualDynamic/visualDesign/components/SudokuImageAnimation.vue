@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 九宫魔方图
--->
 <template>
   <div style="width: 100%">
     <div class="container">

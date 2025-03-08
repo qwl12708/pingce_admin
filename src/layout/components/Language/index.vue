@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 国际语言切换列表组件
--->
 <template>
   <el-dropdown trigger="click" @command="changeLanguage">
     <span><svg-icon id="guide-language" name="language"></svg-icon></span>

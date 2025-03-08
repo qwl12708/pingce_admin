@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 图标移动按钮
--->
 <template>
   <div class="container">
     <button>

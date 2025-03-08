@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 发光文字动效
--->
 <template>
   <div style="width: 100%">
     <div class="container">

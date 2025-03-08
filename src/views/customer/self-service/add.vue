@@ -71,7 +71,14 @@
             <el-form-item label="管理员手机号码" prop="phone" required>
               <el-input v-model="form.phone" placeholder="请输入">
                 <template #append>
-                  <el-button type="primary" class="!rounded-button whitespace-nowrap">获取验证码</el-button>
+                  <el-button
+                    type="primary"
+                    class="!rounded-button whitespace-nowrap"
+                    @click="sendSmsCode"
+                    :disabled="isSendingCode || countdown > 0"
+                  >
+                    {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+                  </el-button>
                 </template>
               </el-input>
             </el-form-item>
@@ -101,7 +108,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { addInstitution, editInstitution, getInstitutionInfo } from '@/api/customer'
+import { addInstitution, editInstitution, getInstitutionInfo, createSms } from '@/api/customer'
 import { ElMessage } from 'element-plus'
 import ImageUploader from '@/components/ImageUploader/index.vue'
 
@@ -136,6 +143,37 @@ const rules = ref({
   org_logo: [{ required: true, message: '请上传单位LOGO', trigger: 'change' }],
   org_voucher: [{ required: true, message: '请上传加盖公章的用户承诺或营业执照', trigger: 'change' }]
 })
+
+const isSendingCode = ref(false)
+const countdown = ref(0)
+
+const sendSmsCode = async () => {
+  if (!form.phone) {
+    ElMessage.error('请输入管理员手机号码')
+    return
+  }
+  const phoneRegex = /^1[3-9]\d{9}$/
+  if (!phoneRegex.test(form.phone)) {
+    ElMessage.error('请输入有效的手机号码')
+    return
+  }
+  isSendingCode.value = true
+  countdown.value = 60
+  try {
+    await createSms({ phone: form.phone })
+    ElMessage.success('验证码已发送')
+    const timer = setInterval(() => {
+      countdown.value -= 1
+      if (countdown.value <= 0) {
+        clearInterval(timer)
+        isSendingCode.value = false
+      }
+    }, 1000)
+  } catch (error) {
+    ElMessage.error('发送验证码失败')
+    isSendingCode.value = false
+  }
+}
 
 onMounted(async () => {
   console.log('页面初始化', router)

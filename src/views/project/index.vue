@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 这里是测试页面
--->
 <template>
   <div class="project-box content-box card">
     <h3>测试UI组件库中英文(配合中英文切换按钮查验)</h3>

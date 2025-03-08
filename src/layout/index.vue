@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 页面布局
--->
 <template>
   <div class="layout-wrap">
     <component :is="layoutComponents" />

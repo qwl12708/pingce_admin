@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 文字线条循环动效
--->
 <template>
   <div style="width: 100%">
     <div class="container">

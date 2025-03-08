@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 圆角渐变按钮
--->
 <template>
   <div class="container">
     <button>Button</button>

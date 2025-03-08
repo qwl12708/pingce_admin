@@ -1,9 +1,4 @@
 <!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 拖拽拉伸
--->
-<!-- 
   :layout.sync="layout"    //栅格的初始布局数据源。值必须为 `Array`，其数据项为 `Object`。 每条数据项必须有 `i, x, y, w 和 h` 属性。
   :col-num="12"            //定义栅格系统的列数，其值需为自然数。
   :row-height="30"         //每行的高度，单位像素。
@@ -11,7 +6,7 @@
   :is-resizable="true"     //标识栅格中的元素是否可调整大小。
   :vertical-compact="true" //标识布局是否垂直压缩。即行内垂直方向上顶端对齐
   :margin="[10, 10]"       //每个栅格之间的间距
-  :use-css-transforms="true">   //标识是否使用CSS属性 `transition-property: transform;` 
+  :use-css-transforms="true">   //标识是否使用CSS属性 `transition-property: transform;`
 -->
 <template>
   <div class="draggable-draw card">

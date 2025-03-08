@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 水滴登录
--->
 <template>
   <div style="width: 100%">
     <div class="container">

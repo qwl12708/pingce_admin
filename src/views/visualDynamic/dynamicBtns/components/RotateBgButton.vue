@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 旋转背景按钮
--->
 <template>
   <div class="container" ref="buttonRef">Button</div>
 </template>

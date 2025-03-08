@@ -2,7 +2,7 @@
   <div class="main-content min-h-screen bg-white p-6">
     <h1 class="text-2xl font-medium mb-8">新增合同</h1>
     <!-- 表单区域 -->
-    <el-form :model="form" ref="formRef" label-width="120px">
+    <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
       <div class="bg-white rounded-lg p-6 mb-6 shadow-sm">
         <div class="grid grid-cols-4 gap-6">
           <el-form-item label="合同编号" prop="name" required>
@@ -33,11 +33,11 @@
               <el-option v-for="item in customerOptions" :key="item.value" :label="item.label" :value="item.label" />
             </el-select>
           </el-form-item>
-          <el-form-item label="客户管理员" prop="customerManager" required>
+          <!-- <el-form-item label="客户管理员" prop="customerManager" required>
             <el-select v-model="form.customerManager" placeholder="请选择客户管理员" class="w-full">
               <el-option v-for="item in managerOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
 
           <el-form-item label="审批流名称" prop="approve_id" required>
             <el-select v-model="form.approve_id" placeholder="请选择客户管理员" class="w-full">
@@ -98,8 +98,8 @@
       </div>
       <!-- 底部按钮 -->
       <div class="flex justify-center gap-4">
-        <el-button type="primary" class="!rounded-button w-32" @click="submitForm">提交审批</el-button>
-        <el-button class="!rounded-button w-32" @click="cancelForm">不保存</el-button>
+        <el-button type="primary" class="!rounded-button w-32" @click="submitForm(1)">提交</el-button>
+        <el-button class="!rounded-button w-32" @click="submitForm(0)">保存为草稿</el-button>
       </div>
     </el-form>
 
@@ -136,17 +136,26 @@ import { getInstitutionList, getInstitutionInfo } from '@/api/customer'
 import { addContract } from '@/api/contract'
 import { getUserList, getApprovalFlowList } from '@/api/system/user'
 import { getProductList } from '@/api/product'
+import { ElMessage } from 'element-plus'
 
 const tableRef = ref()
 const router = useRouter()
 const route = useRoute()
 const formRef = ref(null)
+const rules = ref({
+  name: [{ required: true, message: '合同编号必填', trigger: 'blur' }],
+  customer_id: [{ required: true, message: '客户编号必选', trigger: 'blur' }],
+  customerManager: [{ required: true, message: '客户名称必选', trigger: 'blur' }],
+  approve_id: [{ required: true, message: '审批流名称必填', trigger: 'blur' }],
+  buy_time: [{ required: true, message: '购买日期', trigger: 'change' }]
+})
 
 const form = ref({
   name: '',
   customer_id: '',
   customerName: '',
   customerManager: '',
+  approve_id: null,
   buy_time: 0
 })
 
@@ -225,7 +234,7 @@ const deletePackage = () => {
   })
 }
 
-const submitForm = async () => {
+const submitForm = async (status: number) => {
   console.log('%c [ form.value ]-188', 'font-size:13px; background:pink; color:#bf2c9f;', form.value)
   const contract_content = JSON.stringify(
     tableData.value.map(({ id, real_money, open_time }) => ({
@@ -243,16 +252,16 @@ const submitForm = async () => {
       await addContract({
         ...form.value,
         buy_time,
-        contract_content
+        contract_content,
+        status
       })
-      router.push('/contract')
+      ElMessage.success('操作成功')
+      router.push('/contract/list')
     }
   })
 }
 
-const cancelForm = () => {
-  router.push('/contract')
-}
+const save = () => {}
 
 const fetchPackageData = async () => {
   const { data } = await getProductList({ page: 1, pageSize: 100 })

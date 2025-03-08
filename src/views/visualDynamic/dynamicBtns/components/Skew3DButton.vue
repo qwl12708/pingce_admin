@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 倾斜三维按钮
--->
 <template>
   <div class="container">
     <button>Button</button>

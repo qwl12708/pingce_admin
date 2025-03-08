@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 丰富动效
--->
 <template>
   <div class="container">
     <div class="multipleColumnsBox">

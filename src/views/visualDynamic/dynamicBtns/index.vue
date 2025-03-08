@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 动态按钮
--->
 <template>
   <div class="dynamic-btns card">
     <div class="btns-wrap" v-for="(item, index) in gridboxList" :key="index + 1">

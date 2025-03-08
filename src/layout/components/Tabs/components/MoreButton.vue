@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 更多
--->
 <template>
   <el-dropdown trigger="click" :teleported="false">
     <el-button size="small" type="primary">

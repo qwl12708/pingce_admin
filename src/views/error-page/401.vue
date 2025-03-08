@@ -12,9 +12,6 @@
           <li class="link-type">
             <router-link to="/"> 回首页 </router-link>
           </li>
-          <li class="link-type">
-            <a href="https://gitee.com/zjh-sir/vue-el-plus-admin.git" target="_blank">随便看看</a>
-          </li>
           <li>
             <a href="#" @click.prevent="dialogVisible = true">点我看图</a>
           </li>

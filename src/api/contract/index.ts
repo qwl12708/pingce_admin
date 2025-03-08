@@ -21,11 +21,11 @@ export const addContract = ({
   /**
    * 合同名称
    */
-  name
+  name,
   /**
    * 0：草稿，1：审批中，2：审批通过，3：驳回，4：撤回
    */
-  // status?: number
+  status
 }) => {
   return request({
     url: '/platformApi/contract/add',
@@ -35,7 +35,8 @@ export const addContract = ({
       buy_time,
       contract_content,
       customer_id,
-      name
+      name,
+      status
     }
   })
 }
@@ -184,5 +185,14 @@ export const readContract = (data: { id: number }) => {
     url: '/platformApi/contract/read',
     method: 'POST',
     data
+  })
+}
+
+// 获取合同审批记录
+export const getContractApproveRecord = (params: { id: number }) => {
+  return request({
+    url: '/platformApi/contract/approve/flow',
+    method: 'GET',
+    params
   })
 }

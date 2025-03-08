@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 悬停圆圈延伸按钮
--->
 <template>
   <div class="container">
     <button @mousemove="onMouse" @mouseleave="onMouse" ref="buttonRef">

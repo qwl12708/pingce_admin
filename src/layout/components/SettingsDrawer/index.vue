@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 界面设置
--->
 <template>
   <el-drawer v-model="drawerVisible" :title="$t('setting.drawerTitle')" size="300px">
     <!-- 布局切换 -->

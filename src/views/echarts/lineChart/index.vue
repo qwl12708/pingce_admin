@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 折线图
--->
 <template>
   <div ref="echartsRef" class="card content-box"></div>
 </template>

@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { reactive, toRefs } from 'vue'
 import { resetRouter } from '@/router'
 import { removeToken } from '@/utils/auth'
-import { mockUser } from '@/assets/mock/userMock'
 
 export const useUserStore = defineStore('user', () => {
   const initData: UserState = reactive({
@@ -36,7 +35,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function getInfo() {
-    return new Promise<any>((resolve): any => {
+    return new Promise<any>(async (resolve): any => {
       let info: any = null
       // TODO
       info = {
@@ -45,6 +44,7 @@ export const useUserStore = defineStore('user', () => {
         introduction: '管理员', // 介绍
         roles: ['admin'] // 角色
       }
+      // const { data } = await getRoleInfo()
       const { roles, name, avatar, introduction } = info
       setName(name)
       setAvatar(avatar)

@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @Description: 侧边栏菜单布局
--->
 <template>
   <div class="vertical-wrapper">
     <div class="left-wrapper" :class="{ 'folded-style': isCollapse }">

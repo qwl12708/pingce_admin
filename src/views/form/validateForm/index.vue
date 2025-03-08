@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 校验表单
--->
 <template>
   <div class="card content-box">
     <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" label-width="140px">

@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: App
--->
 <template>
   <el-config-provider :locale="locale">
     <router-view></router-view>

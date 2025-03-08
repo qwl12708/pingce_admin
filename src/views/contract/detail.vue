@@ -96,13 +96,13 @@
     <!-- 审批记录弹窗 -->
     <el-dialog title="审批记录" v-model.value:visible="showApprovalRecordDialog">
       <el-steps
-        :active="approvalRecords.length"
+        :active="contractApproveRecord.length"
         direction="vertical"
         :space="80"
         style="max-height: 500px; overflow-y: scroll"
       >
         <el-step
-          v-for="(record, index) in approvalRecords"
+          v-for="(record, index) in contractApproveRecord"
           :key="index"
           :title="record.approver"
           :description="`${record.time} - ${record.result}`"
@@ -123,11 +123,11 @@
           :rules="[{ required: true, message: '请选择审批结果', trigger: 'change' }]"
         >
           <el-radio-group v-model="approvalForm.result">
-            <el-radio label="通过">通过</el-radio>
-            <el-radio label="驳回">驳回</el-radio>
+            <el-radio :label="1">通过</el-radio>
+            <el-radio :label="2">驳回</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="驳回原因" v-if="approvalForm.result === '驳回'">
+        <el-form-item label="驳回原因" v-if="approvalForm.result === 2">
           <el-input type="textarea" v-model="approvalForm.comment" placeholder="请输入驳回原因" />
         </el-form-item>
       </el-form>
@@ -142,7 +142,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getContractInfo, approvalContract } from '@/api/contract'
+import { getContractInfo, approvalContract, getContractApproveRecord } from '@/api/contract'
 import { Document, Tickets } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 
@@ -152,6 +152,7 @@ const router = useRouter()
 const contractId = ref(route.query.id)
 const contractInfo = ref<any>({})
 const tableData = ref([])
+const contractApproveRecord = ref([])
 
 const statusMap = {
   3: '已通过', // 3
@@ -166,21 +167,30 @@ const fetchContractInfo = async () => {
   tableData.value = data.contract_content || []
 }
 
+const fetchContractApproveRecord = async () => {
+  const { data } = await getContractApproveRecord({ id: Number(contractId.value) })
+  contractApproveRecord.value = data
+}
+
 onMounted(() => {
   fetchContractInfo()
+  fetchContractApproveRecord()
 })
 
 const showApprovalRecordDialog = ref(false)
-const approvalRecords = ref(contractInfo.value.approvalRecords || [])
 
 const showApprovalDialog = ref(false)
 const approvalForm = ref({
-  result: '',
+  result: 1,
   comment: ''
 })
 
 const handleApprovalSubmit = async () => {
-  await approvalContract({ ids: contractId.value })
+  await approvalContract({
+    id: contractId.value,
+    type: approvalForm.value.result,
+    comment: approvalForm.value.comment
+  })
   showApprovalDialog.value = false
   fetchContractInfo()
 }

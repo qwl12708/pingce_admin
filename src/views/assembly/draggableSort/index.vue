@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 拖拽排序九宫格
--->
 <template>
   <div class="draggable-wrapper card">
     <div class="draggable-item" v-for="(item, index) in draggableItems" :key="item" :style="{ background: item }">

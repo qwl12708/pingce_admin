@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 后视镜侧面按钮
--->
 <template>
   <div class="container">
     <button>Button</button>

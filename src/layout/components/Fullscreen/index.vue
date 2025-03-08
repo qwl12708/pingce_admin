@@ -1,15 +1,6 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 全屏组件
--->
 <template>
   <div class="fullscreen" @click="toggle">
-    <svg-icon
-      id="guide-fullscreen"
-      :name="isFullscreen ? 'exit-fullscreen' : 'fullscreen'"
-      class="svg-icon"
-    />
+    <svg-icon id="guide-fullscreen" :name="isFullscreen ? 'exit-fullscreen' : 'fullscreen'" class="svg-icon" />
   </div>
 </template>
 

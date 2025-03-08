@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 边框按钮2
--->
 <template>
   <div class="container">
     <button>Button</button>

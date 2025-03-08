@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 过渡背景按钮
--->
 <template>
   <div class="container">
     <button>Button</button>

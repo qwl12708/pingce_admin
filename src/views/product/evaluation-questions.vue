@@ -30,12 +30,13 @@
         chosen-class="draggable-chosen"
         @end="handleDragEnd"
       >
-        <template #item="{ element: q }">
+        <template #item="{ element: q, index }">
           <div class="question-item">
             <el-card>
               <!-- 题目头部 -->
               <div class="question-header">
                 <el-icon class="drag-handle"><Menu /></el-icon>
+                <span class="question-order">{{ index + 1 }}</span>
 
                 <!-- 题目内容 -->
                 <div class="question-content">
@@ -151,21 +152,8 @@
                 </template>
 
                 <!-- 通用设置 -->
-
-                <el-form-item label="附件" prop="attachment">
-                  <el-upload
-                    v-model:file-list="q.attachments"
-                    multiple
-                    :limit="5"
-                    :before-upload="beforeUpload"
-                    :on-remove="handleRemoveFile"
-                    :http-request="handleUpload"
-                  >
-                    <el-button type="primary">上传附件</el-button>
-                    <template #tip>
-                      <div class="upload-tip">支持图片、音频、视频文件，单个不超过100MB</div>
-                    </template>
-                  </el-upload>
+                <el-form-item label="附件" prop="attachments">
+                  <ImageUploader v-model="q.attachments" multiple tip="支持图片、音频、视频文件，单个不超过10MB" />
                 </el-form-item>
               </div>
             </el-card>
@@ -177,14 +165,20 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Menu } from '@element-plus/icons-vue'
 import draggable from 'vuedraggable'
+import ImageUploader from '@/components/ImageUploader/new.vue'
+import { getQuestionnaireQuestionList as getQuestionnaireQuestion, handleQuestionnaireQuestion } from '@/api/product'
 
 // 生成唯一ID
 let questionId = 0
 const generateId = () => Date.now() + questionId++
+
+const questionnaire_id = ref('')
+const del_id = ref('')
 
 // 题目数据
 const questions = ref([])
@@ -256,6 +250,32 @@ const questionTypes = [
   { label: '论述题', value: 'essay' }
 ]
 
+const route = useRoute()
+
+onMounted(async () => {
+  const questionnaireId = route.query.id
+  if (questionnaireId) {
+    // 编辑页面，获取问卷调查试题内容
+    const { data } = await getQuestionnaireQuestion({ questionnaire_id: questionnaireId })
+    questions.value = data.map(q => ({
+      ...q,
+      type: convertType(q.type),
+      check_content: {
+        ...q.check_content,
+        scoring_type: convertScoringType(q.check_content.scoring_type)
+      },
+      _content: typeof q.content[0] === 'string' ? q.content.join('；') : '',
+      options: q.content,
+      attachments: (q.attachments || []).map(f => ({
+        name: f.name,
+        url: f.url,
+        type: f.type,
+        uid: Symbol('file').toString()
+      }))
+    }))
+  }
+})
+
 const getOptions = type => {
   switch (type) {
     case 'radio':
@@ -303,6 +323,7 @@ const createQuestion = (type = 'radio') => ({
     num: 1, // 答出多少个关键词，得num分
     check_standard: 1 // 评判标准
   },
+  _content: '',
   options:
     type === 'judge'
       ? [
@@ -346,6 +367,11 @@ const addQuestion = () => {
 
 // 删除题目
 const removeQuestion = id => {
+  // 若是编辑页
+  if (questionnaire_id.value) {
+    del_id.value += `,${id}`
+  }
+
   const index = questions.value.findIndex(q => q.id === id)
   questions.value.splice(index, 1)
 
@@ -445,40 +471,41 @@ const beforeUpload = file => {
   return true
 }
 
-const handleUpload = async ({ file }) => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve({
-        uid: file.uid,
-        name: file.name,
-        url: URL.createObjectURL(file),
-        raw: file
-      })
-    }, 1000)
+const getParams = () => {
+  const params = { questionnaire_id: questionnaire_id.value, del_id: del_id.value }
+  const _questions = questions.value.map(item => {
+    const { options, attachments, type, _content, ...rest } = item
+    const _attachments = attachments.map(e => e.url)
+    const _type = getType(type)
+    let content = questionnaire_id.value ? options : options.map(({ id, ...rest }) => ({ ...rest }))
+    if (['fill', 'short', 'essay'].includes(type) && typeof _content === 'string') {
+      content = _content.split('；')
+    } // fill type => { title, answer, score }
+
+    return { ...rest, content, type: _type, attachments: _attachments }
   })
+  params.content = _questions
+
+  return params
 }
 
-const handleRemoveFile = file => {
-  URL.revokeObjectURL(file.url)
-}
+const getType = type => questionTypes.findIndex(e => e.value === type) + 1
 
 // 保存处理
 const validateAndSave = async () => {
+  console.log('questions', questions.value)
+
   try {
     await formRef.value.validate()
-    const data = questions.value.map(q => ({
-      ...q,
-      content: q.options,
-      options: null,
-      attachments: q.attachments.map(f => ({
-        name: f.name,
-        url: f.url,
-        type: f.raw.type
-      }))
-    }))
-    console.log('保存数据:', data)
+
+    const p = getParams()
+    const { content, ...rest } = p
+    console.log('保存数据', p)
+    // console.log('保存数据', { ...rest, content: JSON.stringify(content) })
+    await handleQuestionnaireQuestion({ ...rest, content: JSON.stringify(content) })
     ElMessage.success('保存成功')
   } catch (err) {
+    console.error('err', err)
     ElMessage.error('请检查表单填写是否正确')
   }
 }
@@ -505,6 +532,16 @@ const onChangeRadio = ({ type: qType, score, id: qId }, idx) => {
 
 const handleSizeChange = () => {}
 const handlePageChange = () => {}
+
+const convertType = type => {
+  const typeMap = ['radio', 'checkbox', 'judge', 'fill', 'short', 'essay']
+  return typeMap[type - 1] || 'radio'
+}
+
+const convertScoringType = scoringType => {
+  const scoringTypeMap = [1, 2, 3, 4, 5, 6, 7]
+  return scoringTypeMap[scoringType - 1] || 2
+}
 </script>
 
 <style scoped>
@@ -542,6 +579,11 @@ const handlePageChange = () => {}
   cursor: move;
   color: #999;
   margin-top: 10px;
+}
+
+.question-order {
+  margin-top: 5px;
+  font-weight: bold;
 }
 
 .question-content {

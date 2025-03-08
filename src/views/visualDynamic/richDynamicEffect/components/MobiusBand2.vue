@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 莫比乌斯环循环圆点动效
--->
 <template>
   <div style="width: 100%">
     <div class="container">

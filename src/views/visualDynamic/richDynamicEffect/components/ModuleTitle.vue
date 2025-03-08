@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 动效卡片标题
--->
 <template>
   <div class="moduleTitle">
     {{ props.title }}

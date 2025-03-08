@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 视觉设计
--->
 <template>
   <div class="visual-design card">
     <div

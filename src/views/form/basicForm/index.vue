@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 基础表单
--->
 <template>
   <div class="card content-box">
     <el-form :model="formData" label-width="140px">

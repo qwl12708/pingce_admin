@@ -2,6 +2,14 @@ import request from '@/plugins/request'
 const INSTITUTION_PATH = '/platformApi/institution'
 const USER_PATH = '/platformApi/user'
 
+// 发送验证码
+export const createSms = (data: { phone: string; verifyCode?: string }) =>
+  request({
+    url: '/platformApi/sms/create/org',
+    method: 'POST',
+    data
+  })
+
 // 添加客户
 export const addInstitution = (data: {
   type?: number

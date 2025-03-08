@@ -79,6 +79,132 @@
 </template>
 
 <script setup>
+const _p = {
+  questionnaire_id: 7,
+  del_id: '',
+  content: [
+    {
+      name: '单选',
+      score: 5,
+      check_content: {
+        scoring_type: 1,
+        num: 1,
+        check_standard: 1
+      },
+      content: [
+        {
+          title: '选项A',
+          score: 1,
+          answer: 1
+        },
+        {
+          title: '选项B',
+          score: 0,
+          answer: 0
+        },
+        {
+          title: '选项C',
+          score: 0,
+          answer: 0
+        },
+        {
+          title: '选项D',
+          score: 0,
+          answer: 0
+        }
+      ],
+      type: 1,
+      attachments: []
+    },
+    {
+      name: '多选',
+      score: 5,
+      check_content: {
+        scoring_type: 3,
+        num: 1,
+        check_standard: 1
+      },
+      content: [
+        {
+          title: '多qa',
+          score: 0,
+          answer: 1
+        },
+        {
+          title: 'dd',
+          score: 2,
+          answer: 1
+        },
+        {
+          title: '发发发',
+          score: 3
+        }
+      ],
+      type: 2,
+      attachments: []
+    },
+    {
+      name: '判断',
+      score: 5,
+      check_content: {
+        scoring_type: 2,
+        num: 1,
+        check_standard: 1
+      },
+      content: [
+        {
+          title: '正确',
+          score: 5,
+          answer: 1
+        },
+        {
+          title: '错误',
+          score: 0,
+          answer: 0
+        }
+      ],
+      type: 3,
+      attachments: []
+    },
+    {
+      name: '填空题',
+      score: 5,
+      check_content: {
+        scoring_type: 7,
+        num: 2,
+        check_standard: 1
+      },
+      content: [''],
+      type: 4,
+      attachments: []
+    },
+    {
+      name: '简答题',
+      score: 5,
+      check_content: {
+        scoring_type: 7,
+        num: 2,
+        check_standard: 1
+      },
+      content: ['发发发', '滚滚滚', '哈哈哈'],
+      type: 5,
+      attachments: []
+    },
+    {
+      name: '论述题',
+      score: 5,
+      check_content: {
+        scoring_type: 6,
+        num: 2,
+        check_standard: 1
+      },
+      content: ['发发发2', '滚滚滚2', '哈哈哈2'],
+      type: 6,
+      attachments: []
+    }
+  ]
+}
+
 import { reactive } from 'vue'
 
 // 题目类型选项

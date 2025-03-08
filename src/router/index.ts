@@ -48,10 +48,10 @@ router.beforeEach(async (to, from, next) => {
         try {
           // 获取用户信息
           // 角色必须是数组！例如：['admin']或，['developer'，'visitor']
-          const { roles } = await userStore.getInfo()
+          const { roles, ids = [] } = await userStore.getInfo()
 
           // 基于角色生成可访问路由数组
-          const accessRoutes = await authStore.generateAsyncRoutes(roles)
+          const accessRoutes = await authStore.generateAsyncRoutes(roles, ids)
 
           // 动态添加可访问路由
           accessRoutes.forEach(async (item: any) => {

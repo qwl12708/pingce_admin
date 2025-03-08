@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 烟雾动画（以烟雾视频加背景渐变实现）
--->
 <template>
   <div style="width: 100%">
     <div class="container">

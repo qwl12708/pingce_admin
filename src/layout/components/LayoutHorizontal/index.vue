@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 横向布局 | 默认导航栏
--->
 <template>
   <div class="horizontal-wrapper">
     <el-affix :offset="0">

@@ -3,6 +3,7 @@ import { getToken } from '@/utils/auth'
 import { isOnLine } from '@/utils/index'
 import { ElMessage, ElLoading } from 'element-plus'
 import router from '@/router'
+const env = import.meta.env
 
 /**
  * @description: 校验网络请求状态码
@@ -46,9 +47,10 @@ export const checkStatus = (status: number) => {
   }
 }
 
+const requestIp = env.VITE_USER_NODE_ENV === 'production' ? env.VITE_API_URL : '/api'
+
 const instance = axios.create({
-  // baseURL: import.meta.env.VITE_API_URL,
-  baseURL: '/api',
+  baseURL: requestIp,
   timeout: 30 * 1000, // Timeout
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'

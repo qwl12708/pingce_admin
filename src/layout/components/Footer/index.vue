@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 页脚
--->
 <template>
   <footer v-if="true">
     <a :href="href" :target="target">{{ context }}</a>
@@ -12,9 +7,8 @@
 <script lang="ts" setup name="Footer">
 import { reactive, toRefs } from 'vue'
 const initData = reactive({
-  href: 'https://gitee.com/zjh-sir/vue-el-plus-admin.git',
   target: '_blank',
-  context: 'Vue ElementPlus Admin.'
+  context: 'Vue ElementPlus Admin'
 })
 const { href, target, context } = toRefs(initData)
 </script>

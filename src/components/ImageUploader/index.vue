@@ -1,22 +1,27 @@
 <template>
   <el-upload
     class="image-uploader flex items-center justify-center"
-    :class="customClass"
-    :show-file-list="false"
+    :show-file-list="true"
     :before-upload="beforeUpload"
     :http-request="uploadImage"
     :list-type="listType"
+    :on-preview="handlePictureCardPreview"
+    :on-remove="handleRemove"
     v-model:file-list="fileList"
+    :multiple="multiple"
   >
     <div>
-      <div v-if="!imageUrl" class="upload-placeholder">
+      <div v-if="multiple" class="upload-placeholder">
         <el-icon><Plus /></el-icon>
         <div class="text-xs mt-1">上传</div>
       </div>
-      <img v-else :src="imageUrl" class="uploaded-image" />
-      <p v-if="tip">{{ tip }}</p>
+      <p class="text-gray-400 text-xs mt-2 text-center" v-if="tip">{{ tip }}</p>
     </div>
   </el-upload>
+
+  <el-dialog v-model="dialogVisible">
+    <img w-full :src="dialogImageUrl" alt="Preview Image" />
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -35,10 +40,14 @@ const props = defineProps({
     type: String,
     default: '180px'
   },
-  customClass: {
-    type: String,
-    default: ''
+  multiple: {
+    type: Boolean,
+    default: false
   },
+  // customClass: {
+  //   type: String,
+  //   default: ''
+  // },
   tip: {
     type: String,
     default: ''
@@ -47,6 +56,10 @@ const props = defineProps({
     type: String,
     default: 'picture-card',
     validator: (value: string) => ['text', 'picture', 'picture-card'].includes(value)
+  },
+  returnString: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -82,11 +95,40 @@ const uploadImage = async (e: any) => {
   formData.append('file', e.file)
   try {
     const response = await uploadImg(formData)
-    imageUrl.value = response.data.url
-    emits('update:value', response.data.url)
+    console.log('%c [ response ]-94', 'font-size:13px; background:pink; color:#bf2c9f;', response)
+    console.log('%c [ fileList ]-95', 'font-size:13px; background:pink; color:#bf2c9f;', fileList.value)
+
+    fileList.value.at(-1).url = response.data.url
+    if (props.multiple) {
+      // fileList.value.splice(fileList.value.length - 1, 1, { url: response.data.url })
+      emits('update:value', props.returnString ? fileList.value : fileList.value.map(file => file.url))
+    } else {
+      imageUrl.value = response.data.url
+      emits('update:value', response.data.url)
+    }
   } catch (error) {
     ElMessage.error('图片上传失败')
   }
+  console.log('%c [ fileList ]-110', 'font-size:13px; background:pink; color:#bf2c9f;', fileList.value)
+}
+
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
+
+const handleRemove = (uploadFile, uploadFiles) => {
+  fileList.value = uploadFiles
+  if (props.multiple) {
+    emits('update:value', props.returnString ? fileList.value : fileList.value.map(file => file.url))
+  } else {
+    imageUrl.value = ''
+    fileList.value = [] // 清空 fileList
+    emits('update:value', props.returnString ? '' : [])
+  }
+}
+
+const handlePictureCardPreview = uploadFile => {
+  dialogImageUrl.value = uploadFile.url!
+  dialogVisible.value = true
 }
 </script>
 

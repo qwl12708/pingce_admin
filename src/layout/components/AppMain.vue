@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: qwl qwl12708@163.com
- * @Description: Mian 渲染入口文件
--->
 <template>
   <div class="app-main">
     <router-view v-slot="{ Component, route }">

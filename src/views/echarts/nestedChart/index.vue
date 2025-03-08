@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 嵌套环形图
--->
 <template>
   <div ref="echartsRef" class="card content-box"></div>
 </template>

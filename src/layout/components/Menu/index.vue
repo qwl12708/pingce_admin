@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 菜单栏组件
--->
 <template>
   <el-menu
     class="el-menu-custom"
@@ -15,12 +10,7 @@
     :collapse="isCollapse"
   >
     <template v-if="isVertical">
-      <SubMenu
-        v-for="routeItem in authRoutes"
-        :key="routeItem.path"
-        :item="routeItem"
-        :base-path="routeItem.path"
-      />
+      <SubMenu v-for="routeItem in authRoutes" :key="routeItem.path" :item="routeItem" :base-path="routeItem.path" />
     </template>
     <template v-else>
       <div v-for="routeItem in authRoutes" :key="routeItem.path">

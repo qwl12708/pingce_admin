@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 面包屑
--->
 <template>
   <div class="breadcrumb-box">
     <el-breadcrumb separator-icon="ArrowRight">

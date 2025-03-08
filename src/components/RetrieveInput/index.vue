@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 自定义检索输入框
--->
 <template>
   <div id="serach-input-wrap">
     <div class="serach-input">

@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 朋克效果按钮
--->
 <template>
   <div class="container">
     <button>Button</button>

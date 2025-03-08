@@ -199,7 +199,7 @@ export const getAnswerTemplateList = (params: { name?: string; page?: number; pa
   })
 
 // 创建岗位类型
-export const addjob_type = (data: { name?: string }) =>
+export const addjobType = (data: { name?: string }) =>
   request({
     url: QUESTIONNAIRE_PATH + '/job/type/add',
     method: 'POST',
@@ -229,7 +229,39 @@ export const getJobList = () =>
   })
 
 // 获取问卷调查列表
-export const getQuestionnaireList = (params: { page?: number; pageSize?: number }) =>
+/**
+ *
+ * @param params
+ * @returns {
+    "id": 4,
+    "type": 1,
+    "post_type": "销售",
+    "job": "1",
+    "name": "ddd0",
+    "answer_time": 10,
+    "score": 1,
+    "is_rand": 1,
+    "is_switching_screens": 2,
+    "switching_screens_num": 0,
+    "report_type": 0,
+    "info": "ddddd",
+    "invite_id": 1,
+    "answer_id": 1,
+    "questionnaire_path": "11",
+    "result_path": "22",
+    "report_path": "22",
+    "info_path": "http://117.72.37.29:801/storage/20250227/xZH1740638513prnOcR.pdf",
+    "status": 1,
+    "data_type": "platform",
+    "questions_num": 0,
+    "questions_score": 0,
+    "create_time": 1740044754,
+    "update_time": 0,
+    "inviteTemplate": null,
+    "answerTemplate": null
+}
+ */
+export const getQuestionnaireList = (params: { page?: number; pageSize?: number; keyword?: string }) =>
   request({
     url: QUESTIONNAIRE_PATH + '/lst',
     method: 'GET',

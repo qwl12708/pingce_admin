@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 水罐摇晃动效
--->
 <template>
   <div style="width: 100%">
     <div class="container">

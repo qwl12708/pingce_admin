@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 斜线按钮
--->
 <template>
   <div class="container">
     <button>

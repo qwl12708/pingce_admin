@@ -1,213 +1,274 @@
 <template>
-  <el-upload
-    v-model:file-list="fileListRef"
-    class="custom-upload"
-    :action="props.action"
-    :accept="props.accept"
-    :multiple="props.multiple"
-    :limit="props.limit"
-    :disabled="props.disabled || uploading"
-    :show-file-list="props.showFileList"
-    :http-request="httpRequest"
-    :before-upload="beforeUpload"
-    :on-exceed="handleExceed"
-    :on-success="handleSuccess"
-    :on-error="handleError"
-    :on-progress="handleProgress"
-  >
-    <!-- 自定义上传按钮 -->
-    <template #trigger>
-      <el-button :type="props.buttonType" :disabled="props.disabled || uploading">
-        {{ uploading ? '上传中...' : props.buttonText }}
-      </el-button>
-    </template>
+  <div class="upload-container">
+    <el-upload
+      v-model:file-list="fileList"
+      class="upload-demo"
+      :multiple="multiple"
+      :show-file-list="true"
+      :before-upload="beforeUpload"
+      :on-change="handleChange"
+      :http-request="uploadFile"
+      :on-remove="handleRemove"
+      :on-preview="handlePictureCardPreview"
+      :accept="acceptTypes"
+      list-type="picture-card"
+    >
+      <el-icon><Plus /></el-icon>
 
-    <!-- 提示信息 -->
-    <template #tip>
-      <div v-if="props.tip" class="upload-tip">
-        {{ props.tip }}
-      </div>
-    </template>
+      <template #file="{ file }">
+        <div class="file-item">
+          <div class="preview" v-if="isImage(file)">
+            <img :src="file.url" class="image" />
+          </div>
+          <div class="preview" v-else-if="isVideo(file)">
+            <video class="video">
+              <source :src="file.url" :type="file.type" />
+            </video>
+            <div class="play-icon">
+              <el-icon><VideoPlay /></el-icon>
+            </div>
+          </div>
+          <div class="preview" v-else-if="isAudio(file)">
+            <el-icon><Headset /></el-icon>
+          </div>
+          <div class="preview" v-else>
+            <el-icon><Document /></el-icon>
+          </div>
 
-    <!-- 自定义文件列表展示 -->
-    <template #file="{ file }">
-      <div class="file-item">
-        <span>{{ file.name }}</span>
-        <span v-if="file.status === 'uploading'" class="progress"> ({{ file.percentage }}%) </span>
-        <el-icon v-if="file.status === 'success'" class="success-icon">
-          <Check />
-        </el-icon>
-      </div>
-    </template>
-  </el-upload>
+          <div class="file-info">
+            <span class="filename">{{ file.name }}</span>
+            <span class="filesize">{{ formatFileSize(file.size) }}</span>
+          </div>
+
+          <span class="delete-btn" @click="handleRemove(file)">
+            <el-icon><Close /></el-icon>
+          </span>
+        </div>
+      </template>
+
+      <el-dialog v-model="dialogVisible">
+        <img w-full :src="dialogImageUrl" alt="Preview Image" />
+      </el-dialog>
+    </el-upload>
+  </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { ElMessage, ElNotification } from 'element-plus'
-import { uploadImg } from '@/api/modules/UploadApi'
+<script lang="ts" setup>
+import { ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
+import { Plus, VideoPlay, Headset, Document } from '@element-plus/icons-vue'
+import { uploadImg, uploadFile as _uploadFile } from '@/api/modules/UploadApi'
 
 const props = defineProps({
-  // 必填参数
-  action: {
-    type: String,
-    required: true
-  },
-  // 自定义请求方法 (可覆盖默认的 axios 上传)
-  httpRequest: {
-    type: Function,
-    default: null
-  },
-  // 其他配置参数
-  buttonText: {
-    type: String,
-    default: '点击上传'
-  },
-  buttonType: {
-    type: String,
-    default: 'primary'
-  },
-  limit: {
-    type: Number,
-    default: 5
+  modelValue: {
+    type: Array,
+    default: () => []
   },
   multiple: {
     type: Boolean,
-    default: true
-  },
-  accept: {
-    type: String,
-    default: ''
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  },
-  tip: {
-    type: String,
-    default: ''
-  },
-  showFileList: {
-    type: Boolean,
-    default: true
-  },
-  // 文件校验
-  maxSize: {
-    type: Number, // 单位 MB
-    default: 10
-  },
-  acceptType: {
-    type: Array,
-    default: () => ['image/jpeg', 'image/png']
+    default: () => false
   }
 })
 
-const emit = defineEmits(['success', 'error', 'exceed', 'progress'])
+const emit = defineEmits(['update:modelValue'])
 
-// 响应式状态
-const fileListRef = ref([])
-const uploading = ref(false)
+// 支持的文件类型
+const acceptTypes = 'image/*, video/*, audio/*, .pdf, .doc, .docx, .xls, .xlsx'
 
-// 默认的 HTTP 请求方法 (可被 props.httpRequest 覆盖)
-const defaultHttpRequest = async ({ file, onProgress, onSuccess, onError }) => {
-  const formData = new FormData()
-  formData.append('file', file)
+// 文件列表处理
+const fileList = ref([...props.modelValue])
 
-  try {
-    const res = await uploadImg(formData, {
-      onUploadProgress: progressEvent => {
-        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-        onProgress({ percent })
-      }
-    })
+// 类型判断方法
+const isImage = file => file.type?.startsWith('image/')
+const isVideo = file => file.type?.startsWith('video/')
+const isAudio = file => file.type?.startsWith('audio/')
 
-    // axios.post(props.action, formData, {
-    //   headers: { 'Content-Type': 'multipart/form-data' },
-    //   onUploadProgress: progressEvent => {
-    //     const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-    //     onProgress({ percent })
-    //   }
-    // })
-    onSuccess(res.data)
-  } catch (err) {
-    onError(err)
-  }
-}
-
-// 覆盖 el-upload 的默认请求
-const httpRequest = options => {
-  return props.httpRequest ? props.httpRequest(options) : defaultHttpRequest(options)
+// 文件大小格式化
+const formatFileSize = size => {
+  if (size === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(size) / Math.log(k))
+  return parseFloat((size / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
 // 上传前校验
 const beforeUpload = file => {
-  // 文件类型校验
-  const isTypeValid = props.acceptType.includes(file.type)
-  if (!isTypeValid) {
-    ElMessage.error(`文件类型不支持，仅支持 ${props.acceptType.join(', ')}`)
+  const maxSize = 10 * 1024 * 1024 // 10MB
+  if (file.size > maxSize) {
+    ElMessage.error('文件大小不能超过10MB')
     return false
   }
-
-  // 文件大小校验 (MB 转字节)
-  const isSizeValid = file.size / 1024 / 1024 < props.maxSize
-  if (!isSizeValid) {
-    ElMessage.error(`文件大小不能超过 ${props.maxSize}MB`)
-    return false
-  }
-
   return true
 }
 
-// 处理上传成功
-const handleSuccess = (response, file) => {
-  uploading.value = false
-  emit('success', { response, file })
-  ElNotification.success({ title: '上传成功', message: file.name })
+// 文件变化处理
+const handleChange = file => {
+  // 生成预览URL
+  if (!file.url && file.raw) {
+    file.url = URL.createObjectURL(file.raw)
+  }
 }
 
-// 处理上传失败
-const handleError = (err, file) => {
-  uploading.value = false
-  emit('error', { err, file })
-  ElNotification.error({ title: '上传失败', message: file.name })
+// 自定义上传方法
+const uploadFile = async options => {
+  console.log('%c [ options ]-115', 'font-size:13px; background:pink; color:#bf2c9f;', options)
+  const { file, onSuccess, onError } = options
+  try {
+    // 调用实际的上传接口
+    const res = await uploadFileAPI(file)
+    console.log('%c [ res ]-105', 'font-size:13px; background:pink; color:#bf2c9f;', res)
+    onSuccess(res)
+
+    // 更新文件列表
+    const index = fileList.value.findIndex(item => item.uid === file.uid)
+    if (index > -1) {
+      const newFile = {
+        uid: file.uid,
+        name: file.name,
+        url: res.url,
+        type: file.type,
+        size: file.size
+      }
+      fileList.value.splice(index, 1, newFile)
+    }
+    emitUpdate()
+  } catch (err) {
+    onError(err)
+    ElMessage.error('上传失败')
+    // 更新文件状态为失败
+    const index = fileList.value.findIndex(item => item.uid === file.uid)
+    if (index > -1) {
+      fileList.value.splice(index, 1, {
+        ...fileList.value[index],
+        status: 'exception'
+      })
+    }
+  }
 }
 
-// 处理上传进度
-const handleProgress = (event, file) => {
-  emit('progress', { percent: event.percent, file })
+// 触发更新事件
+const emitUpdate = () => {
+  const formattedList = fileList.value.map(item => ({
+    name: item.name,
+    url: item.url,
+    type: item.type,
+    size: item.size
+  }))
+  emit('update:modelValue', formattedList)
 }
 
-// 处理超出文件数量限制
-const handleExceed = files => {
-  emit('exceed', files)
-  ElMessage.warning(`最多允许上传 ${props.limit} 个文件`)
+// 上传接口
+const uploadFileAPI = file => {
+  const action = isImage(file) ? uploadImg : _uploadFile
+  const formData = new FormData()
+  formData.append('file', file)
+  return new Promise(async resolve => {
+    const response = await action(formData)
+    resolve({
+      url: response.data.url,
+      name: file.name,
+      type: file.type
+    })
+  })
+}
+
+// 监听外部数据变化
+watch(
+  () => props.modelValue,
+  newVal => {
+    fileList.value = [...newVal]
+  }
+)
+
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
+
+// 删除文件处理
+const handleRemove = file => {
+  fileList.value = fileList.value.filter(item => item.uid !== file.uid)
+  emitUpdate()
+}
+
+const handlePictureCardPreview = uploadFile => {
+  dialogImageUrl.value = uploadFile.url!
+  dialogVisible.value = true
 }
 </script>
 
 <style scoped>
-.custom-upload {
-  margin: 20px 0;
-}
-
-.upload-tip {
-  font-size: 12px;
-  color: #666;
-  margin-top: 8px;
+.upload-container {
+  position: relative;
 }
 
 .file-item {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.preview {
+  width: 100%;
+  height: 120px;
   display: flex;
   align-items: center;
-  padding: 5px;
+  justify-content: center;
+  background: #f5f7fa;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-.success-icon {
-  color: #67c23a;
-  margin-left: 8px;
+.image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
-.progress {
-  color: #409eff;
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.play-icon {
+  position: absolute;
+  font-size: 24px;
+  color: white;
+}
+
+.file-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.filename {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filesize {
   margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.delete-btn {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border-radius: 0 6px 0 6px;
 }
 </style>

@@ -165,7 +165,6 @@ const fetchConsultantList = async () => {
   try {
     const { data } = await getConsultantList()
     consultantOptions.value = data.map(item => ({ value: item.id, label: item.name }))
-    tableData.value = data
     total.value = data.length
   } catch (error) {
     console.error('获取测评顾问列表失败', error)

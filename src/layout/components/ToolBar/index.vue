@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: qwl qwl12708@163.com
- * @Description: 工具栏
--->
 <template>
   <div class="right-menu" :class="{ 'ver-style': isShowVerticalStyle }">
     <Fullscreen class="right-menu-item hover-effect ver-clr" />

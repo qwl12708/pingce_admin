@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 三只鸟按钮
--->
 <template>
   <div class="birdButton">
     <div class="content">

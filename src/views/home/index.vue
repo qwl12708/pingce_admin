@@ -5,7 +5,7 @@
       <div class="flex-1">
         <!-- 顶部导航 -->
         <div class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-          <div class="text-lg">欢迎回来，今天又是充满希望的一天</div>
+          <div class="text-lg">环境：测试。欢迎回来，今天又是充满希望的一天</div>
         </div>
 
         <!-- 待办事项 -->

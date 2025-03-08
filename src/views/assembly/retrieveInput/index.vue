@@ -1,8 +1,3 @@
-<!--
- * @Author: zanjiahao
- * @LastEditors: zanjiahao
- * @Description: 检索输入框使用案例
--->
 <template>
   <div class="retrieve-input-box card">
     <h3 class="text">检索输入框🌞🌞🌞</h3>
