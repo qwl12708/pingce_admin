@@ -68,6 +68,7 @@ router.beforeEach(async (to, from, next) => {
           next({ ...to, replace: true })
         } catch (error) {
           // 删除令牌并转到登录页面重新登录
+          localStorage.clear()
           await userStore.resetToken() // 重置token信息和登录用户信息
           ElMessage({
             type: 'error',

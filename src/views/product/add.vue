@@ -23,9 +23,16 @@
       </el-form-item>
 
       <el-form-item v-if="form.is_limit_area === 1" label="选择地区" prop="limit_area" required>
-        <el-select v-model="form.limit_area" multiple placeholder="请选择地区(可多选)">
-          <el-option v-for="item in areaOptions" :key="item.value" :label="item.label" :value="item.value" />
-        </el-select>
+        <el-tree-select
+          v-model="form.limit_area"
+          :data="regionData"
+          show-checkbox
+          multiple
+          node-key="id"
+          :props="defaultProps"
+          placeholder="请选择所属区域"
+          class="w-full"
+        />
       </el-form-item>
 
       <el-form-item label="使用期限" prop="day" required>
@@ -74,6 +81,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { addProduct, editProduct, getJobTypeList, getProductInfo, getQuestionnaireList } from '@/api/product'
+import { getAreas } from '@/api/customer'
 
 const router = useRouter()
 const route = useRoute()
@@ -88,16 +96,17 @@ const form = reactive({
   day: '',
   price: '',
   evaluation_type: 1,
-  evaluation_id: 1,
+  evaluation_id: 0,
   job_type: ''
 })
 
-const areaOptions = [
-  { value: 'beijing', label: '北京' },
-  { value: 'shanghai', label: '上海' },
-  { value: 'guangzhou', label: '广州' },
-  { value: 'shenzhen', label: '深圳' }
-]
+const regionData = ref([])
+const originalDataMap = ref({})
+
+const defaultProps = {
+  children: 'children',
+  label: 'label'
+}
 
 const durationOptions = [
   { value: 7, label: '7天' },
@@ -117,10 +126,13 @@ const questionnaireOptions = ref([])
 const industryOptions = ref([])
 
 onMounted(async () => {
+  fetchAreas()
   const { id } = route.query
   if (id) {
     isEdit.value = true
     const { data } = await getProductInfo({ id: Number(id) })
+    const limit_area_ids = data.limit_area.map(pair => pair[1])
+    data.limit_area = limit_area_ids
     Object.assign(form, data)
   }
 
@@ -137,7 +149,16 @@ onMounted(async () => {
 const handleSubmit = async () => {
   await formRef.value.validate(async (valid: boolean) => {
     if (valid) {
-      const p = form.evaluation_type == 1 ? { ...form, evaluation_id: null } : form
+      const limit_area = form.limit_area
+        .map(id => {
+          const city = originalDataMap.value[id]
+          return city ? [city.pid, city.id] : null
+        })
+        .filter(pair => pair !== null)
+
+      form.limit_area = JSON.stringify(limit_area)
+      const p = form.evaluation_type == 1 ? { ...form, evaluation_id: 0 } : form
+
       if (isEdit.value) {
         await editProduct(p)
       } else {
@@ -150,6 +171,40 @@ const handleSubmit = async () => {
 
 const handleCancel = () => {
   router.push('/product')
+}
+
+const fetchAreas = async () => {
+  try {
+    const { data } = await getAreas()
+    originalDataMap.value = data.reduce((acc, item) => {
+      acc[item.id] = item
+      return acc
+    }, {})
+    regionData.value = transformToTree(data)
+  } catch (error) {
+    console.error('获取地区列表失败', error)
+  }
+}
+
+const transformToTree = data => {
+  const tree = []
+  const map = {}
+
+  data.forEach(item => {
+    map[item.id] = { ...item, label: item.name, children: [] }
+  })
+
+  data.forEach(item => {
+    if (item.pid === 0) {
+      tree.push(map[item.id])
+    } else {
+      if (map[item.pid]) {
+        map[item.pid].children.push(map[item.id])
+      }
+    }
+  })
+
+  return tree
 }
 </script>
 

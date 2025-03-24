@@ -95,11 +95,10 @@ export const getProductInfo = (params: { id?: number }) =>
   })
 
 // ------start
-
-// 更新产品状态 TODO:
-export const updateProductStatus = (data: { id?: number }) =>
+// 产品套餐 - 产品套餐冻结状态修改
+export const updateProductStatus = (data: { id?: number; status: number }) =>
   request({
-    url: PRODUCT_PATH + '/status',
+    url: PRODUCT_PATH + '/freeze',
     method: 'POST',
     data
   })

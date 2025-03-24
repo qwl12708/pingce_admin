@@ -27,6 +27,7 @@ export const addInstitution = (data: {
   phone1?: string
   phone2?: string
   counsellor_id?: number
+  code: string
 }) =>
   request({
     url: INSTITUTION_PATH + '/add',
@@ -52,6 +53,7 @@ export const editInstitution = (data: {
   phone2?: string
   counsellor_id?: number
   id?: number
+  code: string
 }) =>
   request({
     url: INSTITUTION_PATH + '/edit',
@@ -145,7 +147,7 @@ export const getConsultantList = () =>
   })
 
 // 绑定评测顾问
-export const bindConsultant = (data: { id?: number; consultant_id?: number }) =>
+export const bindConsultant = (data: { ids?: string; consultant_id?: number }) =>
   request({
     url: INSTITUTION_PATH + '/bind/consultant',
     method: 'POST',

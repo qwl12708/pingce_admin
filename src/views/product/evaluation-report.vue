@@ -32,8 +32,7 @@
 
       <!-- 表格区域 -->
       <div class="bg-white rounded-lg shadow-sm">
-        <div class="p-4 flex justify-between items-center border-b border-gray-100">
-          <h2 class="text-lg font-medium">邀请函模版</h2>
+        <div class="p-4 flex justify-end items-center border-b border-gray-100">
           <div class="space-x-2">
             <el-button @click="onAdd" type="primary" class="!rounded-button whitespace-nowrap"> 导出 </el-button>
             <template v-if="activeTab === 'pending'">

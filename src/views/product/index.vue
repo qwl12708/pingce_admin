@@ -44,7 +44,7 @@
         <el-table-column label="操作" fixed="right" width="120">
           <template #default="{ row }">
             <el-button type="primary" link class="!rounded-button" @click="handleEdit(row)"> 编辑 </el-button>
-            <el-button type="primary" link class="!rounded-button" @click="handleFreeze(row)">
+            <el-button type="danger" link class="!rounded-button" @click="handleFreeze(row)">
               {{ row.status === 1 ? '冻结' : '解冻' }}
             </el-button>
           </template>
@@ -73,6 +73,7 @@ import { Plus, Refresh } from '@element-plus/icons-vue'
 import router from '@/router'
 import { getProductList, updateProductStatus } from '@/api/product'
 import dayjs from 'dayjs'
+import { ElMessage } from 'element-plus'
 
 interface TableItem {
   product_no: string
@@ -114,8 +115,11 @@ const handleEdit = (row: TableItem) => {
 
 const handleFreeze = async (row: TableItem) => {
   console.log('freeze/unfreeze row:', row)
-  await updateProductStatus({ id: row.id })
-  fetchProductList()
+  const res = await updateProductStatus({ id: row.id, status: row.status === 1 ? 0 : 1 })
+  if (res.code === 200) {
+    fetchProductList()
+    ElMessage.success('操作成功')
+  }
 }
 
 const handleRefresh = () => {

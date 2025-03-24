@@ -190,6 +190,7 @@ import {
 import WangEditor from '@/components/WangEditor/index.vue'
 import FileUploader from '@/components/FileUploader/index.vue'
 import { ElMessage } from 'element-plus'
+import router from '@/router'
 
 const route = useRoute()
 const form = ref({
@@ -252,6 +253,7 @@ const handleContentChange = () => {
 const fetchProductDetail = async (id: number) => {
   const { data } = await getQuestionnaireInfo({ id })
   Object.assign(form.value, data)
+  editorRef.value = data.info
 }
 
 const handleSubmit = async () => {
@@ -260,13 +262,14 @@ const handleSubmit = async () => {
   try {
     await action(p)
     ElMessage.success('提交成功')
+    router.push('/product/evaluation')
   } catch (error) {
     ElMessage.error('提交失败')
   }
 }
 
 const handleCancel = () => {
-  // 处理取消逻辑
+  router.push('/product/evaluation')
 }
 </script>
 <style scoped>

@@ -179,6 +179,7 @@ const generateId = () => Date.now() + questionId++
 
 const questionnaire_id = ref('')
 const del_id = ref('')
+const originalQuestionIds = ref([])
 
 // 题目数据
 const questions = ref([])
@@ -255,6 +256,7 @@ const route = useRoute()
 onMounted(async () => {
   const questionnaireId = route.query.id
   if (questionnaireId) {
+    questionnaire_id.value = questionnaireId
     // 编辑页面，获取问卷调查试题内容
     const { data } = await getQuestionnaireQuestion({ questionnaire_id: questionnaireId })
     questions.value = data.map(q => ({
@@ -273,6 +275,7 @@ onMounted(async () => {
         uid: Symbol('file').toString()
       }))
     }))
+    originalQuestionIds.value = questions.value.map(q => q.id)
   }
 })
 
@@ -478,11 +481,18 @@ const getParams = () => {
     const _attachments = attachments.map(e => e.url)
     const _type = getType(type)
     let content = questionnaire_id.value ? options : options.map(({ id, ...rest }) => ({ ...rest }))
+
+    // 新增题目时不传id
+    let _rest = { ...rest }
+    if (!originalQuestionIds.value.includes(item.id)) {
+      _rest = { ...rest, id: null }
+    }
+
     if (['fill', 'short', 'essay'].includes(type) && typeof _content === 'string') {
       content = _content.split('；')
     } // fill type => { title, answer, score }
 
-    return { ...rest, content, type: _type, attachments: _attachments }
+    return { ..._rest, content, type: _type, attachments: _attachments }
   })
   params.content = _questions
 

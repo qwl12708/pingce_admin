@@ -3,6 +3,7 @@ import { getToken } from '@/utils/auth'
 import { isOnLine } from '@/utils/index'
 import { ElMessage, ElLoading } from 'element-plus'
 import router from '@/router'
+import { useUserStore } from '@/store/modules/user'
 const env = import.meta.env
 
 /**
@@ -15,7 +16,7 @@ export const checkStatus = (status: number) => {
     case 400:
       ElMessage.error('请求失败！请您稍后重试')
       break
-    case 401:
+    case 600:
       ElMessage.error('登录失效！请您重新登录')
       break
     case 403:
@@ -92,15 +93,22 @@ instance.interceptors.request.use(
  *  服务器换返回信息 -> [拦截统一处理] -> 客户端JS获取到信息
  */
 instance.interceptors.response.use(
-  response => {
+  async response => {
     if (response.config.loadingInstance) {
       response.config.loadingInstance.close()
     }
     const res = response.data
     if (res.code !== 200) {
-      ElMessage.error(res.msg || '请求失败')
+      checkStatus(res.code)
+      if (res.code === 600) {
+        localStorage.clear()
+        const userStore = useUserStore()
+        await userStore.resetToken()
+        router.replace('/login')
+      }
       return Promise.reject(new Error(res.msg || 'Error'))
     }
+
     return res
   },
   async error => {

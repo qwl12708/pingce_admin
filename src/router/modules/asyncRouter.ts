@@ -83,6 +83,18 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           hidden: true,
           id: idCounter++
         }
+      },
+      {
+        path: 'area',
+        component: () => import('@/views/customer/area/index.vue'),
+        meta: {
+          title: '区域管理',
+          icon: 'none',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true,
+          id: idCounter++
+        }
       }
     ]
   },

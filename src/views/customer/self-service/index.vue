@@ -62,8 +62,8 @@
               >
                 新增订单
               </el-button>
-              <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="updataStatus(scope.row)">
-                {{ scope.row.status ? '解冻' : '冻结' }}
+              <el-button type="danger" link class="!rounded-button whitespace-nowrap" @click="updataStatus(scope.row)">
+                {{ scope.row.status === 2 ? '解冻' : '冻结' }}
               </el-button>
             </div>
           </template>

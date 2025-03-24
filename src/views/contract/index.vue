@@ -62,16 +62,7 @@
       <el-table-column prop="buy_time" label="购买时间" width="160" />
       <el-table-column prop="creater" label="创建人" width="120" />
       <el-table-column prop="money" label="合同金额(元)" width="120" />
-      <el-table-column prop="status_name" label="合同状态" width="120">
-        <template #default="{ row }">
-          <div>
-            <span>{{ row.status_name }}</span>
-            <el-button v-if="row.status === 1" @click="_readContract(row.id)" link type="primary" size="small"
-              >阅读合同</el-button
-            >
-          </div>
-        </template>
-      </el-table-column>
+      <el-table-column prop="status_name" label="合同状态" width="120" />
       <el-table-column prop="approve_user_current" label="审批人" width="120" />
       <el-table-column prop="approve_time" label="审批时间" width="160" />
       <el-table-column prop="approve_info" label="退回说明" width="160" />
@@ -134,7 +125,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getContractList, approvalContract, readContract } from '@/api/contract'
+import { getContractList, approvalContract } from '@/api/contract'
 import {
   ElButton,
   ElTable,
@@ -174,15 +165,15 @@ const fetchContractList = async () => {
   pending_count.value = data.pending_count
 }
 
-const _readContract = async id => {
-  const res = await readContract({ id })
-  const { code } = res
-  if (code === 200) {
-    ElMessage.success('操作成功')
-    return
-  }
-  ElMessage.error('操作失败')
-}
+// const _readContract = async id => {
+//   const res = await readContract({ id })
+//   const { code } = res
+//   if (code === 200) {
+//     ElMessage.success('操作成功')
+//     return
+//   }
+//   ElMessage.error('操作失败')
+// }
 
 onMounted(() => {
   fetchContractList()

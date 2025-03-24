@@ -85,8 +85,8 @@
             <el-form-item label="预留其他使用者手机号码" prop="phone2">
               <el-input v-model="form.phone2" placeholder="请输入" />
             </el-form-item>
-            <el-form-item label="验证码" prop="verifyCode" required>
-              <el-input v-model="form.verifyCode" placeholder="请输入" />
+            <el-form-item label="验证码" prop="code" required>
+              <el-input v-model="form.code" placeholder="请输入" />
             </el-form-item>
             <el-form-item label="客服顾问" prop="counsellor_id">
               <el-select v-model="form.counsellor_id" placeholder="请选择">
@@ -127,7 +127,7 @@ const form = reactive({
   phone1: '',
   phone: '',
   phone2: '',
-  verifyCode: '',
+  code: '',
   counsellor_id: '',
   org_logo: '',
   org_voucher: ''
@@ -139,7 +139,7 @@ const rules = ref({
   city_id: [{ required: true, message: '请选择市/州', trigger: 'change' }],
   name: [{ required: true, message: '请输入管理员姓名', trigger: 'blur' }],
   phone: [{ required: true, message: '请输入管理员手机号码', trigger: 'blur' }],
-  verifyCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
+  code: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
   org_logo: [{ required: true, message: '请上传单位LOGO', trigger: 'change' }],
   org_voucher: [{ required: true, message: '请上传加盖公章的用户承诺或营业执照', trigger: 'change' }]
 })

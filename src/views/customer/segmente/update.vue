@@ -41,7 +41,8 @@
 import { ref, onMounted, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { bindUserArea, getAreas, getInstitutionInfo } from '@/api/customer'
+import { bindUserArea, getAreas } from '@/api/customer'
+import { getDepartmentList, getUserInfo } from '@/api/system/user'
 
 const router = useRouter()
 const route = useRoute()
@@ -60,7 +61,7 @@ const form = reactive<FormState>({
   department: '',
   regions: []
 })
-
+const originalDataMap = ref({})
 const rules = ref({
   regions: [{ required: true, message: '请选择所属区域', trigger: 'change' }]
 })
@@ -71,25 +72,43 @@ const defaultProps = {
 }
 
 const regionData = ref([])
+const departmentsMap = ref({})
 
 onMounted(async () => {
   fetchAreas()
+  await getDepartments()
   const { id } = route.query
   if (id) {
-    const { data } = await getInstitutionInfo({ id: Number(id) })
-    form.name = data.org_name
+    const { data } = await getUserInfo({ id: Number(id) })
+    form.name = data.name
     form.phone = data.phone
-    form.department = data.contacts
-    // form.regions = []
+    form.department = departmentsMap.value[data.dept_id]
+    form.regions = data.undertakeArea.map(item => item.city_id)
   }
 })
+
+const getDepartments = async () => {
+  try {
+    const { data } = await getDepartmentList()
+    departmentsMap.value = data.reduce((acc, item) => {
+      acc[item.id] = item.name
+      return acc
+    }, {})
+  } catch (error) {
+    console.error('获取顾问列表失败', error)
+  }
+}
 
 const fetchAreas = async () => {
   try {
     const { data } = await getAreas()
+    originalDataMap.value = data.reduce((acc, item) => {
+      acc[item.id] = item
+      return acc
+    }, {})
     regionData.value = transformToTree(data)
   } catch (error) {
-    console.error('获取测评顾问列表失败', error)
+    console.error('获取地区列表失败', error)
   }
 }
 
@@ -120,7 +139,14 @@ const handleSubmit = async () => {
 
   try {
     await formRef.value.validate()
-    await bindUserArea({ id: route.query.id, area: form.regions.join(',') })
+    const area = form.regions
+      .map(id => {
+        const city = originalDataMap.value[id]
+        return city ? [city.pid, city.id] : null
+      })
+      .filter(pair => pair !== null)
+
+    await bindUserArea({ id: route.query.id, area: JSON.stringify(area) })
     ElMessage.success('提交成功')
   } catch (error) {
     ElMessage.error('提交失败')

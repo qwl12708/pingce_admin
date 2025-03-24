@@ -16,7 +16,7 @@
         </div>
         <div class="flex items-center mr-8">
           <span class="text-gray-500">创建时间：</span>
-          <span>{{ dayjs(contractInfo.create_time).format('YYYY-MM-DD HH:mm:ss') }}</span>
+          <span>{{ dayjs(contractInfo.create_time * 1000).format('YYYY-MM-DD HH:mm:ss') }}</span>
         </div>
         <div class="flex items-center mr-8">
           <span class="text-gray-500">状态：</span>
@@ -29,10 +29,19 @@
           >
         </div>
       </div>
-      <el-steps :active="1" finish-status="success" class="mt-4 border-t border-gray-100 pt-4">
-        <el-step title="已发起" description="小张15238198135 2022-01-25 23:22" />
-        <el-step title="审核中" description="审核员（审核中）" />
-        <el-step title="完成" />
+
+      <el-steps
+        :active="contractApproveRecord.length"
+        finish-status="success"
+        class="mt-4 border-t border-gray-100 pt-4"
+      >
+        <el-step
+          v-for="(record, index) in contractApproveRecord"
+          :key="index"
+          :title="record.name"
+          :description="`${record.user_name + record.user_phone}`"
+        >
+        </el-step>
       </el-steps>
     </div>
     <!-- 详细信息 -->
@@ -48,11 +57,11 @@
         </div>
         <div class="flex items-center">
           <span class="text-gray-500 w-24">客户名称：</span>
-          <span>{{ contractInfo.name }}</span>
+          <span>{{ contractInfo.customer_name }}</span>
         </div>
         <div class="flex items-center">
           <span class="text-gray-500 w-24">客户管理员：</span>
-          <span>{{ contractInfo.updater }}</span>
+          <span>{{ contractInfo.customer_contacts }}</span>
         </div>
         <div class="flex items-center">
           <span class="text-gray-500 w-24">合同编号：</span>
@@ -60,7 +69,7 @@
         </div>
         <div class="flex items-center">
           <span class="text-gray-500 w-24">购买日期：</span>
-          <span>{{ dayjs(contractInfo.buy_time).format('YYYY-MM-DD HH:mm:ss') }} </span>
+          <span>{{ dayjs(contractInfo.buy_time * 1000).format('YYYY-MM-DD HH:mm:ss') }} </span>
         </div>
       </div>
     </div>
@@ -104,8 +113,8 @@
         <el-step
           v-for="(record, index) in contractApproveRecord"
           :key="index"
-          :title="record.approver"
-          :description="`${record.time} - ${record.result}`"
+          :title="new Date(record.create_time * 1000).toLocaleString()"
+          :description="`${record.user_name + record.user_phone} - ${record.info}`"
         >
         </el-step>
       </el-steps>

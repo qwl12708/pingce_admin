@@ -100,7 +100,7 @@ const validatePassword = (rule: unknown, value: string | undefined, callback: (m
 }
 const initData = reactive({
   loginForm: {
-    username: 'admin',
+    username: '12345678911',
     password: '123456'
   },
   rules: {

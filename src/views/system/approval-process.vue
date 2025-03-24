@@ -33,7 +33,7 @@
             <el-button link type="primary" class="!rounded-button whitespace-nowrap" @click="handleEdit(row)">
               编辑
             </el-button>
-            <el-button link type="primary" class="!rounded-button whitespace-nowrap" @click="handleDelete(row)">
+            <el-button link type="danger" class="!rounded-button whitespace-nowrap" @click="handleDelete(row)">
               删除
             </el-button>
           </template>
@@ -60,8 +60,9 @@
 import { onMounted, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import router from '@/router'
-import { getApprovalFlowList } from '@/api/system/user'
+import { deleteApprovalFlow, getApprovalFlowList } from '@/api/system/user'
 import dayjs from 'dayjs'
+import { ElMessage } from 'element-plus'
 
 const page = ref(1)
 const pageSize = ref(10)
@@ -107,7 +108,12 @@ const handleEdit = (row: any) => {
   router.push(`/system/approval-process-update?id=${row.id}`)
 }
 const handleDelete = (row: any) => {
-  console.log('删除', row)
+  deleteApprovalFlow({ id: row.id })
+    .then(() => {
+      ElMessage.success('删除成功')
+      fetchApprovalTypeList()
+    })
+    .catch(e => console.error('error', e))
 }
 const handleStatus = (row: any) => {
   row.status = !row.status
