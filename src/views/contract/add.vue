@@ -59,10 +59,14 @@
       <!-- 金额统计 -->
       <div class="flex justify-end mb-4 text-sm">
         <span class="mr-6"
-          >合计金额：<span class="text-blue-600">¥{{ totalAmount.toFixed(2) }}</span></span
+          >合计金额：<span class="text-blue-600"
+            >¥{{ tableData.length ? advancedSum(tableData, 'price') : 0 }}</span
+          ></span
         >
         <span
-          >成交金额：<span class="text-red-500">¥{{ dealAmount.toFixed(2) }}</span></span
+          >成交金额：<span class="text-red-500"
+            >¥{{ tableData.length && tableData[0].real_money ? advancedSum(tableData, 'real_money') : 0 }}</span
+          ></span
         >
       </div>
 
@@ -77,7 +81,7 @@
           <el-table-column label="使用期限" prop="day" width="120" />
           <el-table-column label="限售地区" prop="limit_area" width="120" />
           <el-table-column label="备注" prop="remark" />
-          <el-table-column label="成交金额(元)" width="120">
+          <el-table-column label="成交金额(元)" prop="real_money" width="120">
             <template #default="scope">
               <el-input v-model="scope.row.real_money" placeholder="请输入" class="!bg-white border rounded" />
             </template>
@@ -202,6 +206,24 @@ const _getUserList = async () => {
     value: item.id,
     label: item.name
   }))
+}
+
+// 获取最大小数位数
+const getDecimals = num => {
+  const str = num.toString().split('.') || ''
+  return str.length
+}
+// 通用高精度计算方案（处理任意小数位）
+const advancedSum = (data, key) => {
+  const maxDecimals = Math.max(...data.map(item => getDecimals(item[key])))
+  const factor = 10 ** maxDecimals
+
+  return (
+    data.reduce((acc, curr) => {
+      const value = Number(Number(curr[key]).toFixed(maxDecimals))
+      return acc + Math.round(value * factor)
+    }, 0) / factor
+  )
 }
 
 onMounted(async () => {

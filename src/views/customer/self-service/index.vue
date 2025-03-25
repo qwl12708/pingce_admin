@@ -35,7 +35,7 @@
       <el-table :data="tableData" style="width: 100%" class="custom-table">
         <el-table-column type="selection" />
         <el-table-column label="序号" type="index" />
-        <el-table-column prop="id" label="客户编号" sortable />
+        <el-table-column prop="user_no" label="客户编号" sortable />
         <el-table-column prop="org_name" label="客户名称" sortable />
         <el-table-column prop="create_time" label="注册日期" sortable>
           <template #default="{ row }">
@@ -62,7 +62,12 @@
               >
                 新增订单
               </el-button>
-              <el-button type="danger" link class="!rounded-button whitespace-nowrap" @click="updataStatus(scope.row)">
+              <el-button
+                type="danger"
+                link
+                class="!rounded-button whitespace-nowrap"
+                @click="updataStatus(scope.row.id)"
+              >
                 {{ scope.row.status === 2 ? '解冻' : '冻结' }}
               </el-button>
             </div>

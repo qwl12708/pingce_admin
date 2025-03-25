@@ -69,7 +69,7 @@
         </div>
         <div class="flex items-center">
           <span class="text-gray-500 w-24">购买日期：</span>
-          <span>{{ dayjs(contractInfo.buy_time * 1000).format('YYYY-MM-DD HH:mm:ss') }} </span>
+          <span>{{ dayjs(contractInfo.buy_time * 1000).format('YYYY-MM-DD') }} </span>
         </div>
       </div>
     </div>
@@ -92,13 +92,21 @@
         <el-table-column label="类别" prop="type" />
         <el-table-column label="产品套餐" prop="name" />
         <el-table-column label="可使用问卷" prop="evaluation_name" />
-        <el-table-column label="金额(元)" prop="money" />
+        <el-table-column label="金额(元)" prop="price" />
         <el-table-column label="使用期限" prop="day" />
         <el-table-column label="限制地区" prop="limit_area" />
         <el-table-column label="备注" prop="remark" />
         <el-table-column label="成交金额(元)" prop="real_money" />
-        <el-table-column label="开通时间" prop="open_time" />
-        <el-table-column label="截止日期" prop="end_time" />
+        <el-table-column label="开通时间" prop="open_time">
+          <template #default="{ row }">
+            <span>{{ row.open_time ? dayjs(row.open_time).format('YYYY-MM-DD') : '-' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="截止日期" prop="freeze_time">
+          <template #default="{ row }">
+            <span>{{ row.freeze_time ? dayjs(row.freeze_time).format('YYYY-MM-DD') : '-' }}</span>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
 

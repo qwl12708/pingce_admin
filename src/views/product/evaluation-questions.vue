@@ -172,6 +172,7 @@ import { Menu } from '@element-plus/icons-vue'
 import draggable from 'vuedraggable'
 import ImageUploader from '@/components/ImageUploader/new.vue'
 import { getQuestionnaireQuestionList as getQuestionnaireQuestion, handleQuestionnaireQuestion } from '@/api/product'
+import router from '@/router'
 
 // 生成唯一ID
 let questionId = 0
@@ -514,6 +515,7 @@ const validateAndSave = async () => {
     // console.log('保存数据', { ...rest, content: JSON.stringify(content) })
     await handleQuestionnaireQuestion({ ...rest, content: JSON.stringify(content) })
     ElMessage.success('保存成功')
+    router.push('/product/evaluation')
   } catch (err) {
     console.error('err', err)
     ElMessage.error('请检查表单填写是否正确')

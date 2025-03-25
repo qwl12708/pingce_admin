@@ -93,7 +93,7 @@
             <el-radio :label="2">不通过</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="审批意见">
+        <el-form-item v-if="approvalForm.type === 2" label="审批意见">
           <el-input type="textarea" v-model="approvalForm.comment" placeholder="请输入审批意见" />
         </el-form-item>
       </el-form>
@@ -194,10 +194,11 @@ const approvalForm = ref({
 })
 
 const handleApprovalSubmit = async () => {
+  const p = approvalForm.value.type === 2 ? { comment: approvalForm.value.comment } : {}
   await approvalContract({
     id: Number(id.value),
     type: Number(approvalForm.value.type),
-    comment: approvalForm.value.comment
+    ...p
   })
   showApprovalDialog.value = false
   id.value = ''

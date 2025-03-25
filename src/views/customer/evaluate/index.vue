@@ -47,7 +47,6 @@
       <el-table-column label="操作" fixed="right" width="500">
         <template #default="scope">
           <div class="flex items-center gap-2">
-            <el-button type="primary" link>查询</el-button>
             <el-button @click="goDetail(scope.row.id)" type="primary" link>修改客户信息</el-button>
             <el-button @click="goAddContract(scope.row.id)" type="primary" link>新增订单</el-button>
             <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="updataStatus(scope.row)">

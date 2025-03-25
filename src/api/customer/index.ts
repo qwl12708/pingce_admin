@@ -20,7 +20,6 @@ export const addInstitution = (data: {
   org_logo?: string
   org_voucher?: string
   phone?: string
-  name?: string
   contacts?: string
   province_id?: string
   city_id?: string
@@ -45,7 +44,6 @@ export const editInstitution = (data: {
   org_logo?: string
   org_voucher?: string
   phone?: string
-  name?: string
   contacts?: string
   province_id?: string
   city_id?: string
@@ -227,6 +225,6 @@ export const getAllProduct = (params: { id: number; page: number; pageSize: numb
  */
 export const getAreas = () =>
   request({
-    url: '/manageapi/area/lst',
+    url: '/platformApi/area/lst',
     method: 'GET'
   })

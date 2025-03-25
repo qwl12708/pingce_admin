@@ -30,7 +30,16 @@
       <el-table-column label="作答指引" prop="answerTemplateName" width="120" />
       <el-table-column label="测评报告" prop="report_path" width="120" />
       <el-table-column label="横向对比报告" prop="comparison_path" width="120" />
-      <el-table-column label="简介" prop="info" width="120" />
+      <el-table-column label="简介" prop="info" width="200">
+        <!-- 将富文本转化为文本，并且只显示10个字，超出部分显示展开 -->
+        <template #default="{ row }">
+          {{
+            extractTextFromHTML(row.info).length > 10
+              ? extractTextFromHTML(row.info).slice(0, 10) + '...'
+              : extractTextFromHTML(row.info)
+          }}
+        </template>
+      </el-table-column>
       <el-table-column label="打乱题序" prop="is_rand" width="120" />
       <el-table-column label="限制切屏" prop="is_switching_screens" width="120" />
       <el-table-column label="状态" prop="status" width="120" sortable />
@@ -109,6 +118,15 @@ const fetchQuestionnaireList = async () => {
     answerTemplateName: answerTemplates.value.find(template => template.id === item.answer_id)?.name || ''
   }))
   total.value = data.total
+}
+
+function extractTextFromHTML(html) {
+  // 创建临时容器
+  const temp = document.createElement('div')
+  // 注入 HTML（浏览器会自动解析）
+  temp.innerHTML = html
+  // 获取纯文本内容（自动处理 HTML 实体）
+  return temp.textContent || temp.innerText || ''
 }
 
 const fetchTemplates = async () => {
