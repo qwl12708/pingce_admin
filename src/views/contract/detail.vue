@@ -31,15 +31,15 @@
       </div>
 
       <el-steps
-        :active="contractApproveRecord.length"
+        :active="contractInfo?.approve_content?.length"
         finish-status="success"
         class="mt-4 border-t border-gray-100 pt-4"
       >
         <el-step
-          v-for="(record, index) in contractApproveRecord"
+          v-for="(record, index) in contractInfo?.approve_content || []"
           :key="index"
-          :title="record.name"
-          :description="`${record.user_name + record.user_phone}`"
+          :title="record.name + (record.status === 1 ? '（已通过）' : '（待处理）')"
+          :description="`${record.approver.join('，')}`"
         >
         </el-step>
       </el-steps>
@@ -181,6 +181,7 @@ const statusMap = {
 const fetchContractInfo = async () => {
   const { data } = await getContractInfo({ id: Number(contractId.value) })
   contractInfo.value = data
+  console.log('%c [ contractInfo ]-184', 'font-size:13px; background:pink; color:#bf2c9f;', contractInfo)
   tableData.value = data.contract_content || []
 }
 

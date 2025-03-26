@@ -150,7 +150,7 @@ const goRecord = id => {
 }
 
 const onAddCustomer = () => {
-  router.push('/customer/add')
+  router.push('/customer/add?type=1')
 }
 const updataStatus = async id => {
   const res = await updateInstitutionStatus({ id })
@@ -160,6 +160,12 @@ const updataStatus = async id => {
     return
   }
   ElMessage.success('更新成功！')
+  tableData.value = tableData.value.map(item => {
+    if (item.id === id) {
+      item.status = item.status === 2 ? 1 : 2
+    }
+    return item
+  })
 }
 </script>
 

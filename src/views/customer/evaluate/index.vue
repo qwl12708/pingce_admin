@@ -39,8 +39,21 @@
     <el-table :data="tableData" class="mb-4 bg-white">
       <el-table-column type="selection" />
       <el-table-column label="序号" prop="index" />
-      <el-table-column label="客户编号" prop="code" />
-      <el-table-column label="客户名称" prop="name" sortable />
+
+      <el-table-column prop="user_no" label="客户编号" sortable />
+      <el-table-column prop="org_name" label="客户名称" sortable />
+      <!--
+{
+  "id": 3,
+  "user_no": "20250325222450921",
+  "org_name": "单位001",
+  "create_time": 1742912690,
+  "project_num": 0,
+  "answer_num": 0,
+  "contacts": "ceshi",
+  "status": 1
+}
+-->
       <el-table-column label="剩余点数" prop="remainingCount" sortable />
       <el-table-column label="点数最后截止日期" prop="pointsEndDate" />
       <el-table-column label="套餐最后截止日期" prop="packageEndDate" />
@@ -49,8 +62,8 @@
           <div class="flex items-center gap-2">
             <el-button @click="goDetail(scope.row.id)" type="primary" link>修改客户信息</el-button>
             <el-button @click="goAddContract(scope.row.id)" type="primary" link>新增订单</el-button>
-            <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="updataStatus(scope.row)">
-              {{ scope.row.status ? '解冻' : '冻结' }}
+            <el-button type="danger" link class="!rounded-button whitespace-nowrap" @click="updataStatus(scope.row.id)">
+              {{ scope.row.status === 2 ? '解冻' : '冻结' }}
             </el-button>
             <el-button @click="onSeeRecord" type="primary" link>查看客户使用记录</el-button>
           </div>
@@ -71,65 +84,37 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import router from '@/router'
 import { ElMessage } from 'element-plus'
-import { updateInstitutionStatus } from '@/api/customer'
+import { getInstitutionList, updateInstitutionStatus } from '@/api/customer'
 
 const activeTab = ref('three') // one: 一周内, three: 三个月内, all: 全部
 const currentPage = ref(1)
 const pageSize = ref(10)
-const tableData = ref([
-  {
-    index: 1,
-    code: '20240412001',
-    name: '深圳市科技创新有限公司',
-    remainingCount: 5,
-    pointsEndDate: '2024-04-12 13:00',
-    packageEndDate: '2024-04-12 13:00'
-  },
-  {
-    index: 2,
-    code: '20240412002',
-    name: '广州未来教育科技有限公司',
-    remainingCount: 5,
-    pointsEndDate: '2024-04-12 13:00',
-    packageEndDate: '2024-04-12 13:00'
-  },
-  {
-    index: 3,
-    code: '20240412003',
-    name: '北京智慧人才评估中心',
-    remainingCount: 5,
-    pointsEndDate: '2024-04-12 13:00',
-    packageEndDate: '2024-04-12 13:00'
-  },
-  {
-    index: 4,
-    code: '20240412004',
-    name: '上海卓越人才服务有限公司',
-    remainingCount: 5,
-    pointsEndDate: '2024-04-12 13:00',
-    packageEndDate: '2024-04-12 13:00'
-  },
-  {
-    index: 5,
-    code: '20240412005',
-    name: '杭州人才发展研究院',
-    remainingCount: 5,
-    pointsEndDate: '2024-04-12 13:00',
-    packageEndDate: '2024-04-12 13:00'
-  },
-  {
-    index: 6,
-    code: '20240412006',
-    name: '成都人力资源服务有限公司',
-    remainingCount: 5,
-    pointsEndDate: '2024-04-12 13:00',
-    packageEndDate: '2024-04-12 13:00'
+
+const total = ref(0)
+const week_total = ref(0)
+const tableData = ref([])
+
+const fetchTableData = async () => {
+  try {
+    const { data } = await getInstitutionList({
+      page: currentPage.value,
+      pageSize: pageSize.value
+    })
+    tableData.value = data.list
+    total.value = data.total
+    week_total.value = data.week_total
+  } catch (error) {
+    console.error('获取客户列表失败', error)
   }
-])
+}
+
+onMounted(() => {
+  fetchTableData()
+})
 
 const onSeeRecord = () => {
   console.log('查看客户使用记录')
@@ -156,6 +141,12 @@ const updataStatus = async id => {
     return
   }
   ElMessage.success('更新成功！')
+  tableData.value = tableData.value.map(item => {
+    if (item.id === id) {
+      item.status = item.status === 2 ? 1 : 2
+    }
+    return item
+  })
 }
 </script>
 <style scoped>
