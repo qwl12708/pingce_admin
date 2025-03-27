@@ -84,8 +84,12 @@
             </el-form-item>
             <el-form-item label="客服顾问" prop="counsellor_id">
               <el-select v-model="form.counsellor_id" placeholder="请选择">
-                <el-option label="顾问A" value="a" />
-                <el-option label="顾问B" value="b" />
+                <el-option
+                  v-for="item in consultantOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
           </div>
@@ -102,7 +106,14 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { addInstitution, editInstitution, getInstitutionInfo, createSms, getAreas } from '@/api/customer'
+import {
+  addInstitution,
+  editInstitution,
+  getInstitutionInfo,
+  createSms,
+  getAreas,
+  getConsultantList
+} from '@/api/customer'
 import { ElMessage } from 'element-plus'
 import ImageUploader from '@/components/ImageUploader/index.vue'
 
@@ -146,6 +157,7 @@ const cascaderProps = {
 const isSendingCode = ref(false)
 const countdown = ref(0)
 const regionData = ref([])
+const consultantOptions = ref([])
 
 const sendSmsCode = async () => {
   if (!form.phone) {
@@ -177,6 +189,7 @@ const sendSmsCode = async () => {
 
 onMounted(async () => {
   console.log('页面初始化', router)
+  fetchConsultantList()
   fetchAreas()
   const type = router.currentRoute.value.query?.type
   const id = router.currentRoute.value.query?.id
@@ -191,6 +204,15 @@ onMounted(async () => {
     }
   }
 })
+
+const fetchConsultantList = async () => {
+  try {
+    const { data } = await getConsultantList()
+    consultantOptions.value = data.map(item => ({ value: item.id, label: item.name }))
+  } catch (error) {
+    console.error('获取测评顾问列表失败', error)
+  }
+}
 
 const fetchAreas = async () => {
   try {
