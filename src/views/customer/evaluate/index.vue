@@ -5,30 +5,36 @@
       <div class="flex gap-8">
         <div
           :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'three' }]"
-          @click="activeTab = 'three'"
+          @click="handleClickTab('three')"
         >
           <el-icon class="mr-2 text-blue-500">
             <img src="../../../assets/image/icons/three.png" />
           </el-icon>
-          <span>您有 <span class="text-blue-500 font-medium">*</span> 个客户三个月内服务期满</span>
+          <span
+            >您有 <span class="text-blue-500 font-medium">{{ three_month_total }}</span> 个客户三个月内服务期满</span
+          >
         </div>
         <div
           :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'one' }]"
-          @click="activeTab = 'one'"
+          @click="handleClickTab('one')"
         >
           <el-icon class="mr-2 text-blue-500">
             <img src="../../../assets/image/icons/one.png" />
           </el-icon>
-          <span>您有 <span class="text-blue-500 font-medium">*</span> 个新客户一周内首次建立测评项目</span>
+          <span
+            >您有 <span class="text-blue-500 font-medium">{{ week_total }}</span> 个新客户一周内首次建立测评项目</span
+          >
         </div>
         <div
           :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'all' }]"
-          @click="activeTab = 'all'"
+          @click="handleClickTab('all')"
         >
           <el-icon class="mr-2 text-blue-500">
             <img src="../../../assets/image/icons/all.png" />
           </el-icon>
-          <span>您共为 <span class="text-blue-500 font-medium">*</span> 个客户提供专业服务</span>
+          <span
+            >您共为 <span class="text-blue-500 font-medium">{{ total }}</span> 个客户提供专业服务</span
+          >
         </div>
       </div>
       <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="onAddCustomer">
@@ -42,18 +48,6 @@
 
       <el-table-column prop="user_no" label="客户编号" sortable />
       <el-table-column prop="org_name" label="客户名称" sortable />
-      <!--
-{
-  "id": 3,
-  "user_no": "20250325222450921",
-  "org_name": "单位001",
-  "create_time": 1742912690,
-  "project_num": 0,
-  "answer_num": 0,
-  "contacts": "ceshi",
-  "status": 1
-}
--->
       <el-table-column label="剩余点数" prop="remainingCount" sortable />
       <el-table-column label="点数最后截止日期" prop="pointsEndDate" />
       <el-table-column label="套餐最后截止日期" prop="packageEndDate" />
@@ -72,12 +66,12 @@
     </el-table>
     <!-- 分页区域 -->
     <div class="flex items-center justify-between py-4">
-      <span class="text-gray-600">共 999 条</span>
+      <span class="text-gray-600">共 {{ total }} 条</span>
       <el-pagination
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
         :page-sizes="[10, 20, 30, 40]"
-        :total="999"
+        :total="total"
         layout="sizes, prev, pager, next"
       />
     </div>
@@ -88,25 +82,33 @@ import { onMounted, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import router from '@/router'
 import { ElMessage } from 'element-plus'
-import { getInstitutionList, updateInstitutionStatus } from '@/api/customer'
+import { getEvaluationList, updateInstitutionStatus } from '@/api/customer'
 
 const activeTab = ref('three') // one: 一周内, three: 三个月内, all: 全部
+const tabMap = {
+  all: 0,
+  one: 1,
+  three: 2
+}
 const currentPage = ref(1)
 const pageSize = ref(10)
 
 const total = ref(0)
 const week_total = ref(0)
+const three_month_total = ref(0)
 const tableData = ref([])
 
 const fetchTableData = async () => {
   try {
-    const { data } = await getInstitutionList({
+    const { data } = await getEvaluationList({
+      type: tabMap[activeTab.value],
       page: currentPage.value,
       pageSize: pageSize.value
     })
     tableData.value = data.list
     total.value = data.total
     week_total.value = data.week_total
+    three_month_total.value = data.three_month_total
   } catch (error) {
     console.error('获取客户列表失败', error)
   }
@@ -131,6 +133,12 @@ const goDetail = id => {
 
 const goAddContract = id => {
   router.push({ path: '/contract/add', query: { id } })
+}
+
+const handleClickTab = tab => {
+  activeTab.value = tab
+  currentPage.value = 1
+  fetchTableData()
 }
 
 const updataStatus = async id => {

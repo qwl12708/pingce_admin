@@ -136,7 +136,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { getInstitutionList, getInstitutionInfo } from '@/api/customer'
+import { getInstitutionInfo, getSegmenteList } from '@/api/customer'
 import { addContract } from '@/api/contract'
 import { getUserList, getApprovalFlowList } from '@/api/system/user'
 import { getProductList } from '@/api/product'
@@ -170,13 +170,11 @@ const approvalFlowOptions = ref([])
 const tableData = ref([])
 const packageData = ref([])
 const showPackageDialog = ref(false)
-const totalAmount = ref(24000.0)
-const dealAmount = ref(24000.0)
 const selectedPackages = ref([])
 const selectedTableRows = ref([])
 
 const fetchCustomerOptions = async () => {
-  const { data } = await getInstitutionList({ page: 1, pageSize: 100 })
+  const { data } = await getSegmenteList({ page: 1, pageSize: 100 })
   customerOptions.value = data.list.map((item: any) => ({
     value: item.id,
     label: item.org_name,
@@ -210,7 +208,7 @@ const _getUserList = async () => {
 
 // 获取最大小数位数
 const getDecimals = num => {
-  const str = num.toString().split('.') || ''
+  const str = (num || '').split('.') || ''
   return str.length
 }
 // 通用高精度计算方案（处理任意小数位）

@@ -255,13 +255,12 @@ const handleSubmit = async () => {
       await addInstitution(p)
     }
     ElMessage.success('提交成功')
-    router.push('/customer/self-service')
+    handleCancel()
   }
 }
 
 const handleCancel = () => {
-  console.log('取消操作')
-  router.push('/customer/self-service')
+  router.back()
 }
 </script>
 <style scoped>

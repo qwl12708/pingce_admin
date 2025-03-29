@@ -68,7 +68,7 @@ export const updateInstitutionStatus = (data: { id?: number }) =>
   })
 
 // 获取自助客户列表
-export const getInstitutionList = (params: { page?: number; pageSize?: number }) =>
+export const getInstitutionList = (params: { type: number; page?: number; pageSize?: number }) =>
   request({
     url: INSTITUTION_PATH + '/self/lst',
     method: 'GET',
@@ -114,7 +114,7 @@ export const getSegmenteList = (params: {
   })
 
 // 获取测评客户列表
-export const getEvaluationList = (params: { page?: number; pageSize?: number }) =>
+export const getEvaluationList = (params: { type: number; page?: number; pageSize?: number }) =>
   request({
     url: INSTITUTION_PATH + '/evaluation/lst',
     method: 'GET',

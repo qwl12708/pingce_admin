@@ -5,7 +5,7 @@
       <div class="flex gap-8">
         <div
           :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'all' }]"
-          @click="activeTab = 'all'"
+          @click="handleClickTab('all')"
         >
           <el-icon class="mr-2 text-blue-500">
             <img src="../../../assets/image/icons/all.png" />
@@ -16,7 +16,7 @@
         </div>
         <div
           :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'one' }]"
-          @click="activeTab = 'one'"
+          @click="handleClickTab('one')"
         >
           <el-icon class="mr-2 text-blue-500">
             <img src="../../../assets/image/icons/one.png" />
@@ -122,6 +122,7 @@ const tableData = ref<TableItem[]>([])
 const fetchTableData = async () => {
   try {
     const { data } = await getInstitutionList({
+      type: activeTab.value === 'one' ? 1 : 0,
       page: currentPage.value,
       pageSize: pageSize.value
     })
@@ -147,6 +148,12 @@ const goContract = id => {
 
 const goRecord = id => {
   router.push(`/customer/use-record?id=${id}`)
+}
+
+const handleClickTab = (tab: string) => {
+  activeTab.value = tab
+  currentPage.value = 1
+  fetchTableData()
 }
 
 const onAddCustomer = () => {
