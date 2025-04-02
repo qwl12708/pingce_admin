@@ -4,8 +4,8 @@
     <div class="flex items-center justify-between py-4 mb-6">
       <div class="flex gap-8">
         <div
-          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'tui' }]"
-          @click="activeTab = 'tui'"
+          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 1 }]"
+          @click="handleClickTab(1)"
         >
           <el-icon class="mr-2 text-blue-500">
             <img src="../../assets/image/icons/tui.png" />
@@ -15,8 +15,8 @@
           >
         </div>
         <div
-          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'guan' }]"
-          @click="activeTab = 'guan'"
+          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 2 }]"
+          @click="handleClickTab(2)"
         >
           <el-icon class="mr-2 text-blue-500">
             <img src="../../assets/image/icons/guan.png" />
@@ -27,26 +27,26 @@
           >
         </div>
         <div
-          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'cha' }]"
-          @click="activeTab = 'cha'"
+          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 3 }]"
+          @click="handleClickTab(3)"
         >
           <el-icon class="mr-2 text-blue-500">
             <img src="../../assets/image/icons/cha.png" />
           </el-icon>
           <span
-            >您有 <span class="text-blue-500 font-medium">{{ pending_count }}</span> 个审批通过的合同未查看</span
+            >您有 <span class="text-blue-500 font-medium">{{ pass_count }}</span> 个审批通过的合同未查看</span
           >
         </div>
 
         <div
-          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 'shen' }]"
-          @click="activeTab = 'shen'"
+          :class="['flex items-center', { 'text-blue-500 border-b-2 border-blue-500': activeTab === 4 }]"
+          @click="handleClickTab(4)"
         >
           <el-icon class="mr-2 text-blue-500">
             <img src="../../assets/image/icons/shen.png" />
           </el-icon>
           <span
-            >您有 <span class="text-blue-500 font-medium">{{ pass_count }}</span> 个合同待审批</span
+            >您有 <span class="text-blue-500 font-medium">{{ pending_count }}</span> 个合同待审批</span
           >
         </div>
       </div>
@@ -113,6 +113,8 @@
           :page-sizes="[10, 20, 30, 40]"
           :total="total"
           layout="sizes, prev, pager, next"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
         />
         <span class="text-gray-600">跳至</span>
         <el-input v-model="jumpPage" class="w-16" />
@@ -137,13 +139,11 @@ import {
   ElFormItem,
   ElRadioGroup,
   ElRadio,
-  ElMessage,
-  type FormInstance,
-  type FormRules
+  type FormInstance
 } from 'element-plus'
 
 const router = useRouter()
-const activeTab = ref('tui')
+const activeTab = ref(2) // 1: 退回。 2: 全部。  3: 审批通过。4: 待审批
 const currentPage = ref(1)
 const pageSize = ref(10)
 const jumpPage = ref(1)
@@ -157,12 +157,22 @@ const id = ref('')
 const formRef = ref<FormInstance>()
 
 const fetchContractList = async () => {
-  const { data } = await getContractList({ page: currentPage.value, pageSize: pageSize.value })
+  const { data } = await getContractList({ type: activeTab.value, page: currentPage.value, pageSize: pageSize.value })
   tableData.value = data.list
   total.value = data.total
   back_count.value = data.back_count
   pass_count.value = data.pass_count
   pending_count.value = data.pending_count
+}
+
+const handleSizeChange = (val: number) => {
+  pageSize.value = val
+  fetchContractList()
+}
+
+const handleCurrentChange = (val: number) => {
+  currentPage.value = val
+  fetchContractList()
 }
 
 // const _readContract = async id => {
@@ -219,6 +229,12 @@ const handleCloseDialog = () => {
   formRef.value?.resetFields()
   showApprovalDialog.value = false
   id.value = ''
+}
+
+const handleClickTab = tab => {
+  activeTab.value = tab
+  currentPage.value = 1
+  fetchContractList()
 }
 </script>
 

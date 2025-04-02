@@ -21,7 +21,11 @@
       <el-table-column type="selection" fixed="left" width="55" />
       <el-table-column label="问卷编号" fixed="left" prop="id" width="80" />
       <el-table-column label="问卷名称" prop="name" width="200" sortable />
-      <el-table-column label="类别" prop="type" width="120" sortable />
+      <el-table-column label="类别" prop="type" width="120" sortable>
+        <template #default="{ row }">
+          {{ typeMap[row.type] }}
+        </template>
+      </el-table-column>
       <el-table-column label="岗位类别" prop="post_type" width="120" sortable />
       <el-table-column label="题目总数" prop="questions_num" width="100" />
       <el-table-column label="时长(分钟)" prop="answer_time" width="120" />
@@ -40,10 +44,26 @@
           }}
         </template>
       </el-table-column>
-      <el-table-column label="打乱题序" prop="is_rand" width="120" />
-      <el-table-column label="限制切屏" prop="is_switching_screens" width="120" />
-      <el-table-column label="状态" prop="status" width="120" sortable />
-      <el-table-column label="报告生成类别" prop="report_type" width="150" sortable />
+      <el-table-column label="打乱题序" prop="is_rand" width="120">
+        <template #default="{ row }">
+          {{ is_randMap[row.is_rand] }}
+        </template>
+      </el-table-column>
+      <el-table-column label="限制切屏" prop="is_switching_screens" width="120">
+        <template #default="{ row }">
+          {{ is_switching_screensMap[row.is_switching_screens] }}
+        </template>
+      </el-table-column>
+      <el-table-column label="状态" prop="status" width="120" sortable>
+        <template #default="{ row }">
+          {{ statusMap[row.status] }}
+        </template>
+      </el-table-column>
+      <el-table-column label="报告生成类别" prop="report_type" width="150" sortable>
+        <template #default="{ row }">
+          {{ reportTypeMap[row.report_type] }}
+        </template>
+      </el-table-column>
       <el-table-column label="交付日期" prop="deadlineDate" width="120" />
       <el-table-column label="操作" fixed="right" width="300" align="center">
         <template #default="scope">
@@ -104,6 +124,33 @@ interface TableItem {
   status: '正常' | '冻结'
   report_type: string
   deadlineDate: string
+}
+
+const typeMap = {
+  1: '通用问卷',
+  2: '岗位胜任力测评问卷',
+  3: '定制问卷',
+  4: '公益测评问卷'
+}
+
+const is_randMap = {
+  1: '随机顺序',
+  2: '固定顺序'
+}
+
+const is_switching_screensMap = {
+  1: '禁止',
+  2: '不禁止'
+}
+
+const statusMap = {
+  1: '正常',
+  2: '冻结'
+}
+
+const reportTypeMap = {
+  1: '人工编制',
+  2: '系统生成'
 }
 
 const tableData = ref<TableItem[]>([])
