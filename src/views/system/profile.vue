@@ -5,7 +5,7 @@
         <!-- 头像区域 -->
         <div class="flex flex-col items-center mb-8">
           <div class="relative">
-            <img :src="userAvatar" class="w-20 h-20 rounded-full object-cover" alt="用户头像" />
+            <img :src="userInfo.avatar" class="w-20 h-20 rounded-full object-cover" alt="用户头像" />
             <el-upload
               class="avatar-uploader"
               :show-file-list="false"
@@ -102,17 +102,20 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Lock, Refresh } from '@element-plus/icons-vue'
 import type { UploadProps, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
-const userAvatar = 'https://ai-public.mastergo.com/ai/img_res/2825cb8dd29c7a769459ca5632199e11.jpg'
+import { getCurrentUserInfo, editCurrentUserInfo } from '@/api/system/user'
+// TODO: 修改花名、部门、头像、密码重置等接口
+
 const userInfo = ref({
   name: '李思琪',
   phone: '15232632632',
   nickname: '小美爱吃糖',
   department: '销售部'
 })
+
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const dialogLabel = ref('')
@@ -120,6 +123,20 @@ const editType = ref('')
 const editForm = ref({
   value: ''
 })
+
+onMounted(() => {
+  fetchUserInfo()
+})
+
+const fetchUserInfo = async () => {
+  try {
+    const response = await getCurrentUserInfo()
+    userInfo.value = response.data
+  } catch (error) {
+    ElMessage.error('获取用户信息失败')
+  }
+}
+
 const handleEdit = (type: string) => {
   editType.value = type
   if (type === 'nickname') {

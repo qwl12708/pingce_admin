@@ -577,3 +577,11 @@ export const getCurrentUserInfo = () =>
     url: '/platformApi/user/person/info',
     method: 'GET'
   })
+
+// 修改当前登录用户的信息
+export const editCurrentUserInfo = (data: { avatar?: string; nickname?: string; dept_id?: number }) =>
+  request({
+    url: '/platformApi/user/person/edit',
+    method: 'POST',
+    data
+  })
