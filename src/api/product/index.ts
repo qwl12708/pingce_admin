@@ -128,31 +128,35 @@ export const getEvaluationReportList = (params: { name?: string; page?: number; 
   })
 
 // 导出报告
-export const exportReport = () =>
+export const exportReport = (params: { ids: string }) =>
   request({
-    url: PRODUCT_PATH + '/evaluation-report/export',
-    method: 'POST'
+    url: '/platformApi/people/export',
+    method: 'GET',
+    params
   })
 
 // 下载结果
-export const downloadResult = () =>
+export const downloadResult = (params: { ids: string }) =>
   request({
-    url: PRODUCT_PATH + '/evaluation-report/download-result',
-    method: 'POST'
+    url: '/platformApi/people/result/export',
+    method: 'GET',
+    params
   })
 
 // 上传报告
-export const uploadReport = () =>
+export const uploadReport = (data: { report_file: JSON }) =>
   request({
-    url: PRODUCT_PATH + '/evaluation-report/upload-report',
-    method: 'POST'
+    url: '/platformApi/people/result/import',
+    method: 'POST',
+    data
   })
 
 // 上传对比表
-export const uploadComparison = () =>
+export const uploadComparison = (data: { report_file: JSON }) =>
   request({
-    url: PRODUCT_PATH + '/evaluation-report/upload-comparison',
-    method: 'POST'
+    url: '/platformApi/people/contrast/import',
+    method: 'POST',
+    data
   })
 
 // ------end

@@ -1,6 +1,8 @@
 <template>
   <div class="main-content min-h-screen bg-white p-6">
-    <h1 class="text-2xl font-medium mb-8">新增合同</h1>
+    <h1 class="text-2xl font-medium mb-8">
+      {{ route.query.id ? '编辑合同' : '新增合同' }}
+    </h1>
     <!-- 表单区域 -->
     <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
       <div class="bg-white rounded-lg p-6 mb-6 shadow-sm">
@@ -79,7 +81,11 @@
           <el-table-column label="可使用问卷" prop="evaluation_name" />
           <el-table-column label="金额(元)" prop="price" width="120" />
           <el-table-column label="使用期限" prop="day" width="120" />
-          <el-table-column label="限售地区" prop="limit_area" width="120" />
+          <el-table-column label="限售地区" prop="limit_area" width="120">
+            <template #default="scope">
+              {{ getAreaName(scope.row.limit_area) }}
+            </template>
+          </el-table-column>
           <el-table-column label="备注" prop="remark" />
           <el-table-column label="成交金额(元)" prop="real_money" width="120">
             <template #default="scope">
@@ -136,8 +142,8 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { getInstitutionInfo, getSegmenteList } from '@/api/customer'
-import { addContract } from '@/api/contract'
+import { getAreas, getSegmenteList } from '@/api/customer'
+import { addContract, editContract, getContractInfo } from '@/api/contract'
 import { getUserList, getApprovalFlowList } from '@/api/system/user'
 import { getProductList } from '@/api/product'
 import { ElMessage } from 'element-plus'
@@ -166,6 +172,7 @@ const form = ref({
 const customerOptions = ref([])
 const managerOptions = ref([])
 const approvalFlowOptions = ref([])
+const originalDataMap = ref({})
 
 const tableData = ref([])
 const packageData = ref([])
@@ -188,6 +195,23 @@ const fetchApprovalFlowOptions = async () => {
     value: item.id,
     label: item.name
   }))
+}
+
+const fetchAreas = async () => {
+  try {
+    const { data } = await getAreas()
+    originalDataMap.value = data.reduce((acc, item) => {
+      acc[item.id] = item
+      return acc
+    }, {})
+  } catch (error) {
+    console.error('获取地区列表失败', error)
+  }
+}
+
+const getAreaName = areaArr => {
+  const area = (areaArr || []).map(item => (item || []).map(id => originalDataMap.value[id]?.name))
+  return area.join(', ')
 }
 
 const handleCustomerChange = async (value: any) => {
@@ -229,11 +253,22 @@ onMounted(async () => {
   await fetchCustomerOptions()
   fetchPackageData()
   _getUserList()
+  await fetchAreas()
   const { id } = route.query
   if (id) {
-    const { data } = await getInstitutionInfo({ id: Number(id) })
-    form.value.customer_id = data.id
-    form.value.customerName = data.org_name
+    // 编辑页面，获取合同详情
+    const { data } = await getContractInfo({ id: Number(id) })
+    form.value = {
+      name: data.contract_no,
+      customer_id: data.customer_id,
+      customerName: data.customer_name,
+      approve_id: data.approve_id,
+      buy_time: data.buy_time * 1000 // 转换为毫秒
+    }
+    tableData.value = data.contract_content.map(item => ({
+      ...item,
+      open_time: item.open_time ? new Date(item.open_time) : null
+    }))
   }
 })
 
@@ -268,13 +303,19 @@ const submitForm = async (status: number) => {
   await formRef.value.validate(async (valid: boolean) => {
     if (valid) {
       const buy_time = new Date(form.value.buy_time).getTime() / 1000
-
-      await addContract({
+      const payload = {
         ...form.value,
         buy_time,
         contract_content,
         status
-      })
+      }
+      if (route.query.id) {
+        // 编辑合同
+        await editContract({ ...payload, id: Number(route.query.id) })
+      } else {
+        // 新增合同
+        await addContract(payload)
+      }
       ElMessage.success('操作成功')
       router.push('/contract/list')
     }

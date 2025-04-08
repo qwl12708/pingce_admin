@@ -94,7 +94,11 @@
         <el-table-column label="可使用问卷" prop="evaluation_name" />
         <el-table-column label="金额(元)" prop="price" />
         <el-table-column label="使用期限" prop="day" />
-        <el-table-column label="限制地区" prop="limit_area" />
+        <el-table-column label="限制地区" prop="limit_area">
+          <template #default="{ row }">
+            <span>{{ getAreaName(row.limit_area) }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="备注" prop="remark" />
         <el-table-column label="成交金额(元)" prop="real_money" />
         <el-table-column label="开通时间" prop="open_time">
@@ -162,6 +166,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { getContractInfo, approvalContract, getContractApproveRecord } from '@/api/contract'
 import { Document, Tickets } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
+import { getAreas } from '@/api/customer'
 
 const route = useRoute()
 const router = useRouter()
@@ -170,6 +175,7 @@ const contractId = ref(route.query.id)
 const contractInfo = ref<any>({})
 const tableData = ref([])
 const contractApproveRecord = ref([])
+const originalDataMap = ref({})
 
 const statusMap = {
   3: '已通过', // 3
@@ -190,10 +196,28 @@ const fetchContractApproveRecord = async () => {
   contractApproveRecord.value = data
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchAreas()
   fetchContractInfo()
   fetchContractApproveRecord()
 })
+
+const fetchAreas = async () => {
+  try {
+    const { data } = await getAreas()
+    originalDataMap.value = data.reduce((acc, item) => {
+      acc[item.id] = item
+      return acc
+    }, {})
+  } catch (error) {
+    console.error('获取地区列表失败', error)
+  }
+}
+
+const getAreaName = areaArr => {
+  const area = (areaArr || []).map(item => (item || []).map(id => originalDataMap.value[id]?.name))
+  return area.join(', ')
+}
 
 const showApprovalRecordDialog = ref(false)
 

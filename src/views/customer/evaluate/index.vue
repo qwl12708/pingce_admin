@@ -33,7 +33,7 @@
             <img src="../../../assets/image/icons/all.png" />
           </el-icon>
           <span
-            >您共为 <span class="text-blue-500 font-medium">{{ total }}</span> 个客户提供专业服务</span
+            >您共为 <span class="text-blue-500 font-medium">{{ all }}</span> 个客户提供专业服务</span
           >
         </div>
       </div>
@@ -44,8 +44,7 @@
     <!-- 表格区域 -->
     <el-table :data="tableData" class="mb-4 bg-white">
       <el-table-column type="selection" />
-      <el-table-column label="序号" prop="index" />
-
+      <el-table-column label="序号" type="index" />
       <el-table-column prop="user_no" label="客户编号" sortable />
       <el-table-column prop="org_name" label="客户名称" sortable />
       <el-table-column label="剩余点数" prop="remainingCount" sortable />
@@ -94,6 +93,7 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 
 const total = ref(0)
+const all = ref(0)
 const week_total = ref(0)
 const three_month_total = ref(0)
 const tableData = ref([])
@@ -107,6 +107,7 @@ const fetchTableData = async () => {
     })
     tableData.value = data.list
     total.value = data.total
+    all.value = data.all
     week_total.value = data.week_total
     three_month_total.value = data.three_month_total
   } catch (error) {
@@ -115,6 +116,10 @@ const fetchTableData = async () => {
 }
 
 onMounted(() => {
+  const tab = router.currentRoute.value.query?.tab
+  if (tab) {
+    activeTab.value = tab
+  }
   fetchTableData()
 })
 

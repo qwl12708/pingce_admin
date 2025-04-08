@@ -66,7 +66,12 @@
                 <span class="ml-2 font-medium">客户统计</span>
               </div>
               <div class="grid grid-cols-4 gap-4">
-                <div v-for="(item, index) in customerStats" :key="index" class="text-center">
+                <div
+                  v-for="(item, index) in customerStats"
+                  :key="index"
+                  class="text-center cursor-pointer"
+                  @click="handleCustomerStatsClick(index)"
+                >
                   <div class="text-xl text-orange-500 font-bold">
                     {{ item.count }}<span class="ml-1 text-sm text-black">个</span>
                   </div>
@@ -83,7 +88,12 @@
                 <span class="ml-2 font-medium">问卷统计</span>
               </div>
               <div class="grid grid-cols-4 gap-4">
-                <div v-for="(item, index) in surveyStats" :key="index" class="text-center">
+                <div
+                  v-for="(item, index) in surveyStats"
+                  :key="index"
+                  class="text-center cursor-pointer"
+                  @click="handleSurveyStatsClick(index)"
+                >
                   <div class="text-xl font-bold text-blue-500">
                     {{ item.count }}<span class="ml-1 text-sm text-black">{{ item.danwei }}</span>
                   </div>
@@ -239,6 +249,16 @@ const handleCustomerTaskClick = (item: any) => {
 const handleCustomerContractsClick = (item: any) => {
   console.log(item)
   router.push({ path: '/contract/list' })
+}
+
+const handleCustomerStatsClick = (index: number) => {
+  const tabMap = ['all', 'one', 'all', 'all']
+  const pathMap = ['/customer/self-service', '/customer/self-service', '/customer/evaluate', '/customer/evaluate']
+  router.push({ path: pathMap[index], query: { tab: tabMap[index] } })
+}
+
+const handleSurveyStatsClick = (index: number) => {
+  router.push({ path: '/contract/list', query: { tab: index + 1 } })
 }
 </script>
 

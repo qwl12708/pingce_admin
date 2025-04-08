@@ -19,7 +19,12 @@
             </el-form-item>
 
             <el-form-item required class="relative" label="上传加盖公章的用户承诺或营业执照" prop="org_voucher">
-              <a class="text-blue-500" style="position: absolute; bottom: -10px; left: -160px; cursor: pointer">
+              <a
+                class="text-blue-500"
+                style="position: absolute; bottom: -10px; left: -160px; cursor: pointer"
+                href="http://hzcpcs.qifudaren.net/admin/用户承诺模板.docx"
+                target="_blank"
+              >
                 下载《用户承诺》模版
               </a>
               <ImageUploader v-model:value="form.org_voucher" />

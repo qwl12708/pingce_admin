@@ -57,13 +57,13 @@
     <el-table :data="tableData" style="width: 100%" class="mb-4">
       <el-table-column type="selection" width="55" />
       <el-table-column prop="contract_no" label="合同编号" width="120" />
-      <el-table-column prop="customer_id" label="客户编号" width="100" />
+      <el-table-column prop="user_no" label="客户编号" width="100" />
       <el-table-column prop="customer_name" label="客户名称" width="180" />
       <el-table-column prop="buy_time" label="购买时间" width="160" />
       <el-table-column prop="creater" label="创建人" width="120" />
       <el-table-column prop="money" label="合同金额(元)" width="120" />
       <el-table-column prop="status_name" label="合同状态" width="120" />
-      <el-table-column prop="approve_user_current" label="审批人" width="120" />
+      <el-table-column prop="approve_user" label="审批人" width="120" />
       <el-table-column prop="approve_time" label="审批时间" width="160" />
       <el-table-column prop="approve_info" label="退回说明" width="160" />
       <el-table-column fixed="right" label="操作" width="180">
@@ -78,7 +78,9 @@
               @click="handleShowDialog(scope.row.id)"
               >审批合同</el-button
             >
-            <el-button v-if="scope.row.status === 3" link type="primary" size="small">编辑合同</el-button>
+            <el-button v-if="scope.row.status === 3" link type="primary" size="small" @click="goEdit(scope.row.id)"
+              >编辑合同</el-button
+            >
           </div>
         </template>
       </el-table-column>
@@ -141,8 +143,11 @@ import {
   ElRadio,
   type FormInstance
 } from 'element-plus'
+import { useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
+
 const activeTab = ref(2) // 1: 退回。 2: 全部。  3: 审批通过。4: 待审批
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -175,17 +180,11 @@ const handleCurrentChange = (val: number) => {
   fetchContractList()
 }
 
-// const _readContract = async id => {
-//   const res = await readContract({ id })
-//   const { code } = res
-//   if (code === 200) {
-//     ElMessage.success('操作成功')
-//     return
-//   }
-//   ElMessage.error('操作失败')
-// }
-
 onMounted(() => {
+  const tab = route.query.tab as string
+  if (tab) {
+    activeTab.value = Number(tab)
+  }
   fetchContractList()
 })
 
@@ -235,6 +234,10 @@ const handleClickTab = tab => {
   activeTab.value = tab
   currentPage.value = 1
   fetchContractList()
+}
+
+const goEdit = (contractId: number) => {
+  router.push({ path: '/contract/add', query: { id: contractId } })
 }
 </script>
 

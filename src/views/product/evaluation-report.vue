@@ -34,7 +34,14 @@
       <div class="bg-white rounded-lg shadow-sm">
         <div class="p-4 flex justify-end items-center border-b border-gray-100">
           <div class="space-x-2">
-            <el-button @click="onAdd" type="primary" class="!rounded-button whitespace-nowrap"> 导出 </el-button>
+            <el-button
+              :disabled="selectedRows.length === 0"
+              @click="onExport"
+              type="primary"
+              class="!rounded-button whitespace-nowrap"
+            >
+              导出
+            </el-button>
             <template v-if="activeTab === 'pending'">
               <el-button class="!rounded-button whitespace-nowrap" @click="handleDownloadResult">
                 测评结果批量下载
@@ -109,6 +116,7 @@ import {
   getDoingReportList,
   getNoAnswerReportList
 } from '@/api/product'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const searchKeyword = ref('')
@@ -184,8 +192,10 @@ const handleCurrentChange = (val: number) => {
   fetchTableData()
 }
 
-const onAdd = async () => {
-  await exportReport()
+const onExport = async () => {
+  if (selectedRows.value.length === 0) return
+  const ids = selectedRows.value.map(row => row.id).join(',')
+  await exportReport({ ids })
 }
 
 const onTabClick = (key: string) => {
@@ -194,15 +204,32 @@ const onTabClick = (key: string) => {
 }
 
 const handleDownloadResult = async () => {
-  await downloadResult()
+  if (selectedRows.value.length === 0) return
+  const ids = selectedRows.value.map(row => row.id).join(',')
+  await downloadResult({ ids }).catch(err => {
+    console.log('下载失败', err.message)
+    ElMessage.error(err.message)
+  })
 }
 
 const handleUploadReport = async () => {
-  await uploadReport()
+  if (selectedRows.value.length === 0) return
+  const names = selectedRows.value.map(row => row.questionnaire_name)
+  await uploadReport({ report_file: JSON.stringify(names) }).catch(err => {
+    console.log('上传失败', err.message)
+    ElMessage.error(err.message)
+  })
+  ElMessage.success('上传成功')
 }
 
 const handleUploadComparison = async () => {
-  await uploadComparison()
+  if (selectedRows.value.length === 0) return
+  const names = selectedRows.value.map(row => row.questionnaire_name)
+  await uploadComparison({ report_file: JSON.stringify(names) }).catch(err => {
+    console.log('上传失败', err.message)
+    ElMessage.error(err.message)
+  })
+  ElMessage.success('上传成功')
 }
 </script>
 

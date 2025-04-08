@@ -101,6 +101,7 @@ import router from '@/router'
 import { getInstitutionList, updateInstitutionStatus } from '@/api/customer'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
+import { useRoute } from 'vue-router'
 
 interface TableItem {
   org_code: string
@@ -134,7 +135,13 @@ const fetchTableData = async () => {
   }
 }
 
+const route = useRoute()
+
 onMounted(() => {
+  const tab = route.query.tab as string
+  if (tab) {
+    activeTab.value = tab
+  }
   fetchTableData()
 })
 

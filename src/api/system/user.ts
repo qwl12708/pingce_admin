@@ -585,3 +585,11 @@ export const editCurrentUserInfo = (data: { avatar?: string; nickname?: string; 
     method: 'POST',
     data
   })
+
+// 修改当前登录用户的密码
+export const editCurrentUserPassword = (data: { pwd?: string; repwd?: string }) =>
+  request({
+    url: '/platformApi/user/person/pwd',
+    method: 'POST',
+    data
+  })

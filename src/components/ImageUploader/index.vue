@@ -95,9 +95,6 @@ const uploadImage = async (e: any) => {
   formData.append('file', e.file)
   try {
     const response = await uploadImg(formData)
-    console.log('%c [ response ]-94', 'font-size:13px; background:pink; color:#bf2c9f;', response)
-    console.log('%c [ fileList ]-95', 'font-size:13px; background:pink; color:#bf2c9f;', fileList.value)
-
     fileList.value.at(-1).url = response.data.url
     if (props.multiple) {
       // fileList.value.splice(fileList.value.length - 1, 1, { url: response.data.url })

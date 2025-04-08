@@ -106,7 +106,7 @@
             </div>
           </div>
           <!-- 注意事项 -->
-          <WangEditor height="400px" v-model:value="inviteTemplateContent" />
+          <WangEditor height="400px" disabled v-model:value="inviteTemplateContent" />
         </div>
 
         <!-- 左列文件上传 -->
@@ -219,7 +219,7 @@ const reportTypes = [
 ]
 const problemTips = ref('请详细描述您遇到的问题，包含具体的操作步骤、错误提示等信息，以便我们更好地为您解决问题。')
 
-const inviteTemplateContent = computed(() => templateOptions.value.find(e => e.id === form.value.invite_id)?.intro)
+const inviteTemplateContent = computed(() => templateOptions.value.find(e => e.id === form.value.invite_id)?.content)
 
 const guideTemplates = ref([])
 
