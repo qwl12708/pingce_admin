@@ -35,7 +35,7 @@
       <el-table-column label="状态" width="100">
         <template #default="{ row }">
           <el-tag :type="row.status ? 'success' : 'danger'" class="whitespace-nowrap">
-            {{ row.status ? '开启' : '关闭' }}
+            {{ row.status === 1 ? '开启' : '关闭' }}
           </el-tag>
         </template>
       </el-table-column>
@@ -47,12 +47,18 @@
       </el-table-column>
       <el-table-column label="操作" width="300" fixed="right">
         <template #default="{ row }">
-          <el-button type="primary" link class="!rounded-button whitespace-nowrap"> 编辑 </el-button>
-          <el-button type="primary" link class="!rounded-button whitespace-nowrap">
-            {{ row.status ? '关闭' : '开启' }}
+          <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="handleEdit(row)">
+            编辑
           </el-button>
-          <el-button type="primary" link class="!rounded-button whitespace-nowrap"> 数据权限 </el-button>
-          <el-button type="primary" link class="!rounded-button whitespace-nowrap"> 分配用户 </el-button>
+          <el-button type="danger" link class="!rounded-button whitespace-nowrap" @click="handleToggleStatus(row)">
+            {{ row.status === 1 ? '关闭' : '开启' }}
+          </el-button>
+          <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="handleBoundUsers(row)">
+            已绑定用户
+          </el-button>
+          <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="handleAssignUsers(row)">
+            分配用户
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -71,13 +77,13 @@
 
     <el-dialog
       v-model="roleDialogVisible"
-      title="新增角色"
+      :title="form.id ? '编辑角色' : '新增角色'"
       width="520px"
       :close-on-click-modal="false"
       :show-close="true"
     >
       <div class="form-content">
-        <el-form :model="form" label-width="80px">
+        <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
           <el-form-item label="角色类型" required>
             <el-select v-model="form.type_id" class="w-full">
               <el-option v-for="type in roleTypeOptions" :key="type.value" :label="type.label" :value="type.value" />
@@ -124,15 +130,142 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="boundUsersDialogVisible"
+      title="已绑定用户"
+      width="800px"
+      :close-on-click-modal="false"
+      :show-close="true"
+    >
+      <el-table :data="boundUsersList" class="w-full">
+        <el-table-column label="序号" type="index" width="60" />
+        <el-table-column label="用户名" prop="nickname" />
+        <el-table-column label="姓名" prop="name" />
+        <!-- <el-table-column label="手机号" prop="phone" /> -->
+        <el-table-column label="操作" width="120">
+          <template #default="{ row }">
+            <el-button type="danger" link @click="handleUnbind(row)"> 解绑 </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div class="flex justify-between items-center mt-4">
+        <span class="text-gray-500">共 {{ boundUsersTotal }} 条</span>
+        <el-pagination
+          v-model:current-page="boundUsersPage"
+          v-model:page-size="boundUsersPageSize"
+          :total="boundUsersTotal"
+          :page-sizes="[10, 20, 30, 40]"
+          layout="prev, pager, next, jumper, sizes"
+        />
+      </div>
+    </el-dialog>
+
+    <!-- 分配用户弹窗 -->
+    <el-dialog
+      v-model="assignUsersDialogVisible"
+      title="分配用户"
+      width="800px"
+      :close-on-click-modal="false"
+      :show-close="true"
+    >
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center">
+          <el-input v-model="assignUserSearchKeyword" placeholder="请输入用户名或姓名" class="w-64 mr-4">
+            <template #prefix>
+              <el-icon class="text-gray-400">
+                <Search />
+              </el-icon>
+            </template>
+          </el-input>
+          <el-button type="primary" @click="handleAssignUserSearch">查询</el-button>
+          <el-button @click="handleAssignUserReset">重置</el-button>
+        </div>
+      </div>
+
+      <el-table :data="assignUsersList" @selection-change="handleAssignUserSelectionChange">
+        <el-table-column type="selection" width="55" />
+        <el-table-column label="用户名" prop="nickname" />
+        <el-table-column label="姓名" prop="name" />
+        <el-table-column label="手机号" prop="phone" />
+        <el-table-column label="状态" prop="status">
+          <template #default="{ row }">
+            <el-tag :type="row.status ? 'success' : 'danger'">
+              {{ row.status === 1 ? '开启' : '禁用' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div class="flex justify-between items-center mt-4">
+        <span class="text-gray-500">共 {{ assignUsersTotal }} 条</span>
+        <el-pagination
+          v-model:current-page="assignUsersPage"
+          v-model:page-size="assignUsersPageSize"
+          :total="assignUsersTotal"
+          :page-sizes="[10, 20, 30, 40]"
+          layout="prev, pager, next, jumper, sizes"
+        />
+      </div>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="assignUsersDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleConfirmAssign" :disabled="!selectedAssignUsers.length">
+            确定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
-import { Search, Plus, ArrowDown } from '@element-plus/icons-vue'
-import { getRoleList, deleteRoleType, getRoleTypeList } from '@/api/system/user'
+import { ref, onMounted, watch } from 'vue'
+import { Search, Plus } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import type { FormInstance } from 'element-plus'
+import {
+  getRoleList,
+  deleteRoleType,
+  getRoleTypeList,
+  createRole,
+  editRole,
+  getRoleInfo,
+  toggleRoleStatus,
+  getBoundUserList,
+  unbindUserRole,
+  getUserList,
+  bindUserRole
+} from '@/api/system/user'
 
 import { formatTime } from '@/utils/formatTime'
+import { asyncRoutes } from '@/router/modules/asyncRouter'
+
+// 将路由转换为树形结构
+const convertRoutesToMenuTree = (routes: MenuType.MenuOptions[]): any[] => {
+  return routes.map(route => {
+    const node: any = {
+      id: route.meta?.id,
+      label: route.meta?.title
+    }
+
+    // 只有当子路由存在且不为空时才处理子路由
+    if (route.children && route.children.length > 0) {
+      const children = convertRoutesToMenuTree(route.children)
+      if (children.length > 0) {
+        node.children = children
+      }
+    }
+
+    return node
+  })
+}
+
+// 替换原有的menuData静态数据
+const menuData = ref(convertRoutesToMenuTree(asyncRoutes))
+console.log('%c [ menuData ]-266', 'font-size:13px; background:pink; color:#bf2c9f;', menuData)
 
 const searchKeyword = ref('')
 const selectedRows = ref<any[]>([])
@@ -171,28 +304,119 @@ const handleAdd = () => {
 }
 
 const handleBatchDelete = async () => {
-  if (selectedRows.value.length === 0) {
-    return
-  }
+  if (selectedRows.value.length === 0) return
 
-  const ids = selectedRows.value.map(row => row.id).join(',')
   try {
+    await ElMessageBox.confirm('确认要删除选中的角色吗？', '提示', {
+      type: 'warning'
+    })
+    const ids = selectedRows.value.map(row => row.id).join(',')
     await deleteRoleType({ id: ids })
-    fetchRoleList() // 重新获取角色列表
+    ElMessage.success('删除成功')
+    fetchRoleList()
   } catch (error) {
-    console.error('批量删除失败', error)
+    console.error('删除失败', error)
   }
 }
 
 const roleDialogVisible = ref(false)
 
+const formRef = ref<FormInstance>()
+const rules = {
+  type_id: [{ required: true, message: '请选择角色类型', trigger: 'change' }],
+  name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
+  sort: [{ required: true, message: '请输入显示顺序', trigger: 'blur' }]
+}
+
 const form = ref({
+  id: undefined,
   type_id: '',
   name: '',
   sort: 0,
   status: '1',
   isAdmin: false
 })
+
+const menuTree = ref()
+
+const resetForm = () => {
+  form.value = {
+    id: undefined,
+    type_id: '',
+    name: '',
+    sort: 0,
+    status: '1',
+    isAdmin: false
+  }
+  menuTree.value?.setCheckedKeys([])
+}
+
+const handleEdit = async (row: any) => {
+  const res = await getRoleInfo({ id: row.id })
+  form.value = {
+    id: row.id,
+    type_id: res.data.type_id,
+    name: res.data.name,
+    sort: res.data.sort,
+    status: res.data.status.toString(),
+    isAdmin: res.data.isAdmin
+  }
+  // 确保字符串不为空且包含有效数据
+  if (res.data.rules && res.data.rules.trim()) {
+    const ruleIds = res.data.rules
+      .split(',')
+      .map(Number)
+      .filter(id => !isNaN(id))
+    menuTree.value?.setCheckedKeys(ruleIds)
+  } else {
+    menuTree.value?.setCheckedKeys([])
+  }
+  roleDialogVisible.value = true
+}
+
+const handleToggleStatus = async (row: any) => {
+  try {
+    await toggleRoleStatus({ id: row.id })
+    ElMessage.success('状态修改成功')
+    fetchRoleList()
+  } catch (error) {
+    console.error('状态修改失败', error)
+  }
+}
+
+const handleSubmit = async () => {
+  if (!formRef.value) return
+
+  await formRef.value.validate(async valid => {
+    if (valid) {
+      const checkedKeys = menuTree.value.getCheckedKeys()
+      const halfCheckedKeys = menuTree.value.getHalfCheckedKeys()
+      // 合并完全选中和半选中的节点
+      const allSelectedKeys = [...new Set([...checkedKeys, ...halfCheckedKeys])]
+
+      const data = {
+        ...form.value,
+        rules: allSelectedKeys.join(','),
+        status: parseInt(form.value.status)
+      }
+
+      try {
+        if (form.value.id) {
+          await editRole(data)
+          ElMessage.success('编辑成功')
+        } else {
+          await createRole(data)
+          ElMessage.success('创建成功')
+        }
+        roleDialogVisible.value = false
+        resetForm()
+        fetchRoleList()
+      } catch (error) {
+        console.error('保存失败', error)
+      }
+    }
+  })
+}
 
 const roleTypeOptions = ref<any[]>([])
 
@@ -204,61 +428,121 @@ const fetchRoleTypeList = async () => {
   }))
 }
 
-const menuData = [
-  {
-    id: 1,
-    label: '客户管理',
-    children: [
-      {
-        id: 2,
-        label: '自助客户',
-        children: [
-          {
-            id: 3,
-            label: '新增'
-          },
-          {
-            id: 4,
-            label: '审批'
-          },
-          {
-            id: 5,
-            label: '编辑'
-          },
-          {
-            id: 6,
-            label: '添加订单'
-          }
-        ]
-      },
-      {
-        id: 7,
-        label: '潜在客户'
-      }
-    ]
-  },
-  {
-    id: 8,
-    label: '合同管理'
-  },
-  {
-    id: 9,
-    label: '产品管理'
-  },
-  {
-    id: 10,
-    label: '系统管理'
-  }
-]
-
 const defaultProps = ref({
   children: 'children',
   label: 'label'
 })
 
-const handleSubmit = () => {
-  roleDialogVisible.value = false
+// 已绑定用户相关
+const boundUsersDialogVisible = ref(false)
+const boundUsersList = ref<any[]>([])
+const boundUsersTotal = ref(0)
+const boundUsersPage = ref(1)
+const boundUsersPageSize = ref(10)
+const currentRoleId = ref<number>()
+
+const fetchBoundUsers = async () => {
+  const res = await getBoundUserList({
+    id: currentRoleId.value,
+    page: boundUsersPage.value,
+    pageSize: boundUsersPageSize.value
+  })
+  boundUsersList.value = res.data.list
+  boundUsersTotal.value = res.data.total
 }
+
+const handleBoundUsers = async (row: any) => {
+  currentRoleId.value = row.id
+  boundUsersPage.value = 1
+  boundUsersDialogVisible.value = true
+  await fetchBoundUsers()
+}
+
+const handleUnbind = async (row: any) => {
+  try {
+    await ElMessageBox.confirm('确认要解绑该用户吗？', '提示', {
+      type: 'warning'
+    })
+    await unbindUserRole({
+      role_id: currentRoleId.value,
+      user_id: row.id
+    })
+    ElMessage.success('解绑成功')
+    await fetchBoundUsers()
+  } catch (error) {
+    console.error('解绑失败', error)
+  }
+}
+
+// 监听分页变化
+watch([boundUsersPage, boundUsersPageSize], () => {
+  if (boundUsersDialogVisible.value) {
+    fetchBoundUsers()
+  }
+})
+
+// 分配用户相关
+const assignUsersDialogVisible = ref(false)
+const assignUsersList = ref<any[]>([])
+const assignUsersTotal = ref(0)
+const assignUsersPage = ref(1)
+const assignUsersPageSize = ref(10)
+const assignUserSearchKeyword = ref('')
+const selectedAssignUsers = ref<any[]>([])
+
+const fetchAssignUsersList = async () => {
+  const res = await getUserList({
+    name: assignUserSearchKeyword.value,
+    page: assignUsersPage.value,
+    pageSize: assignUsersPageSize.value
+  })
+  assignUsersList.value = res.data.list
+  assignUsersTotal.value = res.data.total
+}
+
+const handleAssignUsers = (row: any) => {
+  currentRoleId.value = row.id
+  assignUsersPage.value = 1
+  assignUserSearchKeyword.value = ''
+  assignUsersDialogVisible.value = true
+  fetchAssignUsersList()
+}
+
+const handleAssignUserSearch = () => {
+  assignUsersPage.value = 1
+  fetchAssignUsersList()
+}
+
+const handleAssignUserReset = () => {
+  assignUserSearchKeyword.value = ''
+  assignUsersPage.value = 1
+  fetchAssignUsersList()
+}
+
+const handleAssignUserSelectionChange = (rows: any[]) => {
+  selectedAssignUsers.value = rows
+}
+
+const handleConfirmAssign = async () => {
+  try {
+    await bindUserRole({
+      role_id: currentRoleId.value,
+      user_ids: selectedAssignUsers.value.map(user => user.id).join(',')
+    })
+    ElMessage.success('分配用户成功')
+    assignUsersDialogVisible.value = false
+    fetchBoundUsers()
+  } catch (error) {
+    console.error('分配用户失败', error)
+  }
+}
+
+// 监听分页变化
+watch([assignUsersPage, assignUsersPageSize], () => {
+  if (assignUsersDialogVisible.value) {
+    fetchAssignUsersList()
+  }
+})
 </script>
 
 <style scoped>

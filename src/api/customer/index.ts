@@ -153,7 +153,7 @@ export const bindConsultant = (data: { ids?: string; consultant_id?: number }) =
   })
 
 // 获取客户可使用积分和冻结积分
-export const getScoreInfo = (params: { id: string[] }) =>
+export const getScoreInfo = (params: { id: string }) =>
   request({
     url: INSTITUTION_PATH + '/score/info',
     method: 'GET',

@@ -105,6 +105,22 @@ export const getBoundUserList = (params: { id?: number; page?: number; pageSize?
     params
   })
 
+// 平台/用户角色 - 解绑用户角色
+export const unbindUserRole = (data: { role_id?: number; user_id: number }) =>
+  request({
+    url: '/platformApi/user/unbind/role',
+    method: 'POST',
+    data
+  })
+
+// 平台/用户角色 - 绑定用户角色
+export const bindUserRole = (data: { role_id?: number; user_ids: string }) =>
+  request({
+    url: '/platformApi/user/bind/role',
+    method: 'POST',
+    data
+  })
+
 // 平台/部门管理 - 创建部门
 export const createDepartment = (data: { name?: string; pid?: number; sort?: number; director_id?: number }) =>
   request({

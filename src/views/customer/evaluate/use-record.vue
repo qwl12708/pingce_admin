@@ -90,7 +90,7 @@ const scoreProductData = ref([])
 const allProductData = ref([])
 
 const fetchScoreInfo = async () => {
-  const { data } = await getScoreInfo({ id: [customerId.value] })
+  const { data } = await getScoreInfo({ id: customerId.value })
   scoreInfo.value = data
 }
 

@@ -58,7 +58,7 @@
             <el-button type="danger" link class="!rounded-button whitespace-nowrap" @click="updataStatus(scope.row.id)">
               {{ scope.row.status === 2 ? '解冻' : '冻结' }}
             </el-button>
-            <el-button @click="onSeeRecord" type="primary" link>查看客户使用记录</el-button>
+            <el-button @click="onSeeRecord(scope.row.id)" type="primary" link>查看客户使用记录</el-button>
           </div>
         </template>
       </el-table-column>
@@ -123,9 +123,9 @@ onMounted(() => {
   fetchTableData()
 })
 
-const onSeeRecord = () => {
+const onSeeRecord = id => {
   console.log('查看客户使用记录')
-  router.push('/customer/use-record')
+  router.push(`/customer/use-record?id=${id}`)
 }
 
 const onAddCustomer = () => {

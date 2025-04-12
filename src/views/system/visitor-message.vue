@@ -14,7 +14,12 @@
             {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
-        <el-table-column label="回复状态" prop="reply_status" sortable />
+        <el-table-column label="回复状态" prop="status" sortable>
+          <template #default="{ row }">
+            <span v-if="row.status === 0" class="text-red-500">未回复</span>
+            <span v-if="row.status === 1" class="text-green-500">已回复</span>
+          </template>
+        </el-table-column>
         <el-table-column label="回复人" prop="reply_user" sortable />
         <el-table-column label="回复时间" prop="replay_time" sortable>
           <template #default="{ row }">

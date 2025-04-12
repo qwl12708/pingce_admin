@@ -1,8 +1,22 @@
 const Layout = () => import('@/layout/index.vue')
 
-let idCounter = 1
+// 预处理路由，只给叶子节点添加唯一id
+function processRoutes(routes: MenuType.MenuOptions[]) {
+  let id = 1
+  const process = (items: any[]) => {
+    items.forEach(item => {
+      if (item.children && item.children.length) {
+        process(item.children)
+      } else if (item.meta) {
+        item.meta.id = id++
+      }
+    })
+  }
+  process(routes)
+  return routes
+}
 
-export const asyncRoutes: MenuType.MenuOptions[] = [
+const baseRoutes: MenuType.MenuOptions[] = [
   // 客户管理
   {
     path: '/customer',
@@ -22,8 +36,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '自助客户',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -33,8 +46,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '测评客户',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -44,8 +56,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '客户划分',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -56,8 +67,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -68,8 +78,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -80,8 +89,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -92,8 +100,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       }
     ]
@@ -118,8 +125,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '合同列表',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -130,8 +136,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -142,8 +147,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       }
     ]
@@ -167,8 +171,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '产品套餐设置',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -178,8 +181,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '测评问卷',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -189,8 +191,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '作答指引模版',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -200,8 +201,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '邀请函模版',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -211,8 +211,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '测评报告',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -223,8 +222,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -235,8 +233,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -247,8 +244,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -259,8 +255,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -271,8 +266,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       }
     ]
@@ -296,8 +290,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '用户列表',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -307,8 +300,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '部门管理',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -318,8 +310,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '自定义审批流设置',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -329,8 +320,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '角色授权设置',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -340,8 +330,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '操作日志',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -351,8 +340,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '操作日志详情',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -362,8 +350,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '系统配置',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -373,8 +360,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '网站配置',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -384,8 +370,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '其他配置',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -395,8 +380,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '产品配置',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -406,8 +390,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '数据统计',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -417,8 +400,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '通知公告',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -428,8 +410,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '数据备份',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -439,8 +420,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '访客留言',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -450,8 +430,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '代理合作留言',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
       {
@@ -461,8 +440,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           title: '个人信息',
           icon: 'none',
           roles: ['admin', 'visitor'],
-          isKeepAlive: true,
-          id: idCounter++
+          isKeepAlive: true
         }
       },
 
@@ -474,8 +452,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -486,8 +463,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -498,8 +474,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -510,8 +485,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -522,8 +496,7 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       },
       {
@@ -534,10 +507,12 @@ export const asyncRoutes: MenuType.MenuOptions[] = [
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,
-          hidden: true,
-          id: idCounter++
+          hidden: true
         }
       }
     ]
   }
 ]
+
+// 导出预处理后的路由
+export const asyncRoutes = processRoutes(baseRoutes)
