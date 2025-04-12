@@ -14,6 +14,9 @@
           <el-radio :label="2">点数</el-radio>
         </el-radio-group>
       </el-form-item>
+      <el-form-item v-if="form.type === 2" label="点数" prop="score" required>
+        <el-input class="!w-[195px]" v-model="form.score" placeholder="请输入点数" />
+      </el-form-item>
 
       <el-form-item label="限售地区" prop="is_limit_area" required>
         <el-radio-group v-model="form.is_limit_area">
@@ -97,7 +100,8 @@ const form = reactive({
   price: '',
   evaluation_type: 1,
   evaluation_id: 0,
-  job_type: ''
+  job_type: '',
+  score: '' // 新增字段
 })
 
 const regionData = ref([])

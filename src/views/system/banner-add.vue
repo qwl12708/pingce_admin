@@ -11,9 +11,9 @@
           <el-form-item label="类型" prop="type" required>
             <div class="flex gap-6">
               <el-radio-group v-model="form.type">
-                <el-radio :label="0">图文详情</el-radio>
-                <el-radio :label="1">跳转链接</el-radio>
-                <el-radio :label="2">跳转模块</el-radio>
+                <el-radio :label="1">图文详情</el-radio>
+                <el-radio :label="2">跳转链接</el-radio>
+                <el-radio :label="3">跳转模块</el-radio>
               </el-radio-group>
             </div>
           </el-form-item>
@@ -30,24 +30,24 @@
           </el-form-item>
 
           <!-- 根据类型显示不同字段 -->
-          <el-form-item v-if="form.type === 'image'" label="详情内容" prop="content" required>
+          <el-form-item v-if="form.type === 1" label="详情内容" prop="content" required>
             <el-input type="textarea" v-model="form.content" :rows="6" placeholder="请输入详情内容" />
           </el-form-item>
 
-          <el-form-item v-if="form.type === 'link'" label="链接地址" prop="link" required>
+          <el-form-item v-if="form.type === 2" label="链接地址" prop="link" required>
             <el-input v-model="form.link" class="w-64" placeholder="请输入链接地址" />
           </el-form-item>
 
-          <el-form-item v-if="form.type === 'module'" label="跳转模块" prop="module" required>
-            <el-select v-model="form.module" class="w-64" placeholder="请选择">
-              <el-option label="解决方案" value="solution" />
-              <el-option label="公益测评" value="publicTest" />
-              <el-option label="渠道合作" value="channel" />
-              <el-option label="了解科1" value="about" />
-              <el-option label="联系我们" value="contact" />
-              <el-option label="注册页面" value="register" />
-              <el-option label="登录页面" value="login" />
-            </el-select>
+          <el-form-item v-if="form.type === 3" label="跳转模块" prop="moduleName" required>
+            <el-radio-group v-model="form.moduleName">
+              <el-radio :label="'solution'">解决方案</el-radio>
+              <el-radio :label="'publicTest'">公益测评</el-radio>
+              <el-radio :label="'channel'">渠道合作</el-radio>
+              <el-radio :label="'about'">了解科懿</el-radio>
+              <el-radio :label="'contact'">联系我们</el-radio>
+              <el-radio :label="'register'">注册页面</el-radio>
+              <el-radio :label="'login'">登录页面</el-radio>
+            </el-radio-group>
           </el-form-item>
         </div>
 
@@ -71,42 +71,41 @@ import ImageUploader from '@/components/ImageUploader/index.vue'
 import type { FormInstance } from 'element-plus'
 import router from '@/router'
 
-const typeEnum = {
-  1: 'image',
-  2: 'link',
-  3: 'module'
-}
-
 const route = useRoute()
 const isDetailPage = ref(false)
 const isEditPage = ref(false)
 
 const formRef = ref<FormInstance>()
 const form = ref({
-  type: '',
-  img: '',
+  type: 1,
+  img: 'http://117.72.37.29:801/storage/20250226/PNy1740572237vQZRuX.png',
   sort: '',
   content: '',
   link: '',
-  module: ''
+  module: '',
+  moduleName: '' // 新增字段
 })
 
 const fetchBannerInfo = async (id: string) => {
   try {
     const response = await getBannerInfo({ id })
     const data = response.data
+    console.log('%c [ data ]-93', 'font-size:13px; background:pink; color:#bf2c9f;', data)
     form.value.type = data.type
     form.value.img = data.img
     form.value.sort = data.sort
     form.value.content = data.content
     form.value.link = data.link
     form.value.module = data.module
+    form.value.moduleName = data.moduleName // 新增字段赋值
+    console.log('%c [ form ]-101', 'font-size:13px; background:pink; color:#bf2c9f;', form)
   } catch (error) {
     console.error('获取Banner详情失败', error)
   }
 }
 
 onMounted(() => {
+  console.log('Initial form.img:', form.value.img) // 调试日志
   if (route.query.type === 'detail') {
     isDetailPage.value = true
     const id = route.query.id as string

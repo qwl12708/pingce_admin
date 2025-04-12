@@ -72,7 +72,14 @@ watch(
   () => props.value,
   newValue => {
     imageUrl.value = newValue
-  }
+    // 初始化 fileList，当 props.value 有值时，确保 fileList 包含对应的图片
+    if (newValue) {
+      fileList.value = [{ name: 'Uploaded Image', url: newValue }]
+    } else {
+      fileList.value = []
+    }
+  },
+  { immediate: true } // 确保组件加载时立即同步
 )
 
 const beforeUpload = (file: File) => {

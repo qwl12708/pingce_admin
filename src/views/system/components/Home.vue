@@ -3,7 +3,7 @@
     <div class="bg-white rounded-lg shadow-sm">
       <div class="p-6">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-medium">为什么选择科验配置</h2>
+          <h2 class="text-xl font-medium">为什么选择科懿配置</h2>
           <div class="space-x-2">
             <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleAdd">
               <el-icon class="mr-1"><Plus /></el-icon>新增

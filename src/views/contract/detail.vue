@@ -178,8 +178,9 @@ const contractApproveRecord = ref([])
 const originalDataMap = ref({})
 
 const statusMap = {
-  3: '已通过', // 3
-  2: '待审批', // 2
+  4: '撤销', // 4
+  3: '驳回', // 3
+  2: '审批通过', // 2
   1: '未审批', // 1
   0: '草稿' // 0
 }
