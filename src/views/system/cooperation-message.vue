@@ -10,12 +10,12 @@
         <el-table-column label="留言者电话" prop="phone" sortable />
         <el-table-column label="留言时间" prop="create_time" sortable>
           <template #default="{ row }">
-            {{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
         <el-table-column label="回复时间" prop="replay_time" sortable>
           <template #default="{ row }">
-            {{ dayjs(row.replay_time).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ formatTime(row.replay_time) }}
           </template>
         </el-table-column>
         <el-table-column label="留言内容" prop="content" sortable />
@@ -85,7 +85,8 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { getSupplierMessages, replySupplierMessage } from '@/api/system/user'
-import dayjs from 'dayjs'
+
+import { formatTime } from '@/utils/formatTime'
 
 const currentPage = ref(1)
 const pageSize = ref(10)

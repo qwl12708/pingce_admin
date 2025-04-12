@@ -32,13 +32,13 @@
         </el-table-column>
         <el-table-column prop="create_time" label="创建时间" width="160" sortable>
           <template #default="{ row }">
-            {{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
         <el-table-column prop="creater" label="创建人" width="100" />
         <el-table-column prop="status_time" label="状态时间" width="160" sortable>
           <template #default="{ row }">
-            {{ dayjs(row.status_time).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ formatTime(row.status_time) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" width="120">
@@ -72,8 +72,9 @@ import { ref, onMounted } from 'vue'
 import { Plus, Refresh } from '@element-plus/icons-vue'
 import router from '@/router'
 import { getProductList, updateProductStatus } from '@/api/product'
-import dayjs from 'dayjs'
+
 import { ElMessage } from 'element-plus'
+import { formatTime } from '@/utils/formatTime'
 
 interface TableItem {
   product_no: string

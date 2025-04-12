@@ -16,7 +16,11 @@
         <el-table-column label="名称" prop="name" />
         <el-table-column label="适用范围" prop="scope" />
         <el-table-column label="描述" prop="description" />
-        <el-table-column label="创建时间" prop="createTime" width="200" />
+        <el-table-column label="创建时间" prop="create_time" width="200">
+          <template #default="{ row }">
+            <div class="text-gray-600">{{ formatTime(row.create_time) }}</div>
+          </template>
+        </el-table-column>
         <el-table-column label="状态" width="100">
           <template #default="{ row }">
             <div class="flex items-center">
@@ -61,8 +65,9 @@ import { onMounted, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import router from '@/router'
 import { deleteApprovalFlow, getApprovalFlowList } from '@/api/system/user'
-import dayjs from 'dayjs'
+
 import { ElMessage } from 'element-plus'
+import { formatTime } from '@/utils/formatTime'
 
 const page = ref(1)
 const pageSize = ref(10)
@@ -87,10 +92,7 @@ const roleOptions = [
 
 const fetchApprovalTypeList = async () => {
   const response = await getApprovalFlowList({ page: page.value, pageSize: pageSize.value })
-  tableData.value = response.data.list.map((item: any) => ({
-    ...item,
-    createTime: dayjs(item.create_time).format('YYYY-MM-DD HH:mm:ss')
-  }))
+  tableData.value = response.data.list
 
   total.value = response.data.total
 }

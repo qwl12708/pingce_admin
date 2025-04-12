@@ -23,7 +23,7 @@
         <el-table-column label="IP" prop="ip" sortable />
         <el-table-column label="记录时间" prop="create_time" sortable>
           <template #default="{ row }">
-            {{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" width="120">
@@ -53,7 +53,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getLoglist } from '@/api/system/user'
-import dayjs from 'dayjs'
+
+import { formatTime } from '@/utils/formatTime'
 
 const router = useRouter()
 const searchKeyword = ref('')

@@ -39,7 +39,7 @@
         <el-table-column prop="org_name" label="客户名称" sortable />
         <el-table-column prop="create_time" label="注册日期" sortable>
           <template #default="{ row }">
-            <span>{{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}</span>
+            {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
         <el-table-column prop="project_num" label="累计项目数" sortable />
@@ -99,9 +99,9 @@ import { ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import router from '@/router'
 import { getInstitutionList, updateInstitutionStatus } from '@/api/customer'
-import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
 import { useRoute } from 'vue-router'
+import { formatTime } from '@/utils/formatTime'
 
 interface TableItem {
   org_code: string

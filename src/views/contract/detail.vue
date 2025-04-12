@@ -16,7 +16,7 @@
         </div>
         <div class="flex items-center mr-8">
           <span class="text-gray-500">创建时间：</span>
-          <span>{{ dayjs(contractInfo.create_time * 1000).format('YYYY-MM-DD HH:mm:ss') }}</span>
+          <span>{{ formatTime(contractInfo.create_time) }}</span>
         </div>
         <div class="flex items-center mr-8">
           <span class="text-gray-500">状态：</span>
@@ -69,7 +69,7 @@
         </div>
         <div class="flex items-center">
           <span class="text-gray-500 w-24">购买日期：</span>
-          <span>{{ dayjs(contractInfo.buy_time * 1000).format('YYYY-MM-DD') }} </span>
+          <span>{{ formatTime(contractInfo.buy_time) }} </span>
         </div>
       </div>
     </div>
@@ -103,12 +103,12 @@
         <el-table-column label="成交金额(元)" prop="real_money" />
         <el-table-column label="开通时间" prop="open_time">
           <template #default="{ row }">
-            <span>{{ row.open_time ? dayjs(row.open_time).format('YYYY-MM-DD') : '-' }}</span>
+            <span>{{ formatTime(row.open_time) }}</span>
           </template>
         </el-table-column>
         <el-table-column label="截止日期" prop="freeze_time">
           <template #default="{ row }">
-            <span>{{ row.freeze_time ? dayjs(row.freeze_time).format('YYYY-MM-DD') : '-' }}</span>
+            <span>{{ formatTime(row.freeze_time) }}</span>
           </template>
         </el-table-column>
       </el-table>
@@ -165,8 +165,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getContractInfo, approvalContract, getContractApproveRecord } from '@/api/contract'
 import { Document, Tickets } from '@element-plus/icons-vue'
-import dayjs from 'dayjs'
 import { getAreas } from '@/api/customer'
+import { formatTime } from '@/utils/formatTime'
 
 const route = useRoute()
 const router = useRouter()

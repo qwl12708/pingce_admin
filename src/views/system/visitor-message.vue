@@ -11,14 +11,14 @@
         <el-table-column label="留言内容" prop="content" sortable />
         <el-table-column label="留言时间" prop="create_time" sortable>
           <template #default="{ row }">
-            {{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
         <el-table-column label="回复状态" prop="reply_status" sortable />
         <el-table-column label="回复人" prop="reply_user" sortable />
         <el-table-column label="回复时间" prop="replay_time" sortable>
           <template #default="{ row }">
-            {{ dayjs(row.replay_time).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ formatTime(row.replay_time) }}
           </template>
         </el-table-column>
         <el-table-column label="回复记录" prop="replay_content" sortable />
@@ -85,7 +85,8 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { getVisitorMessages, replyVisitorMessage } from '@/api/system/user'
-import dayjs from 'dayjs'
+
+import { formatTime } from '@/utils/formatTime'
 
 const currentPage = ref(1)
 const pageSize = ref(10)

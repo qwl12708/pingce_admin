@@ -29,7 +29,11 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" />
+          <el-table-column prop="createTime" label="创建时间">
+            <template #default="scope">
+              {{ formatTime(scope.row.createTime) }}
+            </template>
+          </el-table-column>
           <el-table-column label="操作" fixed="right">
             <template #default="scope">
               <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="handleEdit(scope.row)">
@@ -52,6 +56,7 @@ import { Plus, Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
 import { getSolutionList, deleteSolution } from '@/api/website/index'
+import { formatTime } from '@/utils/formatTime'
 
 const tableData = reactive([])
 

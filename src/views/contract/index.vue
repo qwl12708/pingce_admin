@@ -64,7 +64,11 @@
       <el-table-column prop="money" label="合同金额(元)" width="120" />
       <el-table-column prop="status_name" label="合同状态" width="120" />
       <el-table-column prop="approve_user" label="审批人" width="120" />
-      <el-table-column prop="approve_time" label="审批时间" width="160" />
+      <el-table-column prop="approve_time" label="审批时间" width="160">
+        <template #default="{ row }">
+          {{ formatTime(row.approve_time) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="approve_info" label="退回说明" width="160" />
       <el-table-column fixed="right" label="操作" width="180">
         <template #default="scope">
@@ -144,6 +148,7 @@ import {
   type FormInstance
 } from 'element-plus'
 import { useRoute } from 'vue-router'
+import { formatTime } from '@/utils/formatTime'
 
 const router = useRouter()
 const route = useRoute()

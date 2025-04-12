@@ -38,8 +38,16 @@
             {{ row.director_username || row.directorInfo?.name }}
           </template>
         </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" />
-        <el-table-column prop="update_time" label="更新时间" />
+        <el-table-column prop="create_time" label="创建时间">
+          <template #default="{ row }">
+            {{ formatTime(row.create_time) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="update_time" label="更新时间">
+          <template #default="{ row }">
+            {{ formatTime(row.update_time) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" fixed="right">
           <template #default="{ row }">
             <template v-if="row.children">
@@ -123,7 +131,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { getDepartmentList, createDepartment, editDepartment, getUserList, deleteDepartment } from '@/api/system/user'
-import dayjs from 'dayjs'
+import { formatTime } from '@/utils/formatTime'
 
 interface directorOptions {
   value: number
@@ -164,19 +172,14 @@ onMounted(() => {
 
 const fetchDepartmentList = async (params = {}) => {
   const response = await getDepartmentList({ ...params })
-  const flatData = response.data.map((item: any) => ({
-    ...item,
-    create_time: dayjs(item.create_time).format('YYYY-MM-DD HH:mm:ss'),
-    update_time: dayjs(item.update_time).format('YYYY-MM-DD HH:mm:ss')
-  }))
-  departmentOptions.value = flatData
+  departmentOptions.value = response.data
     .map((item: any) => ({
       value: item.id,
       label: item.name
     }))
     .concat({ label: '暂无', value: 0 })
-  tableData.value = convertToTree(flatData)
-  total.value = flatData.length
+  tableData.value = convertToTree(response.data)
+  total.value = response.data.length
 }
 
 const convertToTree = (data: any[]) => {

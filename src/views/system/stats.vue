@@ -76,17 +76,17 @@
         <el-table-column label="是否查找答案" prop="is_seek_answer" />
         <el-table-column label="创建时间" prop="create_time">
           <template #default="{ row }">
-            {{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
         <el-table-column label="开始时间" prop="start_time">
           <template #default="{ row }">
-            {{ dayjs(row.start_time).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ formatTime(row.start_time) }}
           </template>
         </el-table-column>
         <el-table-column label="结束时间" prop="end_time">
           <template #default="{ row }">
-            {{ dayjs(row.end_time).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ formatTime(row.end_time) }}
           </template>
         </el-table-column>
       </el-table>
@@ -110,7 +110,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { getEvaluationTotal, getSelfTotal } from '@/api/system/user'
-import dayjs from 'dayjs'
+import { formatTime } from '@/utils/formatTime'
 
 const searchKeyword = ref('')
 const currentTab = ref('1')

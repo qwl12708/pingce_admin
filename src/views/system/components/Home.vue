@@ -38,7 +38,11 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="create_time" label="创建时间" width="180" />
+          <el-table-column prop="create_time" label="创建时间" width="180">
+            <template #default="scope">
+              {{ formatTime(scope.row.create_time) }}
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="150" fixed="right">
             <template #default="scope">
               <el-button type="primary" link class="!rounded-button whitespace-nowrap" @click="handleEdit(scope.row)">
@@ -90,7 +94,11 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="create_time" label="创建时间" width="180" />
+          <el-table-column prop="create_time" label="创建时间" width="180">
+            <template #default="scope">
+              {{ formatTime(scope.row.create_time) }}
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="150" fixed="right">
             <template #default="scope">
               <el-button
@@ -123,6 +131,7 @@ import { Plus, Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
 import { getCustomerList, getAdvantageList, deleteCustomer, deleteAdvantage } from '@/api/website/index'
+import { formatTime } from '@/utils/formatTime'
 
 interface TableItem {
   content: string

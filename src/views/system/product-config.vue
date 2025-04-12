@@ -25,7 +25,11 @@
         <el-table-column label="排序" prop="role" />
         <el-table-column label="创建人" prop="department" />
         <el-table-column label="状态" prop="area" />
-        <el-table-column label="创建时间" prop="createdTime" sortable />
+        <el-table-column label="创建时间" prop="createdTime" sortable>
+          <template #default="{ row }">
+            <span>{{ formatTime(row.createdTime) }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">详情</el-button>
@@ -109,6 +113,7 @@ import { reactive, ref } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import router from '@/router'
+import { formatTime } from '@/utils/formatTime'
 
 const searchKeyword = ref('')
 const currentPage = ref(1)

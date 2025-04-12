@@ -34,7 +34,7 @@
         </el-table-column>
         <el-table-column prop="create_time" label="创建时间">
           <template #default="scope">
-            {{ formatDate(scope.row.create_time) }}
+            {{ formatTime(scope.row.create_time) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" width="180">
@@ -68,7 +68,8 @@ import { ref, onMounted } from 'vue'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import router from '@/router'
 import { getBannerList, deleteBanner } from '@/api/website/banner'
-import dayjs from 'dayjs'
+
+import { formatTime } from '@/utils/formatTime'
 
 interface TableItem {
   content: string
@@ -139,10 +140,6 @@ const fetchBannerList = async () => {
   } catch (error) {
     console.error('获取Banner列表失败', error)
   }
-}
-
-const formatDate = (timestamp: number) => {
-  return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss')
 }
 
 onMounted(() => {

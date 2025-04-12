@@ -44,7 +44,7 @@
         <el-table-column prop="address" label="详细地址" />
         <el-table-column prop="create_time" label="创建时间" sortable>
           <template #default="{ row }">
-            <span>{{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}</span>
+            {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
         <el-table-column prop="project_num" label="累计项目数" sortable />
@@ -94,8 +94,8 @@ import { ref, onMounted } from 'vue'
 import { UserFilled, Setting } from '@element-plus/icons-vue'
 import router from '@/router'
 import { getAreas, getConsultantList, bindConsultant, getSegmenteList } from '@/api/customer'
-import dayjs from 'dayjs'
 import { ElMessage, ElTreeSelect } from 'element-plus'
+import { formatTime } from '@/utils/formatTime'
 
 const showDialog = ref(false)
 const dialogForm = ref({

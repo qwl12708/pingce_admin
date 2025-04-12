@@ -42,7 +42,7 @@
       <el-table-column label="创建人" prop="creator" width="120" />
       <el-table-column label="创建时间" prop="create_time" sortable width="180">
         <template #default="{ row }">
-          {{ dayjs(row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+          {{ formatTime(row.create_time) }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="300" fixed="right">
@@ -131,7 +131,8 @@
 import { ref, onMounted } from 'vue'
 import { Search, Plus, ArrowDown } from '@element-plus/icons-vue'
 import { getRoleList, deleteRoleType, getRoleTypeList } from '@/api/system/user'
-import dayjs from 'dayjs'
+
+import { formatTime } from '@/utils/formatTime'
 
 const searchKeyword = ref('')
 const selectedRows = ref<any[]>([])

@@ -45,8 +45,8 @@
           </template>
         </el-table-column>
         <el-table-column label="创建时间" prop="create_time" sortable>
-          <template #default="scope">
-            {{ dayjs(scope.row.create_time).format('YYYY-MM-DD HH:mm:ss') }}
+          <template #default="{ row }">
+            {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
       </el-table>
@@ -121,7 +121,8 @@ import { Delete, Plus } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { getUserList, getDepartmentList, getRoleList, deleteUsers, createPlatformUser } from '@/api/system/user'
 import ImageUploader from '@/components/ImageUploader/index.vue'
-import dayjs from 'dayjs'
+
+import { formatTime } from '@/utils/formatTime'
 
 const searchKeyword = ref('')
 const currentPage = ref(1)
