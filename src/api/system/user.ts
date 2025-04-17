@@ -59,7 +59,7 @@ export const deleteRoleType = (data: { id: string }) =>
   })
 
 // 平台/用户角色 - 创建角色
-export const createRole = (data: { type_id: number; name: string; sort: number; status: number; rules: string }) =>
+export const createRole = (data: { role_type: string; name: string; sort: number; status: number; rules: string }) =>
   request({
     url: '/platformApi/role/create',
     method: 'POST',
@@ -69,7 +69,7 @@ export const createRole = (data: { type_id: number; name: string; sort: number; 
 // 平台/用户角色 - 编辑角色
 export const editRole = (data: {
   id?: number
-  type_id?: number
+  role_type?: string
   name?: string
   sort?: number
   status?: number

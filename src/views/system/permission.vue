@@ -29,7 +29,13 @@
     <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
       <el-table-column type="selection" width="55" />
       <el-table-column label="序号" prop="id" width="80" />
-      <el-table-column label="角色类型" prop="roleType.name" sortable width="120" />
+      <el-table-column label="角色类型" prop="role_type" sortable width="120">
+        <template #default="{ row }">
+          <el-tag :type="row.role_type === 1 ? 'success' : 'info'">
+            {{ row.role_type }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="角色名称" prop="name" sortable width="120" />
       <el-table-column label="显示顺序" prop="sort" width="100" />
       <el-table-column label="状态" width="100">
@@ -85,7 +91,7 @@
       <div class="form-content">
         <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
           <el-form-item label="角色类型" required>
-            <el-select v-model="form.type_id" class="w-full">
+            <el-select v-model="form.role_type" class="w-full">
               <el-option v-for="type in roleTypeOptions" :key="type.value" :label="type.label" :value="type.value" />
             </el-select>
           </el-form-item>
@@ -100,14 +106,14 @@
 
           <el-form-item label="状态">
             <el-radio-group v-model="form.status">
-              <el-radio label="1">正常</el-radio>
-              <el-radio label="0">停用</el-radio>
+              <el-radio :label="1">正常</el-radio>
+              <el-radio :label="0">停用</el-radio>
             </el-radio-group>
           </el-form-item>
 
-          <el-form-item label="管理员">
+          <!-- <el-form-item label="管理员">
             <el-checkbox v-model="form.isAdmin">设为管理员</el-checkbox>
-          </el-form-item>
+          </el-form-item> -->
 
           <el-form-item label="菜单权限">
             <el-tree
@@ -222,14 +228,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { Search, Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance } from 'element-plus'
 import {
   getRoleList,
   deleteRoleType,
-  getRoleTypeList,
   createRole,
   editRole,
   getRoleInfo,
@@ -273,6 +278,11 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 const tableData = ref<any[]>([])
+const roleTypeOptions = ref<any[]>([
+  { value: 'admin', label: '管理员' },
+  { value: 'consultant', label: '客服顾问' },
+  { value: 'user', label: '普通角色' }
+])
 
 const fetchRoleList = async (params = {}) => {
   const response = await getRoleList(params)
@@ -282,7 +292,6 @@ const fetchRoleList = async (params = {}) => {
 
 onMounted(() => {
   fetchRoleList()
-  fetchRoleTypeList()
 })
 
 const handleSearch = () => {
@@ -323,18 +332,18 @@ const roleDialogVisible = ref(false)
 
 const formRef = ref<FormInstance>()
 const rules = {
-  type_id: [{ required: true, message: '请选择角色类型', trigger: 'change' }],
+  role_type: [{ required: true, message: '请选择角色类型', trigger: 'change' }],
   name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
   sort: [{ required: true, message: '请输入显示顺序', trigger: 'blur' }]
 }
 
 const form = ref({
   id: undefined,
-  type_id: '',
+  role_type: '',
   name: '',
   sort: 0,
-  status: '1',
-  isAdmin: false
+  status: 1
+  // isAdmin: false
 })
 
 const menuTree = ref()
@@ -342,11 +351,11 @@ const menuTree = ref()
 const resetForm = () => {
   form.value = {
     id: undefined,
-    type_id: '',
+    role_type: '',
     name: '',
     sort: 0,
-    status: '1',
-    isAdmin: false
+    status: 1
+    // isAdmin: false
   }
   menuTree.value?.setCheckedKeys([])
 }
@@ -355,22 +364,36 @@ const handleEdit = async (row: any) => {
   const res = await getRoleInfo({ id: row.id })
   form.value = {
     id: row.id,
-    type_id: res.data.type_id,
+    role_type: res.data.role_type,
     name: res.data.name,
     sort: res.data.sort,
-    status: res.data.status.toString(),
-    isAdmin: res.data.isAdmin
+    status: res.data.status
+    // isAdmin: res.data.isAdmin
   }
-  // 确保字符串不为空且包含有效数据
-  if (res.data.rules && res.data.rules.trim()) {
-    const ruleIds = res.data.rules
+
+  // 处理菜单权限回显
+  if (res.data.rules) {
+    const menuIds = res.data.rules
       .split(',')
       .map(Number)
-      .filter(id => !isNaN(id))
-    menuTree.value?.setCheckedKeys(ruleIds)
+      .filter(id => id)
+    console.log('menuIds', menuIds)
+    // 设置选中的节点
+    menuTree.value?.setCheckedKeys(menuIds)
+    // 设置新的选中状态 menuTree.value?.setCheckedKeys([])
+    if (menuIds.length > 0) {
+      nextTick(() => {
+        menuTree.value?.setCheckedKeys(menuIds)
+        roleDialogVisible.value = true
+      })
+    }
+
+    // 展开所有节点以便查看
+    menuTree.value?.expandAll()
   } else {
     menuTree.value?.setCheckedKeys([])
   }
+
   roleDialogVisible.value = true
 }
 
@@ -394,15 +417,21 @@ const handleSubmit = async () => {
       // 合并完全选中和半选中的节点
       const allSelectedKeys = [...new Set([...checkedKeys, ...halfCheckedKeys])]
 
+      const { status, name, sort, role_type } = form.value
       const data = {
-        ...form.value,
-        rules: allSelectedKeys.join(','),
-        status: parseInt(form.value.status)
+        status,
+        name,
+        role_type,
+        sort,
+        rules: allSelectedKeys.join(',')
       }
 
       try {
         if (form.value.id) {
-          await editRole(data)
+          await editRole({
+            id: form.value.id,
+            ...data
+          })
           ElMessage.success('编辑成功')
         } else {
           await createRole(data)
@@ -416,16 +445,6 @@ const handleSubmit = async () => {
       }
     }
   })
-}
-
-const roleTypeOptions = ref<any[]>([])
-
-const fetchRoleTypeList = async () => {
-  const response = await getRoleTypeList()
-  roleTypeOptions.value = response.data.map((item: any) => ({
-    value: item.id,
-    label: item.name
-  }))
 }
 
 const defaultProps = ref({

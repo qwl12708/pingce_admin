@@ -19,8 +19,16 @@
               </div>
               <el-table :data="expireScoreData" style="width: 100%">
                 <el-table-column prop="score" label="点数" />
-                <el-table-column prop="expire_time" label="截止日期" />
-                <el-table-column prop="buy_time" label="购买时间" />
+                <el-table-column prop="end_time" label="截止日期">
+                  <template #default="scope">
+                    {{ formatTime(scope.row.end_time) }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="buy_time" label="购买时间">
+                  <template #default="scope">
+                    {{ formatTime(scope.row.buy_time) }}
+                  </template>
+                </el-table-column>
               </el-table>
             </div>
             <div>
@@ -30,9 +38,17 @@
               </div>
               <el-table :data="usedProductData" style="width: 100%">
                 <el-table-column prop="name" label="套餐名称" />
-                <el-table-column prop="evaluation_name" label="适用问卷" />
-                <el-table-column prop="end_time" label="截止日期" />
-                <el-table-column prop="buy_time" label="购买时间" />
+                <el-table-column prop="questionnaire_name" label="适用问卷" />
+                <el-table-column prop="end_time" label="截止日期">
+                  <template #default="scope">
+                    {{ formatTime(scope.row.end_time) }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="buy_time" label="购买时间">
+                  <template #default="scope">
+                    {{ formatTime(scope.row.buy_time) }}
+                  </template>
+                </el-table-column>
               </el-table>
             </div>
           </div>
@@ -41,14 +57,14 @@
         <el-tab-pane label="测评产品使用记录" name="usage">
           <div class="p-6">
             <el-table :data="scoreProductData" style="width: 100%">
-              <el-table-column prop="project" label="测评项目" />
-              <el-table-column prop="evaluation_name" label="使用问卷" />
-              <el-table-column prop="standard_score" label="标准点数" />
+              <el-table-column prop="project_name" label="测评项目" />
+              <el-table-column prop="questionnaire_name" label="使用问卷" />
+              <el-table-column prop="score_num" label="标准点数" />
               <el-table-column prop="invite_count" label="邀请评测人数" />
-              <el-table-column prop="freeze_score_num" label="冻结点数" />
-              <el-table-column prop="used_score" label="消耗点数" />
-              <el-table-column prop="operator" label="操作者" />
-              <el-table-column prop="use_time" label="使用时间" />
+              <el-table-column prop="freeze_num" label="冻结点数" />
+              <el-table-column prop="use_num" label="消耗点数" />
+              <el-table-column prop="creater" label="操作者" />
+              <el-table-column prop="create_time" label="创建时间" />
             </el-table>
           </div>
         </el-tab-pane>
@@ -56,14 +72,30 @@
         <el-tab-pane label="产品套餐购买记录" name="purchase">
           <div class="p-6">
             <el-table :data="allProductData" style="width: 100%">
-              <el-table-column prop="type" label="类别" />
-              <el-table-column prop="score" label="点数" />
-              <el-table-column prop="package" label="套餐" />
-              <el-table-column prop="evaluation_name" label="可使用问卷" />
-              <el-table-column prop="buy_time" label="购买日期" />
+              <el-table-column prop="type" label="类别">
+                <template #default="scope">
+                  {{ scope.row.type === 1 ? '包年包月' : '点数' }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="score_num" label="点数" />
+              <el-table-column prop="name" label="套餐" />
+              <el-table-column prop="questionnaire_name" label="可使用问卷" />
+              <el-table-column prop="buy_time" label="购买日期">
+                <template #default="scope">
+                  {{ formatTime(scope.row.buy_time) }}
+                </template>
+              </el-table-column>
               <el-table-column prop="contract_no" label="合同编号" />
-              <el-table-column prop="open_time" label="开通时间" />
-              <el-table-column prop="end_time" label="截止日期" />
+              <el-table-column prop="start_time" label="开通时间">
+                <template #default="scope">
+                  {{ formatTime(scope.row.start_time) }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="end_time" label="截止日期">
+                <template #default="scope">
+                  {{ formatTime(scope.row.end_time) }}
+                </template>
+              </el-table-column>
               <el-table-column prop="remark" label="备注" />
             </el-table>
           </div>
@@ -78,6 +110,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getScoreInfo, getExpireScore, getUsedProduct, getScoreProduct, getAllProduct } from '@/api/customer'
 import { Tickets, Box } from '@element-plus/icons-vue'
+import { formatTime } from '@/utils/formatTime'
 
 const route = useRoute()
 const customerId = ref(route.query.id)
@@ -95,22 +128,22 @@ const fetchScoreInfo = async () => {
 }
 
 const fetchExpireScore = async () => {
-  const { data } = await getExpireScore({ id: Number(customerId.value), page: 1, pageSize: 10 })
+  const { data } = await getExpireScore({ id: Number(customerId.value), page: 1, pageSize: 100 })
   expireScoreData.value = data.list
 }
 
 const fetchUsedProduct = async () => {
-  const { data } = await getUsedProduct({ id: Number(customerId.value), page: 1, pageSize: 10 })
+  const { data } = await getUsedProduct({ id: Number(customerId.value), page: 1, pageSize: 100 })
   usedProductData.value = data.list
 }
 
 const fetchScoreProduct = async () => {
-  const { data } = await getScoreProduct({ id: Number(customerId.value), page: 1, pageSize: 10 })
+  const { data } = await getScoreProduct({ id: Number(customerId.value), page: 1, pageSize: 100 })
   scoreProductData.value = data.list
 }
 
 const fetchAllProduct = async () => {
-  const { data } = await getAllProduct({ id: Number(customerId.value), page: 1, pageSize: 10 })
+  const { data } = await getAllProduct({ id: Number(customerId.value), page: 1, pageSize: 100 })
   allProductData.value = data.list
 }
 
@@ -118,12 +151,13 @@ onMounted(() => {
   fetchScoreInfo()
   fetchExpireScore()
   fetchUsedProduct()
-  fetchScoreProduct()
 })
 
 const handleTabClick = (tab: any) => {
-  if (tab.name === 'purchase') {
+  if (tab.props.name === 'purchase') {
     fetchAllProduct()
+  } else if (tab.props.name === 'usage') {
+    fetchScoreProduct()
   }
 }
 </script>

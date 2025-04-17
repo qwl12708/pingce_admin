@@ -108,12 +108,11 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Lock, Refresh } from '@element-plus/icons-vue'
+import { Lock } from '@element-plus/icons-vue'
 import type { UploadProps, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { getCurrentUserInfo, editCurrentUserInfo, editCurrentUserPassword, getDepartmentList } from '@/api/system/user'
 import { uploadImg } from '@/api/modules/UploadApi'
-// TODO: 修改花名、部门、头像、密码重置等接口
 
 const userInfo = ref({})
 

@@ -2,14 +2,15 @@ import { defineStore } from 'pinia'
 import { reactive, toRefs } from 'vue'
 import { resetRouter } from '@/router'
 import { removeToken } from '@/utils/auth'
+import { getCurrentUserInfo } from '@/api/system/user'
 
 export const useUserStore = defineStore('user', () => {
   const initData: UserState = reactive({
     token: '',
     name: '',
     avatar: '', // 头像
-    introduction: '', // 介绍
-    roles: [] // 角色
+    roles: [], // 角色
+    menuIds: [] // 菜单id
   })
 
   // Set Token
@@ -33,24 +34,29 @@ export const useUserStore = defineStore('user', () => {
   function setRoles(val: string[]) {
     initData.roles = val
   }
+  function setMenuIds(val: string[]) {
+    initData.menuIds = val
+  }
 
   function getInfo() {
     return new Promise<any>(async (resolve): any => {
-      let info: any = null
-      // TODO
-      info = {
-        name: 'admin',
-        avatar: '', // 头像
-        introduction: '管理员', // 介绍
-        roles: ['admin'] // 角色
+      try {
+        const { data } = await getCurrentUserInfo()
+        console.log('%c [ data ]-50', 'font-size:13px; background:pink; color:#bf2c9f;', data)
+        const { role_type = ['admin'], nickname, name, avatar } = data
+        setName(nickname)
+        setAvatar(avatar)
+        setIntroduction(name)
+        setRoles(role_type)
+        // 通过map方法将rules中的值转换为数字类型, 且值都为真
+        const rules = data.rules.map(e => Number(e)).filter(Boolean)
+        console.log('%c [ rules ]-53', 'font-size:13px; background:pink; color:#bf2c9f;', rules)
+        setMenuIds(rules)
+
+        resolve({ ...data, roles: role_type, menuIds: rules })
+      } catch (error) {
+        console.log('获取用户信息失败', error)
       }
-      // const { data } = await getRoleInfo()
-      const { roles, name, avatar, introduction } = info
-      setName(name)
-      setAvatar(avatar)
-      setIntroduction(introduction)
-      setRoles(roles)
-      resolve(info)
     })
   }
 
