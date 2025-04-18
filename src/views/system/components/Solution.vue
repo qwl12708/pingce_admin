@@ -24,14 +24,14 @@
           <el-table-column prop="creator" label="创建人" />
           <el-table-column prop="status" label="状态">
             <template #default="scope">
-              <el-tag :type="scope.row.status === '显示' ? 'success' : 'info'">
-                {{ scope.row.status }}
+              <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
+                {{ scope.row.status === 1 ? '显示' : '隐藏' }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间">
+          <el-table-column prop="create_time" label="创建时间">
             <template #default="scope">
-              {{ formatTime(scope.row.createTime) }}
+              {{ formatTime(scope.row.create_time) }}
             </template>
           </el-table-column>
           <el-table-column label="操作" fixed="right">

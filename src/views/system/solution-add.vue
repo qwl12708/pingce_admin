@@ -43,13 +43,13 @@ const isEditPage = ref(false)
 const formRef = ref()
 
 const form = reactive({
-  name: '',
+  title: '',
   sort: 0,
   content: ''
 })
 
 const rules = {
-  name: [
+  title: [
     { required: true, message: '请输入方案名称', trigger: 'blur' },
     { max: 50, message: '长度不能超过50个字符', trigger: 'blur' }
   ],
@@ -58,10 +58,16 @@ const rules = {
 
 const fetchSolutionInfo = async id => {
   try {
-    const response = await getSolutionInfo({ id })
-    form.name = response.data.name
-    form.content = response.data.content
-    form.sort = response.data.sort
+    const {
+      data: {
+        info: { title, content, sort }
+      }
+    } = await getSolutionInfo({ id })
+    Object.assign(form, {
+      title,
+      content,
+      sort
+    })
   } catch (error) {
     ElMessage.error('获取详情失败')
   }

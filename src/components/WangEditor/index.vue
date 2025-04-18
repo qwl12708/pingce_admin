@@ -8,7 +8,7 @@
       v-if="!hideToolBar"
     />
     <Editor
-      class="editor-content'"
+      class="editor-content"
       :style="{ height }"
       :mode="mode"
       v-model="valueHtml"
@@ -105,7 +105,7 @@ props.editorConfig.MENU_CONF!['uploadImage'] = {
     formData.append('file', file)
     try {
       const { data } = await api.UploadApi.uploadImg(formData)
-      insertFn(data.fileUrl)
+      insertFn(data.url)
     } catch (error) {
       console.log(error)
     }

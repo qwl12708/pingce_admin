@@ -131,9 +131,9 @@ const handleSubmit = async () => {
   }
   try {
     if (form.id) {
-      await editInviteTemplate({ ...form, replace_contents, intro: '' })
+      await editInviteTemplate({ ...form, replace_contents: JSON.stringify(replace_contents), intro: '' })
     } else {
-      await addInviteTemplate({ ...form, replace_contents, intro: '' })
+      await addInviteTemplate({ ...form, replace_contents: JSON.stringify(replace_contents), intro: '' })
     }
     ElMessage.success('提交成功')
     router.push('/product/invite-guide')
