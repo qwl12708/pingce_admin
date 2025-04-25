@@ -79,7 +79,7 @@ export const deleteProduct = (data: { ids?: string }) =>
 //         "evaluation_name": ""
 //     }
 // ]
-export const getProductList = (params: { page?: number; pageSize?: number }) =>
+export const getProductList = (params: { customer_id: string; page?: number; pageSize?: number }) =>
   request({
     url: PRODUCT_PATH + '/lst',
     method: 'GET',

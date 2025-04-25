@@ -225,3 +225,61 @@ export const getContact = () =>
     url: CONFIG_PATH + '/contact',
     method: 'GET'
   })
+
+// 产品配置- 创建产品
+export const addProduct = (data: {
+  type: number
+  sort: number
+  img: string
+  content: string
+  link: string
+  muduleName: string
+  title: string
+  intro: string
+}) =>
+  request({
+    url: '/platformApi/web/product/add',
+    method: 'POST',
+    data
+  })
+
+// 产品配置- 编辑产品
+export const editProduct = (data: {
+  id: number
+  type: number
+  sort: number
+  img: string
+  content: string
+  link: string
+  muduleName: string
+  title: string
+  intro: string
+}) =>
+  request({
+    url: '/platformApi/web/product/edit',
+    method: 'POST',
+    data
+  })
+
+// 产品配置- 删除产品
+export const deleteProduct = (data: { ids: string }) =>
+  request({
+    url: '/platformApi/web/product/del',
+    method: 'POST',
+    data
+  })
+
+// 产品配置- 获取产品列表
+export const getProductList = () =>
+  request({
+    url: '/platformApi/web/product/lst',
+    method: 'GET'
+  })
+
+// 产品配置- 获取产品详情
+export const getProductInfo = (params: { id?: string }) =>
+  request({
+    url: '/platformApi/web/product/info',
+    method: 'GET',
+    params
+  })

@@ -121,19 +121,19 @@ const handleSubmit = async () => {
     { caseSensitive: true }
   )
 
-  let replace_contents = {}
+  let replace_content = {}
   if (replaceKeywords.length) {
     keywords.value.forEach(e => {
       if (replaceKeywords.includes(e.value)) {
-        replace_contents[e.value] = e.name
+        replace_content[e.value] = e.name
       }
     })
   }
   try {
     if (form.id) {
-      await editInviteTemplate({ ...form, replace_contents: JSON.stringify(replace_contents), intro: '' })
+      await editInviteTemplate({ ...form, replace_content: JSON.stringify(replace_content), intro: '' })
     } else {
-      await addInviteTemplate({ ...form, replace_contents: JSON.stringify(replace_contents), intro: '' })
+      await addInviteTemplate({ ...form, replace_content: JSON.stringify(replace_content), intro: '' })
     }
     ElMessage.success('提交成功')
     router.push('/product/invite-guide')

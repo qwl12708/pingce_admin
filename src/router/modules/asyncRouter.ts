@@ -384,6 +384,17 @@ const baseRoutes: MenuType.MenuOptions[] = [
         }
       },
       {
+        path: 'product-banner-add',
+        component: () => import('@/views/system/product-banner-add.vue'),
+        meta: {
+          title: '新增产品配置banner',
+          icon: 'none',
+          roles: ['admin', 'visitor'],
+          isKeepAlive: true,
+          hidden: true
+        }
+      },
+      {
         path: 'stats',
         component: () => import('@/views/system/stats.vue'),
         meta: {

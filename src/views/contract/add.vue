@@ -251,7 +251,6 @@ const advancedSum = (data, key) => {
 onMounted(async () => {
   fetchApprovalFlowOptions()
   await fetchCustomerOptions()
-  fetchPackageData()
   _getUserList()
   await fetchAreas()
   const { id } = route.query
@@ -322,10 +321,15 @@ const submitForm = async (status: number) => {
   })
 }
 
-const save = () => {}
-
 const fetchPackageData = async () => {
-  const { data } = await getProductList({ page: 1, pageSize: 100 })
+  if (!form.value.customer_id) {
+    ElMessage.error('请先选择客户编号')
+    return new Promise((_, reject) => {
+      reject('请先选择客户编号')
+    })
+  }
+
+  const { data } = await getProductList({ customer_id: form.value.customer_id, page: 1, pageSize: 100 })
   packageData.value = data.list
 }
 
@@ -339,8 +343,10 @@ const handlePackageConfirm = () => {
 }
 
 const handleShowPackageDialog = async () => {
-  selectedPackages.value = tableData.value
-  showPackageDialog.value = true
+  fetchPackageData().then(() => {
+    selectedPackages.value = tableData.value
+    showPackageDialog.value = true
+  })
 }
 </script>
 

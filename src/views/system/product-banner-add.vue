@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-white p-4">
     <div class="max-w-4xl bg-white rounded-lg shadow-sm p-6">
       <h2 class="text-xl font-medium mb-6">
-        {{ isDetailPage ? '查看 banner 图' : isEditPage ? '编辑 banner 图' : '新增 banner 图' }}
+        {{ isDetailPage ? '查看产品配置 banner 图' : isEditPage ? '编辑产品配置 banner 图' : '新增产品配置banner 图' }}
       </h2>
 
       <el-form ref="formRef" :model="form" label-width="120px" :disabled="isDetailPage">
@@ -66,7 +66,7 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRoute } from 'vue-router'
-import { getBannerInfo, createBanner, editBanner } from '@/api/website/banner'
+import { getProductInfo, addProduct, editProduct } from '@/api/website/index'
 import ImageUploader from '@/components/ImageUploader/index.vue'
 import type { FormInstance } from 'element-plus'
 import router from '@/router'
@@ -88,7 +88,7 @@ const form = ref({
 
 const fetchBannerInfo = async (id: string) => {
   try {
-    const response = await getBannerInfo({ id })
+    const response = await getProductInfo({ id })
     const data = response.data
     console.log('%c [ data ]-93', 'font-size:13px; background:pink; color:#bf2c9f;', data)
     form.value.type = data.type
@@ -120,17 +120,15 @@ onMounted(() => {
 const handleSubmit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   try {
-    const r = await formEl.validate()
-    console.log('%c [ form.value ]-167', 'font-size:13px; background:pink; color:#bf2c9f;', form.value)
-    console.log('%c [ r ]-167', 'font-size:13px; background:pink; color:#bf2c9f;', r)
+    await formEl.validate()
 
     if (route.query.type === 'edit') {
-      await editBanner({ ...form.value, id: route.query.id })
+      await editProduct({ ...form.value, id: route.query.id })
     } else {
-      await createBanner(form.value)
+      await addProduct(form.value)
     }
     ElMessage.success('保存成功')
-    router.push('/system/website-config')
+    router.push('/system/product-config')
   } catch (error) {
     console.error('保存失败', error)
   }

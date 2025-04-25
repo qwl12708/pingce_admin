@@ -34,7 +34,11 @@
             <el-button type="primary" link @click="handleEdit(row)">{{ row.name }}</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="模板内容" prop="remark" />
+        <el-table-column label="模板内容" prop="content">
+          <template #default="{ row }">
+            <div v-html="row.content" class="text-gray-500 text-sm"></div>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>

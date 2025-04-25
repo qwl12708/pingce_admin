@@ -32,12 +32,19 @@
           <el-table-column prop="sort" label="排序" width="80" />
           <el-table-column prop="creater" label="创建人" width="100" />
           <el-table-column prop="status" label="状态" width="100">
+            <!-- switch开关 -->
             <template #default="scope">
-              <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
-                {{ scope.row.status === 1 ? '显示' : '隐藏' }}
-              </el-tag>
+              <el-switch
+                :model-value="scope.row.status === 1"
+                :active-value="true"
+                :inactive-value="false"
+                active-color="#13ce66"
+                inactive-color="#ff4949"
+                @update:model-value="val => handleSwitchChange(scope.row.id, val)"
+              />
             </template>
           </el-table-column>
+
           <el-table-column prop="create_time" label="创建时间" width="180">
             <template #default="scope">
               {{ formatTime(scope.row.create_time) }}
@@ -89,9 +96,14 @@
           <el-table-column prop="creater" label="创建人" width="100" />
           <el-table-column prop="status" label="状态" width="100">
             <template #default="scope">
-              <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
-                {{ scope.row.status === 1 ? '显示' : '隐藏' }}
-              </el-tag>
+              <el-switch
+                :model-value="scope.row.status === 1"
+                :active-value="true"
+                :inactive-value="false"
+                active-color="#13ce66"
+                inactive-color="#ff4949"
+                @update:model-value="val => handleSwitchChangeCooperation(scope.row.id, val)"
+              />
             </template>
           </el-table-column>
           <el-table-column prop="create_time" label="创建时间" width="180">
@@ -130,7 +142,14 @@ import { ref, onMounted } from 'vue'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
-import { getCustomerList, getAdvantageList, deleteCustomer, deleteAdvantage } from '@/api/website/index'
+import {
+  getCustomerList,
+  getAdvantageList,
+  deleteCustomer,
+  deleteAdvantage,
+  updateAdvantageStatus,
+  updateCustomerStatus
+} from '@/api/website/index'
 import { formatTime } from '@/utils/formatTime'
 
 interface TableItem {
@@ -220,6 +239,36 @@ const handleDeleteClient = async (row: any) => {
   }
 }
 
+const handleSwitchChange = async (id: number, value: boolean) => {
+  const targetStatus = value ? 1 : 0
+  const item = tableData.value.find(item => item.id === id)
+  if (!item) return
+
+  try {
+    await updateAdvantageStatus({ id })
+    // 更新成功后手动更新本地数据
+    item.status = targetStatus
+    ElMessage.success('状态更新成功')
+  } catch (error) {
+    ElMessage.error('状态更新失败')
+  }
+}
+
+const handleSwitchChangeCooperation = async (id: number, value: boolean) => {
+  const targetStatus = value ? 1 : 0
+  const item = CustomerData.value.find(item => item.id === id)
+  if (!item) return
+
+  try {
+    await updateCustomerStatus({ id })
+    // 更新成功后手动更新本地数据
+    item.status = targetStatus
+    ElMessage.success('状态更新成功')
+  } catch (error) {
+    ElMessage.error('状态更新失败')
+  }
+}
+
 const handleBatchDeleteClient = async () => {
   if (selectedClients.value.length === 0) {
     ElMessage.warning('请选择要删除的客户')
@@ -248,7 +297,6 @@ const fetchCustomerList = async () => {
 const fetchAdvantageList = async () => {
   try {
     const response = await getAdvantageList()
-    console.log('%c [ 获取优势列表 ]-190', 'font-size:13px; background:pink; color:#bf2c9f;', response)
     tableData.value = response.data
   } catch (error) {
     console.error('获取优势列表失败', error)
