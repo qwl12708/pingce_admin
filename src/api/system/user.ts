@@ -392,6 +392,7 @@ export const setOtherConfig = (data: {
   job_evaluation_intro?: string
   customized_evaluation_intro?: string
   bottom_nav_content?: string
+  bottom_record_content?: string
   copyright_intro?: string
   privacy_intro?: string
 }) =>

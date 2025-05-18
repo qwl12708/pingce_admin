@@ -31,7 +31,7 @@
 
           <!-- 根据类型显示不同字段 -->
           <el-form-item v-if="form.type === 1" label="详情内容" prop="content" required>
-            <el-input type="textarea" v-model="form.content" :rows="6" placeholder="请输入详情内容" />
+            <WangEditor height="400px" v-model:value="form.content" />
           </el-form-item>
 
           <el-form-item v-if="form.type === 2" label="链接地址" prop="link" required>
@@ -68,6 +68,7 @@ import { ElMessage } from 'element-plus'
 import { useRoute } from 'vue-router'
 import { getProductInfo, addProduct, editProduct } from '@/api/website/index'
 import ImageUploader from '@/components/ImageUploader/index.vue'
+import WangEditor from '@/components/WangEditor/index.vue'
 import type { FormInstance } from 'element-plus'
 import router from '@/router'
 

@@ -32,11 +32,7 @@
             </el-form-item>
 
             <el-form-item label="员工人数" prop="employees_num" class="flex items-center">
-              <el-select v-model="form.employees_num" placeholder="请选择">
-                <el-option label="50人以下" value="lt50" />
-                <el-option label="50-200人" value="50-200" />
-                <el-option label="200人以上" value="gt200" />
-              </el-select>
+              <el-input v-model="form.employees_num" placeholder="请输入" />
             </el-form-item>
 
             <el-form-item label="上传单位LOGO" prop="org_logo" required class="flex items-center">
@@ -45,9 +41,7 @@
             </el-form-item>
             <el-form-item label="所属行业" prop="industry_id">
               <el-select v-model="form.industry_id" placeholder="请选择">
-                <el-option label="互联网" value="internet" />
-                <el-option label="金融" value="finance" />
-                <el-option label="教育" value="education" />
+                <el-option v-for="item in industryOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
             <el-form-item label="单位所在省/市/自治区" prop="area_ids" required>
@@ -117,7 +111,8 @@ import {
   getInstitutionInfo,
   createSms,
   getAreas,
-  getConsultantList
+  getConsultantList,
+  getIndustries
 } from '@/api/customer'
 import { ElMessage } from 'element-plus'
 import ImageUploader from '@/components/ImageUploader/index.vue'
@@ -163,6 +158,7 @@ const isSendingCode = ref(false)
 const countdown = ref(0)
 const regionData = ref([])
 const consultantOptions = ref([])
+const industryOptions = ref([])
 
 const sendSmsCode = async () => {
   if (!form.phone) {
@@ -196,6 +192,7 @@ onMounted(async () => {
   console.log('页面初始化', router)
   fetchConsultantList()
   fetchAreas()
+  fetchIndustries()
   const type = router.currentRoute.value.query?.type
   const id = router.currentRoute.value.query?.id
   customerType.value = Number(type)
@@ -209,6 +206,19 @@ onMounted(async () => {
     }
   }
 })
+
+// 添加获取行业列表的方法
+const fetchIndustries = async () => {
+  try {
+    const { data } = await getIndustries()
+    industryOptions.value = data.map(item => ({
+      value: item.id,
+      label: item.name
+    }))
+  } catch (error) {
+    console.error('获取行业列表失败', error)
+  }
+}
 
 const fetchConsultantList = async () => {
   try {

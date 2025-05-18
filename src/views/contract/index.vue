@@ -59,7 +59,11 @@
       <el-table-column prop="contract_no" label="合同编号" width="120" />
       <el-table-column prop="user_no" label="客户编号" width="100" />
       <el-table-column prop="customer_name" label="客户名称" width="180" />
-      <el-table-column prop="buy_time" label="购买时间" width="160" />
+      <el-table-column prop="buy_time" label="购买时间" width="160">
+        <template #default="{ row }">
+          {{ formatTime(row.buy_time) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="creater" label="创建人" width="120" />
       <el-table-column prop="money" label="合同金额(元)" width="120" />
       <el-table-column prop="status_name" label="合同状态" width="120" />

@@ -27,6 +27,7 @@
           <el-form-item label="客服电话">
             <el-input v-model="form.call_center_phone" placeholder="请输入客服电话" class="!w-[300px]" />
           </el-form-item>
+
           <!-- 岗位胜任力测评产品介绍 -->
           <el-form-item label="岗位胜任力测评产品介绍">
             <WangEditor height="300px" v-model:value="form.job_evaluation_intro" />
@@ -38,6 +39,15 @@
           <!-- 底部导航配置 -->
           <el-form-item label="底部导航配置">
             <WangEditor height="300px" v-model:value="form.bottom_nav_content" />
+          </el-form-item>
+          <!-- 底部备案号内容 -->
+          <el-form-item label="底部备案号内容">
+            <el-input
+              v-model="form.bottom_record_content"
+              placeholder="请输入底部备案号内容"
+              :autosize="{ minRows: 2, maxRows: 4 }"
+              type="textarea"
+            />
           </el-form-item>
         </div>
       </el-form>
@@ -59,7 +69,8 @@ const form = ref({
   call_center_phone: '',
   job_evaluation_intro: '',
   customized_evaluation_intro: '',
-  bottom_nav_content: ''
+  bottom_nav_content: '',
+  bottom_record_content: ''
 })
 
 const saveConfig = async () => {

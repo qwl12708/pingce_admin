@@ -228,3 +228,10 @@ export const getAreas = () =>
     url: '/platformApi/area/lst',
     method: 'GET'
   })
+
+// 获取行业列表
+export const getIndustries = () =>
+  request({
+    url: '/platformApi/industry/lst',
+    method: 'GET'
+  })
