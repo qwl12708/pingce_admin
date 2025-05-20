@@ -5,7 +5,7 @@
       <div class="flex-1">
         <!-- 顶部导航 -->
         <div class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-          <div class="text-lg">环境：测试。欢迎回来，今天又是充满希望的一天</div>
+          <div class="text-lg font-bold">环境：测试。欢迎回来，今天又是充满希望的一天</div>
         </div>
 
         <!-- 待办事项 -->
@@ -16,7 +16,7 @@
                 <el-icon class="text-red-500">
                   <img class="" src="../../assets/image/icons/icon-task.png" />
                 </el-icon>
-                <span class="ml-2 font-medium">待处理任务</span>
+                <span class="ml-2 font-bold">待处理任务</span>
               </div>
               <div class="grid grid-cols-3 gap-4">
                 <div
@@ -38,7 +38,7 @@
                 <el-icon class="text-red-500">
                   <img class="" src="../../assets/image/icons/icon-contract.png" />
                 </el-icon>
-                <span class="ml-2 font-medium">待处理合同</span>
+                <span class="ml-2 font-bold">待处理合同</span>
               </div>
               <div class="grid grid-cols-3 gap-4">
                 <div
@@ -63,7 +63,7 @@
                 <el-icon class="text-orange-500">
                   <img class="" src="../../assets/image/icons/icon-kehu.png" />
                 </el-icon>
-                <span class="ml-2 font-medium">客户统计</span>
+                <span class="ml-2 font-bold">客户统计</span>
               </div>
               <div class="grid grid-cols-4 gap-4">
                 <div
@@ -85,7 +85,7 @@
                 <el-icon class="text-blue-500">
                   <img class="" src="../../assets/image/icons/icon-wenjuan.png" />
                 </el-icon>
-                <span class="ml-2 font-medium">问卷统计</span>
+                <span class="ml-2 font-bold">问卷统计</span>
               </div>
               <div class="grid grid-cols-4 gap-4">
                 <div
@@ -112,7 +112,7 @@
                   <el-icon class="text-blue-500">
                     <img :src="section.icon" />
                   </el-icon>
-                  <span class="ml-2 font-medium">{{ section.title }}</span>
+                  <span class="ml-2 font-bold">{{ section.title }}</span>
                 </div>
               </div>
               <div class="space-y-4">
@@ -187,18 +187,18 @@ onMounted(async () => {
     data: { money_num, week_num }
   } = await getTaskStats()
   todoTasks.value = [
-    { count: money_num, label: '三个月内服务期满客户' },
-    { count: week_num, label: '新客户一周内首次建立测评项目' },
-    { count: 0, label: '待人工编制报告数' }
+    { count: money_num, label: '三个月内服务期满客户', tab: 'three' },
+    { count: week_num, label: '新客户一周内首次建立测评项目', tab: 'one' },
+    { count: 0, label: '待人工编制报告数', tab: 'all' }
   ]
 
   const {
     data: { back_count, pass_count, pending_count }
   } = await getContractStats()
   todoContracts.value = [
-    { count: back_count, label: '合同被退回数量' },
-    { count: pending_count, label: '合同待审批' },
-    { count: pass_count, label: '审批通过未查阅' }
+    { count: back_count, label: '合同被退回数量', tab: 1 },
+    { count: pending_count, label: '合同待审批', tab: 4 },
+    { count: pass_count, label: '审批通过未查阅', tab: 3 }
   ]
 
   const {
@@ -243,12 +243,12 @@ onMounted(async () => {
 
 const handleCustomerTaskClick = (item: any) => {
   console.log(item)
-  router.push({ path: '/customer/evaluate' })
+  router.push({ path: `/customer/evaluate`, query: { tab: item.tab } })
 }
 
 const handleCustomerContractsClick = (item: any) => {
   console.log(item)
-  router.push({ path: '/contract/list' })
+  router.push({ path: `/contract/list`, query: { tab: item.tab } })
 }
 
 const handleCustomerStatsClick = (index: number) => {

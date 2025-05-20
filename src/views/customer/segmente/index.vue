@@ -34,29 +34,29 @@
     <!-- 表格区域 -->
     <div class="bg-white p-4 rounded-lg">
       <div class="text-xl font-medium mb-4">客户划分</div>
-      <el-table :data="tableData" style="width: 100%" stripe @selection-change="handleSelectionChange">
-        <el-table-column type="selection" fixed="left" />
-        <el-table-column label="序号" type="index" fixed="left" />
-        <el-table-column prop="user_no" label="客户编号" fixed="left" />
-        <el-table-column prop="org_name" label="客户名称" sortable />
-        <el-table-column prop="province_name" label="单位所在省" sortable />
-        <el-table-column prop="city_name" label="单位所在市" sortable />
-        <el-table-column prop="address" label="详细地址" />
-        <el-table-column prop="create_time" label="创建时间" sortable>
+      <el-table :data="tableData" stripe @selection-change="handleSelectionChange">
+        <el-table-column type="selection" fixed="left" width="55" />
+        <el-table-column label="序号" type="index" fixed="left" width="60" />
+        <el-table-column prop="user_no" label="客户编号" fixed="left" min-width="120" />
+        <el-table-column prop="org_name" label="客户名称" sortable min-width="150" />
+        <el-table-column prop="province_name" label="单位所在省" sortable min-width="120" />
+        <el-table-column prop="city_name" label="单位所在市" sortable min-width="120" />
+        <el-table-column prop="address" label="详细地址" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="create_time" label="创建时间" sortable min-width="150">
           <template #default="{ row }">
             {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
-        <el-table-column prop="project_num" label="累计项目数" sortable />
-        <el-table-column prop="contract_moey" label="累计合同金额（元）" sortable />
-        <el-table-column prop="type" label="类别" sortable />
-        <el-table-column prop="contacts" label="联系人" sortable />
-        <el-table-column prop="phone" label="联系人手机号码" sortable />
-        <el-table-column prop="employees_num" label="员工人数" sortable />
-        <el-table-column prop="industry_name" label="所属行业" />
-        <el-table-column prop="email" label="预留电子邮箱" sortable />
-        <el-table-column prop="counsellor_name" label="测评顾问" sortable />
-        <el-table-column prop="counsellor_phone" label="测评顾问手机号码" sortable />
+        <el-table-column prop="project_num" label="累计项目数" sortable min-width="120" />
+        <el-table-column prop="contract_moey" label="累计合同金额（元）" sortable min-width="150" />
+        <el-table-column prop="type" label="类别" sortable min-width="100" />
+        <el-table-column prop="contacts" label="联系人" sortable min-width="100" />
+        <el-table-column prop="phone" label="联系人手机号码" sortable min-width="140" />
+        <el-table-column prop="employees_num" label="员工人数" sortable min-width="120" />
+        <el-table-column prop="industry_name" label="所属行业" min-width="120" />
+        <el-table-column prop="email" label="预留电子邮箱" sortable min-width="150" show-overflow-tooltip />
+        <el-table-column prop="counsellor_name" label="测评顾问" sortable min-width="120" />
+        <el-table-column prop="counsellor_phone" label="测评顾问手机号码" sortable min-width="160" />
       </el-table>
 
       <!-- 分页 -->
@@ -203,6 +203,31 @@ const handleDialogSubmit = async () => {
 <style scoped>
 .el-table {
   --el-table-header-bg-color: #f5f7fa;
+  width: 100%;
+}
+
+/* 表头样式 */
+:deep(.el-table__header-wrapper th) {
+  background: var(--el-table-header-bg-color);
+  color: var(--el-text-color-primary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  user-select: none;
+  text-overflow: ellipsis;
+  padding: 12px 0;
+}
+
+/* 单元格样式 */
+:deep(.el-table__cell) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 表格横向滚动 */
+:deep(.el-table__body-wrapper) {
+  overflow-x: auto !important;
 }
 
 .el-table th {
