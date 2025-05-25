@@ -35,9 +35,6 @@
               <span class="text-gray-600">所属部门</span>
               <span class="ml-8">{{ getDepartmentName(userInfo.dept_id) }}</span>
             </div>
-            <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleEdit('dept_id')">
-              修改
-            </el-button>
           </div>
         </div>
         <!-- 快捷功能区域 -->

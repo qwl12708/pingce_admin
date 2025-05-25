@@ -41,8 +41,8 @@
             </el-select>
           </el-form-item> -->
 
-          <el-form-item label="审批流名称" prop="approve_id" required>
-            <el-select v-model="form.approve_id" placeholder="请选择客户管理员" class="w-full">
+          <el-form-item label="客户管理员" prop="approve_id" required>
+            <el-select v-model="form.approve_id" placeholder="默认读取" class="w-full">
               <el-option
                 v-for="item in approvalFlowOptions"
                 :key="item.value"
@@ -108,7 +108,7 @@
       </div>
       <!-- 底部按钮 -->
       <div class="flex justify-center gap-4">
-        <el-button type="primary" class="!rounded-button w-32" @click="submitForm(1)">提交</el-button>
+        <el-button type="primary" class="!rounded-button w-32" @click="submitForm(1)">提交审批</el-button>
         <el-button class="!rounded-button w-32" @click="submitForm(0)">保存为草稿</el-button>
       </div>
     </el-form>

@@ -39,7 +39,7 @@
       </el-form-item>
 
       <el-form-item label="使用期限" prop="day" required>
-        <el-select v-model="form.day" placeholder="请选择">
+        <el-select v-model="form.day" filterable allow-create placeholder="请选择">
           <el-option v-for="item in durationOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
@@ -113,10 +113,15 @@ const defaultProps = {
 }
 
 const durationOptions = [
+  { value: 3, label: '3天' },
   { value: 7, label: '7天' },
+  { value: 15, label: '15天' },
   { value: 30, label: '30天' },
   { value: 90, label: '90天' },
-  { value: 365, label: '365天' }
+  { value: 180, label: '180天' },
+  { value: 365, label: '365天' },
+  { value: 720, label: '720天' },
+  { value: 1095, label: '1095天' }
 ]
 
 const questionnaireTypeOptions = [

@@ -22,8 +22,7 @@
             <img src="../../assets/image/icons/guan.png" />
           </el-icon>
           <span
-            >您共管理
-            <span class="text-blue-500 font-medium">{{ back_count + pass_count + pending_count }}</span> 个合同</span
+            >您共管理 <span class="text-blue-500 font-medium">{{ manager_count }}</span> 个合同</span
           >
         </div>
         <div
@@ -164,6 +163,7 @@ const jumpPage = ref(1)
 const back_count = ref(0)
 const pass_count = ref(0)
 const total = ref(0)
+const manager_count = ref(0) // 管理的合同数量
 const pending_count = ref(0)
 const tableData = ref([])
 
@@ -177,6 +177,7 @@ const fetchContractList = async () => {
   back_count.value = data.back_count
   pass_count.value = data.pass_count
   pending_count.value = data.pending_count
+  manager_count.value = data.manager_count
 }
 
 const handleSizeChange = (val: number) => {

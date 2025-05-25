@@ -97,7 +97,9 @@
                   <div class="text-xl font-bold text-blue-500">
                     {{ item.count }}<span class="ml-1 text-sm text-black">{{ item.danwei }}</span>
                   </div>
-                  <div class="text-sm mt-1 text-orange-400 font-bold">{{ item.papelName }}</div>
+                  <div class="text-sm mt-1 text-orange-400 font-bold">
+                    {{ item.papelName }}
+                  </div>
                   <div class="text-sm text-gray-600 mt-1">{{ item.label }}</div>
                 </div>
               </div>
@@ -228,7 +230,7 @@ onMounted(async () => {
       count: use_max_questionnaire_15.count,
       label: '近15天使用人次最多的测评问卷',
       highlight: true,
-      papelName: use_max_questionnaire_15.name,
+      papelName: use_max_questionnaire_15.questionnaire_name,
       danwei: '人次'
     }
   ]

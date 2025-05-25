@@ -116,7 +116,7 @@
               <span class="text-gray-700">测评问卷文件</span>
               <div class="flex items-center">
                 <FileUploader v-model:value="form.questionnaire_path" />
-                <div class="text-gray-400 text-sm mt-2 ml-2">支持.docx.doc.pdf格式，不超过5MB</div>
+                <div class="text-gray-400 text-sm mt-2 ml-2">支持.excel.word格式格式，不超过5MB</div>
               </div>
             </div>
           </div>
@@ -126,7 +126,7 @@
               <span class="text-gray-700">测评结果横向对比汇总表模板</span>
               <div class="flex items-center">
                 <FileUploader v-model:value="form.result_path" />
-                <div class="text-gray-400 text-sm mt-2 ml-2">支持.docx.doc.pdf格式，不超过5MB</div>
+                <div class="text-gray-400 text-sm mt-2 ml-2">支持.excel.word格式格式，不超过5MB</div>
               </div>
             </div>
           </div>
@@ -151,7 +151,7 @@
               <span class="text-gray-700">测评报告模板文件</span>
               <div class="flex items-center">
                 <FileUploader v-model:value="form.report_path" />
-                <div class="text-gray-400 text-sm mt-2 ml-2">支持.docx.doc.pdf格式，不超过5MB</div>
+                <div class="text-gray-400 text-sm mt-2 ml-2">支持.excel.word格式，不超过5MB</div>
               </div>
             </div>
           </div>
@@ -161,7 +161,7 @@
               <span class="text-gray-700">说明或样本文件</span>
               <div class="flex items-center">
                 <FileUploader v-model:value="form.info_path" />
-                <div class="text-gray-400 text-sm mt-2 ml-2">支持.docx.doc.pdf格式，不超过5MB</div>
+                <div class="text-gray-400 text-sm mt-2 ml-2">支持.word.pdf格式，不超过5MB</div>
               </div>
             </div>
           </div>

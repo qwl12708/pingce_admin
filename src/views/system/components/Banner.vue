@@ -22,7 +22,13 @@
             <el-image :src="scope.row.img" class="w-16 h-16 object-cover" fit="cover" />
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="类型" />
+        <el-table-column prop="type" label="类型">
+          <template #default="scope">
+            <span v-if="scope.row.type === 1">图文详情</span>
+            <span v-else-if="scope.row.type === 2">跳转链接</span>
+            <span v-else-if="scope.row.type === 3">跳转模块</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="sort" label="排序" />
         <el-table-column prop="creater" label="创建人" />
         <el-table-column prop="status" label="状态">

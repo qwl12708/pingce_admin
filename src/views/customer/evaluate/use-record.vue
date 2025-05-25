@@ -9,7 +9,7 @@
               <p class="text-blue-100 text-sm mb-4">2024 年 7 月 30 日到期</p>
               <div class="flex gap-8">
                 <span class="text-blue-100">剩余点数：{{ scoreInfo.score_num }}</span>
-                <span class="text-blue-100">活动赠送点数：{{ scoreInfo.freeze_score_num }}</span>
+                <span class="text-blue-100">冻结点数之和：{{ scoreInfo.freeze_score_num }}</span>
               </div>
             </div>
             <div class="mb-8">

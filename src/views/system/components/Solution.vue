@@ -21,7 +21,7 @@
           <el-table-column type="selection" width="55" />
           <el-table-column prop="title" label="标题" />
           <el-table-column prop="sort" label="排序" />
-          <el-table-column prop="creator" label="创建人" />
+          <el-table-column prop="creater" label="创建人" />
           <el-table-column prop="status" label="状态">
             <template #default="scope">
               <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">

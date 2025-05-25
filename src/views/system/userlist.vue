@@ -34,6 +34,7 @@
         <el-table-column type="selection" width="55" />
         <el-table-column label="序号" prop="id" width="100" />
         <el-table-column label="用户名称" prop="name" />
+        <el-table-column label="花名" prop="nickname" />
         <el-table-column label="手机号码" prop="phone" sortable />
         <el-table-column label="用户角色" prop="role_name" />
         <el-table-column label="所在部门" prop="dept_name" />

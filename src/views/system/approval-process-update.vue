@@ -204,7 +204,7 @@ const userOptions = ref<any[]>([])
 const fetchUserList = async () => {
   const response = await getUserList()
   userOptions.value = response.data.list.map((item: any) => ({
-    value: item.id,
+    value: item.id + '',
     label: item.name
   }))
 }

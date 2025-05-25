@@ -48,9 +48,9 @@
         <el-table-column label="操作" fixed="right" width="300" align="center">
           <template #default="scope">
             <div class="flex gap-2">
-              <el-button type="primary" @click="goRecord(scope.row.id)" link class="!rounded-button whitespace-nowrap">
+              <!-- <el-button type="primary" @click="goRecord(scope.row.id)" link class="!rounded-button whitespace-nowrap">
                 查询
-              </el-button>
+              </el-button> -->
               <el-button @click="goDetail(scope.row.id)" type="primary" link class="!rounded-button whitespace-nowrap">
                 修改客户信息
               </el-button>
