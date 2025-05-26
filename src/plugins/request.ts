@@ -97,6 +97,25 @@ instance.interceptors.response.use(
     if (response.config.loadingInstance) {
       response.config.loadingInstance.close()
     }
+
+    // 检查是否为二进制流类型
+    const contentType = response.headers['content-type']
+    if (contentType && (contentType.includes('application/octet-stream') || contentType.includes('application/pdf'))) {
+      const contentDisposition = response.headers['content-disposition']
+      let fileName = ''
+      if (contentDisposition) {
+        const matches = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)
+        if (matches && matches[1]) {
+          fileName = matches[1].replace(/['"]/g, '') // 去除引号
+        }
+      }
+
+      return {
+        data: response.data,
+        fileName: fileName ? decodeURIComponent(fileName) : 'downloaded_file'
+      }
+    }
+
     const res = response.data
     if (res.code !== 200) {
       checkStatus(res.code)

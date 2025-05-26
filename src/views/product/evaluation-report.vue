@@ -195,7 +195,15 @@ const handleCurrentChange = (val: number) => {
 const onExport = async () => {
   if (selectedRows.value.length === 0) return
   const ids = selectedRows.value.map(row => row.id).join(',')
-  await exportReport({ ids })
+  const { data: blobStr, fileName } = await exportReport({ ids })
+  const blob = new Blob([blobStr])
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+  ElMessage.success('导出成功')
 }
 
 const onTabClick = (key: string) => {

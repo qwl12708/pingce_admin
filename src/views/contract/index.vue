@@ -85,7 +85,12 @@
               @click="handleShowDialog(scope.row.id)"
               >审批合同</el-button
             >
-            <el-button v-if="scope.row.status === 3" link type="primary" size="small" @click="goEdit(scope.row.id)"
+            <el-button
+              v-if="scope.row.status === 3 && scope.row.is_edit === 1"
+              link
+              type="primary"
+              size="small"
+              @click="goEdit(scope.row.id)"
               >编辑合同</el-button
             >
           </div>

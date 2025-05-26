@@ -132,7 +132,10 @@ export const exportReport = (params: { ids: string }) =>
   request({
     url: '/platformApi/people/export',
     method: 'GET',
-    params
+    params,
+    _headers: {
+      responseType: 'blob' // 设置响应类型为 blob
+    }
   })
 
 // 下载结果
