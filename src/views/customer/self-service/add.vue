@@ -2,7 +2,9 @@
   <div class="min-h-screen bg-white">
     <div class="flex-1 p-8">
       <div class="bg-white rounded-lg shadow-sm p-6">
-        <h2 class="text-xl font-medium mb-6">新增客户</h2>
+        <h2 class="text-xl font-medium mb-6">
+          {{ isEdit ? '编辑客户信息' : '新增客户信息' }}
+        </h2>
         <div class="flex space-x-8 mb-6">
           <div class="flex items-center space-x-4">
             <span class="text-gray-600">客户类别</span>
@@ -37,7 +39,9 @@
 
             <el-form-item label="上传单位LOGO" prop="org_logo" required class="flex items-center">
               <ImageUploader v-model:value="form.org_logo" />
-              <div class="text-gray-400 text-sm mt-1">要求：png、jpeg、pdf格式，大小在10M以内</div>
+              <div class="text-gray-400 text-sm mt-1">
+                当logo图片出现在左侧方框中，可以点击拖动，使logo图案完全进入方框并处于方框中央后，点击“保存”按钮即可。（要求：png、jpeg、pdf格式，大小在5M以内，160x160px）
+              </div>
             </el-form-item>
             <el-form-item label="所属行业" prop="industry_id">
               <el-select v-model="form.industry_id" placeholder="请选择">
@@ -260,6 +264,30 @@ const transformToTree = data => {
 
 const handleSubmit = async () => {
   if (!formRef.value) return
+
+  // 校验预留电子邮箱
+  if (form.email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(form.email)) {
+      ElMessage.error('请输入有效的电子邮箱地址')
+      return
+    }
+  }
+
+  // 校验预留手机号码
+  const phoneRegex = /^1[3-9]\d{9}$/
+  if (form.phone && !phoneRegex.test(form.phone)) {
+    ElMessage.error('请输入有效的管理员手机号码')
+    return
+  }
+  if (form.phone1 && !phoneRegex.test(form.phone1)) {
+    ElMessage.error('请输入有效的预留其他使用者手机号码')
+    return
+  }
+  if (form.phone2 && !phoneRegex.test(form.phone2)) {
+    ElMessage.error('请输入有效的预留其他使用者手机号码')
+    return
+  }
 
   const valid = await formRef.value.validate()
   if (valid) {

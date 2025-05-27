@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import Home from './components/Home.vue'
 import Banner from './components/Banner.vue'
 import Solution from './components/Solution.vue'
@@ -27,6 +27,8 @@ import Evaluation from './components/Evaluation.vue'
 import Channel from './components/Channel.vue'
 import About from './components/About.vue'
 import Contact from './components/Contact.vue'
+import { useRoute } from 'vue-router'
+const route = useRoute()
 
 const tabs = [
   { key: 'banner', label: 'banner图' },
@@ -58,6 +60,16 @@ const currentComponent = computed(() => {
   }
 })
 const currentTab = ref('banner')
+
+// 根据上个页面的参数tab来设置初始选项
+onMounted(() => {
+  const tab = route.query.tab as string
+  if (tab && tabs.some(t => t.key === tab)) {
+    currentTab.value = tab
+  } else {
+    currentTab.value = 'banner' // 默认选项
+  }
+})
 
 const handleTabChange = (tab: string) => {
   currentTab.value = tab

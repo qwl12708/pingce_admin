@@ -91,7 +91,7 @@ const handleSubmit = async () => {
       await addSolution(form)
     }
     ElMessage.success('保存成功')
-    router.push('/system/website-config')
+    router.push('/system/website-config?tab=solution')
   } catch (error) {
     ElMessage.error('保存失败')
   }
