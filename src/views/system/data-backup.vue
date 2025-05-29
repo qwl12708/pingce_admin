@@ -23,6 +23,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getBackupConfig, setBackupConfig } from '@/api/system/user'
+import { ElMessage } from 'element-plus'
 
 const formRef = ref()
 const checkData = ref([])
@@ -49,11 +50,28 @@ const onSubmit = async () => {
 
   await formRef.value.validate(async valid => {
     if (valid) {
-      const content = checkData.value.filter(e => form.value.selectedItems.includes(e.name))
-      await setBackupConfig({ content: JSON.stringify(content) })
-      console.log('submit form', form.value)
+      const content = Object.values(checkData.value).filter(e => form.value.selectedItems.includes(e.name))
+
+      const promiseList = content.map(
+        async contentItem => await setBackupConfig({ content: JSON.stringify([contentItem]) })
+      )
+      const results = await Promise.all(promiseList)
+      results.forEach(item => {
+        downloadFile(item.data, item.fileName)
+      })
     }
   })
+}
+
+function downloadFile(blobStr, fileName) {
+  const blob = new Blob([blobStr])
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+  ElMessage.success(`导出${fileName}成功`)
 }
 </script>
 
