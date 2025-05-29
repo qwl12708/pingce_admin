@@ -15,7 +15,7 @@
           </div>
         </div>
         <el-form :model="form" :rules="rules" ref="formRef" label-width="170px" label-position="right">
-          <div class="grid grid-cols-2 gap-x-8 gap-y-6 text-left">
+          <div class="grid [grid-template-columns:3fr_7fr] gap-x-8 gap-y-6 text-left">
             <el-form-item required label="单位名称" prop="org_name" class="flex items-center">
               <el-input v-model="form.org_name" placeholder="请输入" />
             </el-form-item>
@@ -23,14 +23,19 @@
             <el-form-item required class="relative" label="上传加盖公章的用户承诺或营业执照" prop="org_voucher">
               <a
                 class="text-blue-500"
-                style="position: absolute; bottom: -10px; left: -160px; cursor: pointer"
+                style="position: absolute; bottom: 14px; left: -160px; cursor: pointer"
                 href="http://hzcpcs.qifudaren.net/admin/用户承诺模板.docx"
                 target="_blank"
               >
                 下载《用户承诺》模版
               </a>
               <ImageUploader v-model:value="form.org_voucher" />
-              <div class="text-gray-400 text-sm mt-1">要求：png、jpeg、pdf格式，大小在10M以内</div>
+              <div class="text-gray-400 text-sm mt-1">
+                要求：png、jpeg、pdf格式，大小在10M以内
+                <span style="opacity: 0; user-select: none; display: inline-block">
+                  这是一段隐形的文字，没啥卵用，仅仅为了占位搞样式。不要问为啥不换种写法，懒得换。
+                </span>
+              </div>
             </el-form-item>
 
             <el-form-item label="员工人数" prop="employees_num" class="flex items-center">
@@ -50,6 +55,7 @@
             </el-form-item>
             <el-form-item label="单位所在省/市/自治区" prop="area_ids" required>
               <el-cascader
+                style="width: 230px"
                 v-model="form.area_ids"
                 :options="regionData"
                 :props="cascaderProps"
@@ -60,13 +66,13 @@
               <el-input v-model="form.email" placeholder="请输入" />
             </el-form-item>
             <el-form-item label="管理员（联系人）" prop="contacts" required>
-              <el-input v-model="form.contacts" placeholder="请输入" />
+              <el-input v-model="form.contacts" style="width: 230px" placeholder="请输入" />
             </el-form-item>
             <el-form-item label="预留其他者使用手机号码" prop="phone1">
               <el-input v-model="form.phone1" placeholder="请输入" />
             </el-form-item>
             <el-form-item label="管理员手机号码" prop="phone" required>
-              <el-input v-model="form.phone" placeholder="请输入">
+              <el-input v-model="form.phone" style="width: 230px" placeholder="请输入">
                 <template #append>
                   <el-button
                     type="primary"
@@ -74,7 +80,9 @@
                     @click="sendSmsCode"
                     :disabled="isSendingCode || countdown > 0"
                   >
-                    {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+                    <span :style="{ color: isSendingCode || countdown > 0 ? '#A8ABB2' : '#409EFF' }">
+                      {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+                    </span>
                   </el-button>
                 </template>
               </el-input>
@@ -83,7 +91,7 @@
               <el-input v-model="form.phone2" placeholder="请输入" />
             </el-form-item>
             <el-form-item label="验证码" prop="code" required>
-              <el-input v-model="form.code" placeholder="请输入" />
+              <el-input v-model="form.code" style="width: 230px" placeholder="请输入" />
             </el-form-item>
             <el-form-item label="客服顾问" prop="counsellor_id">
               <el-select v-model="form.counsellor_id" placeholder="请选择">
@@ -96,7 +104,7 @@
               </el-select>
             </el-form-item>
           </div>
-          <div class="flex justify-center space-x-4 mt-8">
+          <div class="flex space-x-4 mt-8" style="margin-left: 30%">
             <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleSubmit">确定</el-button>
             <el-button class="!rounded-button whitespace-nowrap" @click="handleCancel">返回</el-button>
           </div>
@@ -313,6 +321,25 @@ const handleCancel = () => {
   padding-right: 12px;
   /* white-space: nowrap; */
 }
+
+:deep(.el-upload-list--picture-card .el-upload-list__item) {
+  width: 90px;
+  height: 90px;
+}
+
+:deep(.el-upload--picture-card) {
+  --el-upload-picture-card-size: 90px;
+}
+
+:deep(.el-upload-list--picture-card .el-upload-list__item-thumbnail) {
+  width: 90px;
+  height: 90px;
+}
+
+:deep(.el-upload-list__item) {
+  margin-bottom: 0;
+}
+
 .el-input :deep(.el-input__wrapper) {
   border-radius: 4px;
 }
