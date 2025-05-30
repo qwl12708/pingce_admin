@@ -5,21 +5,33 @@
     <el-form :model="form" ref="formRef" label-width="120px">
       <!-- 基础信息 -->
       <el-form-item label="套餐名称" prop="name" required>
-        <el-input class="!w-[500px]" v-model="form.name" placeholder="请输入" />
+        <el-input
+          class="!w-[500px]"
+          v-model="form.name"
+          placeholder="请输入"
+          :readonly="readonly"
+          :disabled="readonly"
+        />
       </el-form-item>
 
       <el-form-item label="套餐类别" prop="type" required>
-        <el-radio-group v-model="form.type">
+        <el-radio-group v-model="form.type" :disabled="readonly">
           <el-radio :label="1">包年/月</el-radio>
           <el-radio :label="2">点数</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item v-if="form.type === 2" label="点数" prop="score" required>
-        <el-input class="!w-[195px]" v-model="form.score" placeholder="请输入点数" />
+        <el-input
+          class="!w-[195px]"
+          v-model="form.score"
+          placeholder="请输入点数"
+          :readonly="readonly"
+          :disabled="readonly"
+        />
       </el-form-item>
 
       <el-form-item label="限售地区" prop="is_limit_area" required>
-        <el-radio-group v-model="form.is_limit_area">
+        <el-radio-group v-model="form.is_limit_area" :disabled="readonly">
           <el-radio :label="0">不限</el-radio>
           <el-radio :label="1">仅限</el-radio>
         </el-radio-group>
@@ -35,24 +47,31 @@
           :props="defaultProps"
           placeholder="请选择所属区域"
           class="w-full"
+          :disabled="readonly"
         />
       </el-form-item>
 
       <el-form-item label="使用期限" prop="day" required>
-        <el-select v-model="form.day" filterable allow-create placeholder="请选择">
+        <el-select v-model="form.day" filterable allow-create placeholder="请选择" :disabled="readonly">
           <el-option v-for="item in durationOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
 
       <el-form-item label="产品价格" prop="price" required>
-        <el-input class="!w-[195px]" v-model="form.price" placeholder="请输入">
+        <el-input
+          class="!w-[195px]"
+          v-model="form.price"
+          placeholder="请输入"
+          :readonly="readonly"
+          :disabled="readonly"
+        >
           <template #append>元</template>
         </el-input>
       </el-form-item>
 
       <!-- 测评问卷配置 -->
       <el-form-item label="问卷类别" prop="evaluation_type" required>
-        <el-radio-group v-model="form.evaluation_type">
+        <el-radio-group v-model="form.evaluation_type" :disabled="readonly">
           <el-radio v-for="item in questionnaireTypeOptions" :key="item.value" :label="item.value">{{
             item.label
           }}</el-radio>
@@ -60,19 +79,19 @@
       </el-form-item>
 
       <el-form-item v-if="form.evaluation_type !== 1" label="问卷名称" prop="evaluation_id" required>
-        <el-select v-model="form.evaluation_id" placeholder="选择测评问卷">
+        <el-select v-model="form.evaluation_id" placeholder="选择测评问卷" :disabled="readonly">
           <el-option v-for="item in questionnaireOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
 
       <el-form-item v-if="form.evaluation_type === 3" label="选择岗位类别" prop="job_type" required>
-        <el-select v-model="form.job_type" placeholder="选择岗位类别">
+        <el-select v-model="form.job_type" placeholder="选择岗位类别" :disabled="readonly">
           <el-option v-for="item in industryOptions" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
 
       <!-- 操作按钮 -->
-      <div class="flex justify-center gap-4 mt-8">
+      <div class="flex justify-center gap-4 mt-8" v-if="!readonly">
         <el-button type="primary" @click="handleSubmit">确认</el-button>
         <el-button @click="handleCancel">返回</el-button>
       </div>
@@ -90,6 +109,7 @@ const router = useRouter()
 const route = useRoute()
 const formRef = ref(null)
 const isEdit = ref(false)
+const readonly = ref(false)
 
 const form = reactive({
   name: '',
@@ -131,18 +151,18 @@ const questionnaireTypeOptions = [
   { value: 4, label: '定制问卷' }
 ]
 const questionnaireOptions = ref([])
-
-const industryOptions = ref([])
-
 onMounted(async () => {
   fetchAreas()
-  const { id } = route.query
+  const { id, readonly: ro } = route.query
   if (id) {
     isEdit.value = true
     const { data } = await getProductInfo({ id: Number(id) })
     const limit_area_ids = data.limit_area.map(pair => pair[1])
     data.limit_area = limit_area_ids
     Object.assign(form, data)
+  }
+  if (ro == 1) {
+    readonly.value = true
   }
 
   const { data } = await getJobTypeList()

@@ -146,8 +146,15 @@ export const downloadResult = (params: { ids: string }) =>
     params
   })
 
+// 导出报告结果
+export const downloadReportResult = (params: { ids: string }) =>
+  request({
+    url: '/platformApi/people/report/export',
+    method: 'GET',
+    params
+  })
 // 上传报告
-export const uploadReport = (data: { report_file: JSON }) =>
+export const uploadReport = (data: { report_file: string }) =>
   request({
     url: '/platformApi/people/result/import',
     method: 'POST',
@@ -155,7 +162,7 @@ export const uploadReport = (data: { report_file: JSON }) =>
   })
 
 // 上传对比表
-export const uploadComparison = (data: { report_file: JSON }) =>
+export const uploadComparison = (data: { report_file: string }) =>
   request({
     url: '/platformApi/people/contrast/import',
     method: 'POST',

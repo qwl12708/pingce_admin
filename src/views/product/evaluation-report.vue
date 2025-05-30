@@ -33,36 +33,40 @@
       <!-- 表格区域 -->
       <div class="bg-white rounded-lg shadow-sm">
         <div class="p-4 flex justify-end items-center border-b border-gray-100">
-          <div class="space-x-2">
-            <el-button
-              :disabled="selectedRows.length === 0"
-              @click="onExport"
-              type="primary"
-              class="!rounded-button whitespace-nowrap"
-            >
-              导出
-            </el-button>
-            <template v-if="activeTab === 'pending'">
-              <el-button class="!rounded-button whitespace-nowrap" @click="handleDownloadResult">
+          <el-button
+            :disabled="selectedRows.length === 0"
+            @click="onExport"
+            type="primary"
+            class="mr-4 !rounded-button whitespace-nowrap"
+          >
+            导出
+          </el-button>
+          <template v-if="activeTab === 'pending'">
+            <div class="flex">
+              <el-button class="mr-4" :disabled="selectedRows.length === 0" @click="handleDownloadResult">
                 测评结果批量下载
               </el-button>
-              <el-button class="!rounded-button whitespace-nowrap" @click="handleUploadReport">
-                线上测评报告批量上传
-              </el-button>
-              <el-button class="!rounded-button whitespace-nowrap" @click="handleUploadComparison">
-                横向对比上传表批量上传
-              </el-button>
-            </template>
+              <FileUploader class="mr-4" text="线上测评报告批量上传" v-model:value="evaluationPath" />
+              <FileUploader text="横向对比上传表批量上传" v-model:value="compareReportPath" />
+            </div>
+          </template>
 
-            <template v-if="activeTab === 'uploaded'">
-              <el-button class="!rounded-button whitespace-nowrap" @click="handleDownloadResult">
-                测评结果批量下载
-              </el-button>
-              <el-button class="!rounded-button whitespace-nowrap" @click="handleDownloadResult">
-                测评报告批量下载
-              </el-button>
-            </template>
-          </div>
+          <template v-if="activeTab === 'uploaded'">
+            <el-button
+              class="!rounded-button whitespace-nowrap mr-4"
+              :disabled="selectedRows.length === 0"
+              @click="handleDownloadResult"
+            >
+              测评结果批量下载
+            </el-button>
+            <el-button
+              class="!rounded-button whitespace-nowrap mr-4"
+              @click="handleDownloadReportResult"
+              :disabled="selectedRows.length === 0"
+            >
+              测评报告批量下载
+            </el-button>
+          </template>
         </div>
 
         <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
@@ -79,12 +83,12 @@
           <el-table-column label="客户名称" prop="customerName" sortable />
           <el-table-column label="项目名称" prop="productName" sortable />
           <el-table-column label="答题结果" prop="result" sortable />
-          <el-table-column v-if="activeTab === 'uploaded'" label="操作" width="200">
+          <!-- <el-table-column v-if="activeTab === 'uploaded'" label="操作" width="200">
             <template #default="{ row }">
               <el-button type="primary" link @click="handleEdit(row)">测评报告下载</el-button>
               <el-button type="primary" link @click="handleEdit(row)">测评结果下载</el-button>
             </template>
-          </el-table-column>
+          </el-table-column> -->
         </el-table>
 
         <div class="flex justify-between items-center p-4">
@@ -105,8 +109,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
 import {
   getEvaluationReportList,
   exportReport,
@@ -117,8 +120,10 @@ import {
   getNoAnswerReportList
 } from '@/api/product'
 import { ElMessage } from 'element-plus'
+import FileUploader from '@/components/FileUploader/index.vue'
 
-const router = useRouter()
+const evaluationPath = ref('')
+const compareReportPath = ref('')
 const searchKeyword = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -206,19 +211,47 @@ const onExport = async () => {
   ElMessage.success(`导出${fileName}成功`)
 }
 
+const handleDownloadResult = async () => {
+  if (selectedRows.value.length === 0) return
+  const ids = selectedRows.value.map(row => row.id).join(',')
+  const { data: blobStr, fileName } = await downloadResult({ ids })
+  const blob = new Blob([blobStr])
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+  ElMessage.success(`导出${fileName}成功`)
+}
+
+const handleDownloadReportResult = async () => {
+  if (selectedRows.value.length === 0) return
+  const ids = selectedRows.value.map(row => row.id).join(',')
+  const { data: blobStr, fileName } = await downloadReportResult({ ids })
+  const blob = new Blob([blobStr])
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+  ElMessage.success(`导出${fileName}成功`)
+}
+
 const onTabClick = (key: string) => {
   activeTab.value = key
   fetchTableData()
 }
 
-const handleDownloadResult = async () => {
-  if (selectedRows.value.length === 0) return
-  const ids = selectedRows.value.map(row => row.id).join(',')
-  await downloadResult({ ids }).catch(err => {
-    console.log('下载失败', err.message)
-    ElMessage.error(err.message)
-  })
-}
+// const handleDownloadResult = async () => {
+//   if (selectedRows.value.length === 0) return
+//   const ids = selectedRows.value.map(row => row.id).join(',')
+//   await downloadResult({ ids }).catch(err => {
+//     console.log('下载失败', err.message)
+//     ElMessage.error(err.message)
+//   })
+// }
 
 const handleUploadReport = async () => {
   if (selectedRows.value.length === 0) return
@@ -239,6 +272,32 @@ const handleUploadComparison = async () => {
   })
   ElMessage.success('上传成功')
 }
+
+watch(evaluationPath, async newVal => {
+  if (typeof newVal === 'string' && newVal.startsWith('http')) {
+    try {
+      await uploadReport({ report_file: newVal })
+      ElMessage.success('上传成功')
+      // evaluationPath.value = ''
+    } catch (err: any) {
+      console.log('上传失败', err.message)
+      ElMessage.error(err.message)
+    }
+  }
+})
+
+watch(compareReportPath, async newVal => {
+  if (typeof newVal === 'string' && newVal.startsWith('http')) {
+    try {
+      await uploadComparison({ report_file: newVal })
+      ElMessage.success('上传成功')
+      // compareReportPath.value = ''
+    } catch (err: any) {
+      console.log('上传失败', err.message)
+      ElMessage.error(err.message)
+    }
+  }
+})
 </script>
 
 <style scoped>

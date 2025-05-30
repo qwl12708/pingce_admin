@@ -1,6 +1,6 @@
 <template>
   <div class="main-content min-h-screen bg-white p-6">
-    <el-form :model="form" label-width="120px">
+    <el-form :model="form" label-width="120px" :disabled="readonly">
       <div class="space-y-6">
         <!-- 问题类型选择 -->
         <div class="space-y-6">
@@ -228,10 +228,15 @@ const contentLength = ref(0)
 const editorRef = ref<HTMLElement | null>(null)
 const industryOptions = ref([])
 const templateOptions = ref([])
+const readonly = ref(false)
 
 onMounted(async () => {
   if (route.query.id) {
     fetchProductDetail(Number(route.query.id))
+  }
+
+  if (route.query.readonly == 1) {
+    readonly.value = true
   }
 
   const { data } = await getJobTypeList()

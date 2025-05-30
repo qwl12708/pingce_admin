@@ -8,7 +8,7 @@
     :on-remove="handleRemove"
   >
     <div>
-      <el-button v-if="!fileUrl" type="primary">上传</el-button>
+      <el-button v-if="!fileUrl" type="primary">{{ text }}</el-button>
       <p v-if="tip">{{ tip }}</p>
     </div>
   </el-upload>
@@ -36,6 +36,10 @@ const props = defineProps({
   tip: {
     type: String,
     default: ''
+  },
+  text: {
+    type: String,
+    default: '上传'
   }
 })
 

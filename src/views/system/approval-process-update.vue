@@ -105,6 +105,7 @@
               <el-select v-model="node.approver.type" placeholder="审批人类型" class="mb-2 w-full">
                 <el-option label="指定成员" :value="1" />
                 <el-option label="角色" :value="2" />
+                <el-option label="部门负责人" :value="3" />
               </el-select>
               <el-select
                 v-if="node.approver.type === 1"

@@ -118,7 +118,12 @@
                 </div>
               </div>
               <div class="space-y-4">
-                <div v-for="(item, itemIndex) in section.list" :key="itemIndex" class="p-3 bg-gray-50 rounded">
+                <div
+                  v-for="(item, itemIndex) in section.list"
+                  :key="itemIndex"
+                  class="p-3 bg-gray-50 rounded cursor-pointer"
+                  @click="handleProductItemClick(item)"
+                >
                   {{ item.name }}
                 </div>
               </div>
@@ -261,6 +266,15 @@ const handleCustomerStatsClick = (index: number) => {
 
 const handleSurveyStatsClick = (index: number) => {
   router.push({ path: '/contract/list', query: { tab: index + 1 } })
+}
+
+const handleProductItemClick = (item: any) => {
+  if (!item || !item.id) return
+  if (item.type === 0) {
+    router.push({ path: '/product/add', query: { id: item.id, readonly: 1 } })
+  } else if (item.type === 1) {
+    router.push({ path: '/product/evaluation-add', query: { id: item.id, readonly: 1 } })
+  }
 }
 </script>
 
