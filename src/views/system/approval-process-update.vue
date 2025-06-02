@@ -105,7 +105,7 @@
               <el-select v-model="node.approver.type" placeholder="审批人类型" class="mb-2 w-full">
                 <el-option label="指定成员" :value="1" />
                 <el-option label="角色" :value="2" />
-                <el-option label="部门负责人" :value="3" />
+                <el-option label="部门负责人" :value="5" />
               </el-select>
               <el-select
                 v-if="node.approver.type === 1"
@@ -286,7 +286,7 @@ const handleAddNode = () => {
     name: '新节点',
     type: 1,
     approver: {
-      type: 1, // 审批人来源类型，1：指定成员，2：角色
+      type: 1, // 审批人来源类型，1：指定成员，2：角色，5: 部门负责人
       uids: '1' //审批人ID，多个以逗号分隔。 type为1时传
     }
   })
@@ -325,7 +325,7 @@ const handlePublish = async () => {
           name: node.name,
           type: node.type, // 会签1、或签2
           approver: {
-            type: node.approver.type, // 审批人来源类型，1：指定成员，2：角色
+            type: node.approver.type, // 审批人来源类型，1：指定成员，2：角色，5: 部门负责人
             uids: node.approver.uids?.join(',') || '', //审批人ID，多个以逗号分隔。 type为1时传
             role_id: node.approver.role_id?.join(',') || '' // 审批角色ID。 type为2时传
           }

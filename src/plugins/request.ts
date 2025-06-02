@@ -118,14 +118,14 @@ instance.interceptors.response.use(
 
     const res = response.data
     if (res.code !== 200) {
-      checkStatus(res.code)
+      ElMessage.error(res.msg || '请求失败，请稍后重试')
       if (res.code === 600) {
         localStorage.clear()
         const userStore = useUserStore()
         await userStore.resetToken()
         router.replace('/login')
       }
-      return Promise.reject(new Error(res.msg || 'Error'))
+      return Promise.reject(new Error(res.msg || '请求失败，请稍后重试'))
     }
 
     return res
