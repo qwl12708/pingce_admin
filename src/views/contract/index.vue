@@ -56,9 +56,9 @@
     <el-table :data="tableData" style="width: 100%" class="mb-4">
       <el-table-column type="selection" width="55" />
       <el-table-column prop="contract_no" label="合同编号" width="120" />
-      <el-table-column prop="user_no" label="客户编号" width="100" />
+      <el-table-column prop="user_no" label="客户编号" width="200" />
       <el-table-column prop="customer_name" label="客户名称" width="180" />
-      <el-table-column prop="buy_time" label="购买时间" width="160">
+      <el-table-column prop="buy_time" label="购买时间" width="180">
         <template #default="{ row }">
           {{ formatTime(row.buy_time) }}
         </template>
@@ -66,8 +66,16 @@
       <el-table-column prop="creater" label="创建人" width="120" />
       <el-table-column prop="money" label="合同金额(元)" width="120" />
       <el-table-column prop="status_name" label="合同状态" width="120" />
-      <el-table-column prop="approve_user" label="审批人" width="120" />
-      <el-table-column prop="approve_time" label="审批时间" width="160">
+      <!-- 以逗号分隔换行显示每一个 -->
+      <el-table-column prop="approve_user" label="审批人" width="120">
+        <template #default="{ row }">
+          <div v-for="(user, index) in row.approve_user" :key="index">
+            {{ user }}
+          </div>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="approve_time" label="审批时间" width="180">
         <template #default="{ row }">
           {{ formatTime(row.approve_time) }}
         </template>

@@ -229,7 +229,7 @@ const baseRoutes: MenuType.MenuOptions[] = [
         path: 'evaluation-add',
         component: () => import('@/views/product/evaluation-add.vue'),
         meta: {
-          title: '新增测评问卷',
+          title: '新增/编辑测评问卷',
           icon: 'none',
           roles: ['admin', 'visitor'],
           isKeepAlive: true,

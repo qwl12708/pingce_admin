@@ -128,7 +128,11 @@
         <el-table-column label="可使用问卷" prop="evaluation_name" />
         <el-table-column label="金额(元)" prop="price" width="120" />
         <el-table-column label="使用期限" prop="day" width="120" />
-        <el-table-column label="限售地区" prop="limit_area" width="120" />
+        <el-table-column label="限售地区" prop="limit_area" width="120">
+          <template #default="scope">
+            {{ getAreaName(scope.row.limit_area) }}
+          </template>
+        </el-table-column>
         <el-table-column label="备注" prop="remark" />
       </el-table>
       <div class="flex justify-center pt-4">

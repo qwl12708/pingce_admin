@@ -122,7 +122,7 @@
                   v-for="(item, itemIndex) in section.list"
                   :key="itemIndex"
                   class="p-3 bg-gray-50 rounded cursor-pointer"
-                  @click="handleProductItemClick(item)"
+                  @click="handleProductItemClick(item, section.type)"
                 >
                   {{ item.name }}
                 </div>
@@ -259,20 +259,22 @@ const handleCustomerContractsClick = (item: any) => {
 }
 
 const handleCustomerStatsClick = (index: number) => {
-  const tabMap = ['all', 'one', 'all', 'all']
+  const tabMap = ['all', 'one', 'all', 'three']
   const pathMap = ['/customer/self-service', '/customer/self-service', '/customer/evaluate', '/customer/evaluate']
   router.push({ path: pathMap[index], query: { tab: tabMap[index] } })
 }
 
 const handleSurveyStatsClick = (index: number) => {
-  router.push({ path: '/contract/list', query: { tab: index + 1 } })
+  const tabMap = ['all', 'all', 'all', 'all']
+  const pathMap = ['/product/evaluation', '/system/stats', '/questionnaire/list', '/questionnaire/list']
+  router.push({ path: pathMap[index], query: { tab: tabMap[index] } })
 }
 
-const handleProductItemClick = (item: any) => {
+const handleProductItemClick = (item: any, type: number) => {
   if (!item || !item.id) return
-  if (item.type === 0) {
+  if (type === 0) {
     router.push({ path: '/product/add', query: { id: item.id, readonly: 1 } })
-  } else if (item.type === 1) {
+  } else if (type === 1) {
     router.push({ path: '/product/evaluation-add', query: { id: item.id, readonly: 1 } })
   }
 }
