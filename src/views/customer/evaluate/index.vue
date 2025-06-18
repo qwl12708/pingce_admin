@@ -1,5 +1,14 @@
 <template>
   <div class="main-content min-h-screen bg-white p-6">
+    <!-- 搜索区域 -->
+    <div class="flex items-center gap-2 mb-4">
+      <el-input v-model="searchValue" placeholder="请输入客户名称" style="width: 260px" clearable>
+        <template #append>
+          <el-button :icon="Search" @click="onSearch" />
+        </template>
+      </el-input>
+      <el-button @click="onReset">重置</el-button>
+    </div>
     <!-- 顶部提示区域 -->
     <div class="flex items-center justify-between py-4 mb-6">
       <div class="flex gap-8">
@@ -78,7 +87,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus, Search } from '@element-plus/icons-vue'
 import router from '@/router'
 import { ElMessage } from 'element-plus'
 import { getEvaluationList, updateInstitutionStatus } from '@/api/customer'
@@ -97,14 +106,19 @@ const all = ref(0)
 const week_total = ref(0)
 const three_month_total = ref(0)
 const tableData = ref([])
+const searchValue = ref('')
 
 const fetchTableData = async () => {
   try {
-    const { data } = await getEvaluationList({
-      type: tabMap[activeTab.value],
+    const params: any = {
+      type: tabMap[activeTab.value as keyof typeof tabMap],
       page: currentPage.value,
       pageSize: pageSize.value
-    })
+    }
+    if (searchValue.value) {
+      params.org_name = searchValue.value
+    }
+    const { data } = await getEvaluationList(params)
     tableData.value = data.list
     total.value = data.total
     all.value = data.all
@@ -117,14 +131,13 @@ const fetchTableData = async () => {
 
 onMounted(() => {
   const tab = router.currentRoute.value.query?.tab
-  if (tab) {
+  if (typeof tab === 'string') {
     activeTab.value = tab
   }
   fetchTableData()
 })
 
-const onSeeRecord = id => {
-  console.log('查看客户使用记录')
+const onSeeRecord = (id: number) => {
   router.push(`/customer/use-record?id=${id}`)
 }
 
@@ -132,34 +145,44 @@ const onAddCustomer = () => {
   router.push({ path: '/customer/add', query: { type: 2 } })
 }
 
-const goDetail = id => {
+const goDetail = (id: number) => {
   router.push({ path: '/customer/add', query: { type: 2, id } })
 }
 
-const goAddContract = id => {
+const goAddContract = (id: number) => {
   router.push({ path: '/contract/add', query: { id } })
 }
 
-const handleClickTab = tab => {
+const handleClickTab = (tab: string) => {
   activeTab.value = tab
   currentPage.value = 1
   fetchTableData()
 }
 
-const updataStatus = async id => {
+const updataStatus = async (id: number) => {
   const res = await updateInstitutionStatus({ id })
-  if (!res) return
-  if (res.code !== 200) {
+  if (!res || res.status !== 200) {
     ElMessage.error('更新失败！')
     return
   }
   ElMessage.success('更新成功！')
-  tableData.value = tableData.value.map(item => {
+  tableData.value = tableData.value.map((item: any) => {
     if (item.id === id) {
       item.status = item.status === 2 ? 1 : 2
     }
     return item
   })
+}
+
+const onSearch = () => {
+  currentPage.value = 1
+  fetchTableData()
+}
+
+const onReset = () => {
+  searchValue.value = ''
+  currentPage.value = 1
+  fetchTableData()
 }
 </script>
 <style scoped>

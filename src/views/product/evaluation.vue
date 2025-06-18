@@ -159,6 +159,7 @@ const answerTemplates = ref<{ id: number; name: string; intro: string }[]>([])
 
 const fetchQuestionnaireList = async () => {
   const { data } = await getQuestionnaireList({ page: currentPage.value, pageSize: pageSize.value })
+  console.log('%c [ data ]-162', 'font-size:13px; background:pink; color:#bf2c9f;', data)
   tableData.value = data.list.map((item: any) => ({
     ...item,
     inviteTemplateName: inviteTemplates.value.find(template => template.id === item.invite_id)?.name || '',
@@ -178,7 +179,7 @@ function extractTextFromHTML(html) {
 
 const fetchTemplates = async () => {
   const inviteData = await getInviteTemplateList({ page: 1, pageSize: 100 })
-  inviteTemplates.value = inviteData.data
+  inviteTemplates.value = inviteData.data.list
   const answerData = await getAnswerTemplateList({ page: 1, pageSize: 100 })
   answerTemplates.value = answerData.data.list
 }

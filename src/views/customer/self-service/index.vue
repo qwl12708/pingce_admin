@@ -1,5 +1,26 @@
 <template>
   <div class="main-content min-h-screen bg-gray-50 p-6">
+    <!-- 搜索区域 -->
+    <div class="flex items-center gap-0 mb-4">
+      <el-input v-model="searchValue" placeholder="请输入搜索内容" style="width: 380px" clearable>
+        <template #prepend>
+          <el-select v-model="searchField" placeholder="选择字段" style="width: 140px">
+            <el-option label="客户名称" value="org_name" />
+            <el-option label="联系人" value="contacts" />
+            <el-option label="联系人手机号码" value="phone" />
+            <el-option label="所属行业" value="industry_id" />
+            <el-option label="预留电子邮箱" value="email" />
+            <el-option label="测评顾问" value="counsellor_id" />
+            <el-option label="审批状态" value="status" />
+            <el-option label="客户状态" value="isFreezed" />
+          </el-select>
+        </template>
+        <template #append>
+          <el-button :icon="Search" @click="onSearch" />
+        </template>
+      </el-input>
+      <el-button class="ml-2" @click="onReset">重置</el-button>
+    </div>
     <!-- 数据概览区 -->
     <div class="flex justify-between items-center mb-6">
       <div class="flex gap-8">
@@ -32,25 +53,29 @@
     </div>
     <!-- 表格区域 -->
     <div class="bg-white rounded-lg shadow">
-      <el-table :data="tableData" style="width: 100%" class="custom-table">
+      <el-table :data="tableData" class="custom-table" @sort-change="handleSortChange">
         <el-table-column type="selection" />
-        <el-table-column label="序号" type="index" />
-        <el-table-column prop="user_no" label="客户编号" sortable />
-        <el-table-column prop="org_name" label="客户名称" sortable />
-        <el-table-column prop="create_time" label="注册日期" sortable>
+        <el-table-column label="序号" type="index" width="60" />
+        <el-table-column prop="user_no" label="客户编号" width="200" />
+        <el-table-column prop="org_name" label="客户名称" width="200" />
+        <el-table-column prop="create_time" label="注册日期" width="200">
           <template #default="{ row }">
             {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
-        <el-table-column prop="project_num" label="累计项目数" sortable />
-        <el-table-column prop="answer_num" label="累计评估人次" sortable />
-        <el-table-column prop="contacts" label="联系人" sortable />
+        <el-table-column prop="project_num" label="累计项目数" width="200" />
+        <el-table-column prop="answer_num" label="累计评估人次" width="200" />
+        <el-table-column prop="contacts" label="联系人" width="200" />
+        <el-table-column prop="phone" label="联系人手机号码" width="200" />
+        <el-table-column prop="employees_num" label="员工人数" sortable width="200" />
+        <el-table-column prop="industry_name" label="所属行业" width="200" />
+        <el-table-column prop="email" label="预留电子邮箱" width="200" />
+        <el-table-column prop="province_name" label="单位所在省" width="200" />
+        <el-table-column prop="city_name" label="单位所在市" width="200" />
+        <el-table-column prop="counsellor_name" label="测评顾问" width="200" />
         <el-table-column label="操作" fixed="right" width="300" align="center">
           <template #default="scope">
             <div class="flex gap-2">
-              <!-- <el-button type="primary" @click="goRecord(scope.row.id)" link class="!rounded-button whitespace-nowrap">
-                查询
-              </el-button> -->
               <el-button @click="goDetail(scope.row.id)" type="primary" link class="!rounded-button whitespace-nowrap">
                 修改客户信息
               </el-button>
@@ -85,6 +110,8 @@
             layout="sizes, prev, pager, next, jumper"
             :total="total"
             class="!rounded-button"
+            @current-change="fetchTableData"
+            @size-change="fetchTableData"
           />
         </div>
       </div>
@@ -96,20 +123,34 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus, Search } from '@element-plus/icons-vue'
 import router from '@/router'
-import { getInstitutionList, updateInstitutionStatus } from '@/api/customer'
+import { getInstitutionList, updateInstitutionStatus, getAreas, getConsultantList, getIndustries } from '@/api/customer'
 import { ElMessage } from 'element-plus'
 import { useRoute } from 'vue-router'
 import { formatTime } from '@/utils/formatTime'
 
 interface TableItem {
+  id: number // 添加 id 属性
   org_code: string
   org_name: string
   created_at: string
   project_count: number
   evaluation_count: number
   contact_name: string
+  phone: string
+  employees_num: number
+  industry_id: number // 添加 industry_id 属性
+  counsellor_id: number // 添加 counsellor_id 属性
+  email: string
+  province_id: number // 添加 province_id 属性
+  city_id: number // 添加 city_id 属性
+  province_name: string
+  city_name: string
+  address: string
+  counsellor_name: string
+  status: number
+  reject_reason: string
   isFreezed: boolean
 }
 
@@ -120,16 +161,45 @@ const total = ref(0)
 const week_total = ref(0)
 const tableData = ref<TableItem[]>([])
 
+const searchField = ref('org_name')
+const searchValue = ref('')
+
+const searchParams = ref<{ [key: string]: any }>({})
+
 const fetchTableData = async () => {
   try {
-    const { data } = await getInstitutionList({
-      type: activeTab.value === 'one' ? 1 : 0,
-      page: currentPage.value,
-      pageSize: pageSize.value
-    })
-    tableData.value = data.list
-    total.value = data.total
-    week_total.value = data.week_total
+    const [institutionRes, areaRes, industriesRes, consultantsRes] = await Promise.all([
+      getInstitutionList({
+        type: activeTab.value === 'one' ? 1 : 0,
+        page: currentPage.value,
+        pageSize: pageSize.value,
+        ...searchParams.value
+      }),
+      getAreas(),
+      getIndustries(),
+      getConsultantList()
+    ])
+
+    const areaMap = new Map(areaRes.data.map((industry: { id: number; name: string }) => [industry.id, industry.name]))
+
+    const consultantsMap = new Map(
+      consultantsRes.data.map((consultant: { id: number; name: string }) => [consultant.id, consultant.name])
+    )
+
+    const industryMap = new Map(
+      industriesRes.data.map((industry: { id: number; name: string }) => [industry.id, industry.name])
+    )
+
+    tableData.value = institutionRes.data.list.map((item: TableItem) => ({
+      ...item,
+      industry_name: industryMap.get(item.industry_id) || '未知行业',
+      province_name: areaMap.get(item.province_id) || '未知省份',
+      city_name: areaMap.get(item.city_id) || '未知城市',
+      counsellor_name: consultantsMap.get(item.counsellor_id) || '未知顾问'
+    }))
+
+    total.value = institutionRes.data.total
+    week_total.value = institutionRes.data.week_total
   } catch (error) {
     console.error('获取客户列表失败', error)
   }
@@ -145,16 +215,12 @@ onMounted(() => {
   fetchTableData()
 })
 
-const goDetail = id => {
+const goDetail = (id: number) => {
   router.push(`/customer/add?type=1&id=${id}`)
 }
 
-const goContract = id => {
+const goContract = (id: number) => {
   router.push(`/contract/add?id=${id}`)
-}
-
-const goRecord = id => {
-  router.push(`/customer/use-record?id=${id}`)
 }
 
 const handleClickTab = (tab: string) => {
@@ -166,10 +232,9 @@ const handleClickTab = (tab: string) => {
 const onAddCustomer = () => {
   router.push('/customer/add?type=1')
 }
-const updataStatus = async id => {
+const updataStatus = async (id: number) => {
   const res = await updateInstitutionStatus({ id })
-  if (!res) return
-  if (res.code !== 200) {
+  if (!res || res.status !== 200) {
     ElMessage.error('更新失败！')
     return
   }
@@ -180,6 +245,43 @@ const updataStatus = async id => {
     }
     return item
   })
+}
+
+const sortOrder = ref<'asc' | 'desc' | null>(null)
+
+function handleSortChange({ prop, order }: { prop: string; order: 'ascending' | 'descending' | null }) {
+  if (prop === 'employees_num') {
+    sortOrder.value = order === 'ascending' ? 'asc' : order === 'descending' ? 'desc' : null
+    if (sortOrder.value) {
+      tableData.value = [...tableData.value].sort((a, b) => {
+        if (sortOrder.value === 'asc') {
+          return a.employees_num - b.employees_num
+        } else {
+          return b.employees_num - a.employees_num
+        }
+      })
+    } else {
+      fetchTableData() // 还原原始顺序
+    }
+  }
+}
+
+const onSearch = () => {
+  if (!searchField.value || !searchValue.value) {
+    ElMessage.warning('请选择字段并输入搜索内容')
+    return
+  }
+  searchParams.value = { [searchField.value]: searchValue.value }
+  currentPage.value = 1
+  fetchTableData()
+}
+
+const onReset = () => {
+  searchField.value = 'org_name'
+  searchValue.value = ''
+  searchParams.value = {}
+  currentPage.value = 1
+  fetchTableData()
 }
 </script>
 

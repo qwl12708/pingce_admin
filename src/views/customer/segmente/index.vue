@@ -1,33 +1,67 @@
 <template>
   <div class="main-content min-h-screen bg-white p-6">
-    <!-- 头部筛选区域 -->
-    <div class="bg-white p-4 rounded-lg mb-4 flex items-center justify-between">
-      <div class="flex gap-4">
-        <el-tree-select
-          v-model="regions"
-          :data="regionData"
-          show-checkbox
-          multiple
-          node-key="id"
-          placeholder="请选择所属区域"
-          class="w-full"
-        />
-
-        <el-select v-model="customer" placeholder="客户" class="w-48">
-          <el-option v-for="item in consultantOptions" :key="item.value" :label="item.label" :value="item.value" />
-        </el-select>
-        <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleSearch">查询</el-button>
-      </div>
-      <div class="flex gap-4">
-        <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="showDialog = true">
-          <el-icon class="mr-1"><UserFilled /></el-icon>
-          分配/变更测评顾问
-        </el-button>
-
-        <el-button @click="onUpdate" type="link" class="!rounded-button whitespace-nowrap">
-          <el-icon class="mr-1"><Setting /></el-icon>
-          负责区域设置
-        </el-button>
+    <!-- 头部筛选区域  -->
+    <div class="bg-white p-4 pb-0 rounded-lg mb-4">
+      <div class="flex flex-wrap items-start gap-4">
+        <el-form :model="filterForm" class="flex flex-wrap gap-x-6 gap-y-2 grow">
+          <el-form-item label="客户名称">
+            <el-input v-model="filterForm.org_name" placeholder="请输入客户名称" clearable style="width: 180px" />
+          </el-form-item>
+          <el-form-item label="类别">
+            <el-input v-model="filterForm.type" placeholder="请输入类别" clearable style="width: 120px" />
+          </el-form-item>
+          <el-form-item label="联系人">
+            <el-input v-model="filterForm.contacts" placeholder="请输入联系人" clearable style="width: 120px" />
+          </el-form-item>
+          <el-form-item label="联系人手机号码">
+            <el-input v-model="filterForm.phone" placeholder="请输入手机号码" clearable style="width: 140px" />
+          </el-form-item>
+          <el-form-item label="所属行业">
+            <el-input v-model="filterForm.industry_name" placeholder="请输入所属行业" clearable style="width: 120px" />
+          </el-form-item>
+          <el-form-item label="预留电子邮箱">
+            <el-input v-model="filterForm.email" placeholder="请输入邮箱" clearable style="width: 150px" />
+          </el-form-item>
+          <el-form-item label="测评顾问">
+            <el-input
+              v-model="filterForm.counsellor_name"
+              placeholder="请输入测评顾问"
+              clearable
+              style="width: 120px"
+            />
+          </el-form-item>
+          <el-form-item label="所属区域">
+            <el-tree-select
+              v-model="regions"
+              :data="regionData"
+              show-checkbox
+              multiple
+              node-key="id"
+              placeholder="请选择所属区域"
+              class="w-full"
+              style="min-width: 180px; max-width: 220px"
+            />
+          </el-form-item>
+          <el-form-item label="客户顾问">
+            <el-select v-model="customer" placeholder="客户" class="w-48">
+              <el-option v-for="item in consultantOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleSearch">查询</el-button>
+            <el-button class="!rounded-button whitespace-nowrap ml-2" @click="handleReset">重置</el-button>
+          </el-form-item>
+        </el-form>
+        <div class="flex flex-col gap-2 items-end shrink-0 ml-auto">
+          <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="showDialog = true">
+            <el-icon class="mr-1"><UserFilled /></el-icon>
+            分配/变更测评顾问
+          </el-button>
+          <el-button @click="onUpdate" type="link" class="!rounded-button whitespace-nowrap">
+            <el-icon class="mr-1"><Setting /></el-icon>
+            负责区域设置
+          </el-button>
+        </div>
       </div>
     </div>
 
@@ -101,8 +135,8 @@ const showDialog = ref(false)
 const dialogForm = ref({
   consultant: ''
 })
-const consultantOptions = ref([])
-const regionData = ref([])
+const consultantOptions = ref<{ value: string | number; label: string }[]>([])
+const regionData = ref<any[]>([])
 const regions = ref([])
 
 const customer = ref('')
@@ -112,6 +146,56 @@ const total = ref(0)
 const tableData = ref([])
 const selectedIds = ref<string[]>([])
 
+// 表单筛选数据
+const filterForm = ref({
+  org_name: '',
+  type: '',
+  contacts: '',
+  phone: '',
+  industry_name: '',
+  email: '',
+  counsellor_name: ''
+})
+
+// 查询
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchTableData()
+}
+
+const handleReset = () => {
+  filterForm.value = {
+    org_name: '',
+    type: '',
+    contacts: '',
+    phone: '',
+    industry_name: '',
+    email: '',
+    counsellor_name: ''
+  }
+  regions.value = []
+  customer.value = ''
+  currentPage.value = 1
+  fetchTableData()
+}
+
+const fetchTableData = async () => {
+  try {
+    const params: Record<string, any> = {
+      city_ids: regions.value.join(','),
+      customer_ids: customer.value,
+      page: currentPage.value,
+      pageSize: pageSize.value,
+      ...filterForm.value
+    }
+    const { data } = await getSegmenteList(params)
+    tableData.value = data.list
+    total.value = data.total
+  } catch (error) {
+    console.error('获取客户列表失败', error)
+  }
+}
+
 const fetchAreas = async () => {
   try {
     const { data } = await getAreas()
@@ -120,15 +204,15 @@ const fetchAreas = async () => {
     console.error('获取区域失败', error)
   }
 }
-const transformToTree = data => {
-  const tree = []
-  const map = {}
+const transformToTree = (data: any[]): any[] => {
+  const tree: any[] = []
+  const map: Record<string, any> = {}
 
-  data.forEach(item => {
+  data.forEach((item: any) => {
     map[item.id] = { ...item, label: item.name, children: [] }
   })
 
-  data.forEach(item => {
+  data.forEach((item: any) => {
     if (item.pid === 0) {
       tree.push(map[item.id])
     } else {
@@ -141,25 +225,10 @@ const transformToTree = data => {
   return tree
 }
 
-const fetchTableData = async () => {
-  try {
-    const { data } = await getSegmenteList({
-      city_ids: regions.value.join(','),
-      customer_ids: customer.value,
-      page: currentPage.value,
-      pageSize: pageSize.value
-    })
-    tableData.value = data.list
-    total.value = data.total
-  } catch (error) {
-    console.error('获取客户列表失败', error)
-  }
-}
-
 const fetchConsultantList = async () => {
   try {
     const { data } = await getConsultantList()
-    consultantOptions.value = data.map(item => ({ value: item.id, label: item.name }))
+    consultantOptions.value = data.map((item: any) => ({ value: item.id, label: item.name }))
     total.value = data.length
   } catch (error) {
     console.error('获取测评顾问列表失败', error)
@@ -172,12 +241,8 @@ onMounted(() => {
   fetchConsultantList()
 })
 
-const handleSelectionChange = selection => {
-  selectedIds.value = selection.map(item => item.id)
-}
-
-const handleSearch = () => {
-  fetchTableData()
+const handleSelectionChange = (selection: any[]) => {
+  selectedIds.value = selection.map((item: any) => item.id)
 }
 
 const onUpdate = () => {
@@ -190,7 +255,7 @@ const handleDialogSubmit = async () => {
     return
   }
   try {
-    await bindConsultant({ ids: selectedIds.value.join(','), consultant_id: dialogForm.value.consultant })
+    await bindConsultant({ ids: selectedIds.value.join(','), consultant_id: Number(dialogForm.value.consultant) })
     ElMessage.success('分配成功')
     showDialog.value = false
     fetchTableData()
@@ -237,5 +302,9 @@ const handleDialogSubmit = async () => {
 
 .el-pagination {
   justify-content: flex-end;
+}
+
+.bg-white.p-4.rounded-lg.mb-4 .el-form {
+  flex: 1 1 0%;
 }
 </style>

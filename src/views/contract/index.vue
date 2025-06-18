@@ -51,6 +51,30 @@
       </div>
       <el-button @click="onAddContract" type="primary" class="!rounded-button whitespace-nowrap">新增合同</el-button>
     </div>
+    <!-- 筛选表单 -->
+    <el-form :inline="true" class="mb-4" @submit.prevent>
+      <el-form-item label="客户名称">
+        <el-input v-model="filters.customer_name" placeholder="请输入客户名称" clearable />
+      </el-form-item>
+      <el-form-item label="客户管理员">
+        <el-input v-model="filters.counsellor_name" placeholder="请输入客户管理员" clearable />
+      </el-form-item>
+      <el-form-item label="创建人">
+        <el-input v-model="filters.creater" placeholder="请输入创建人" clearable />
+      </el-form-item>
+      <el-form-item label="合同状态">
+        <el-select v-model="filters.status" placeholder="请选择合同状态" clearable style="width: 120px">
+          <el-option v-for="item in contractStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="审批人">
+        <el-input v-model="filters.approve_user" placeholder="请输入审批人" clearable />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="handleSearch">查询</el-button>
+        <el-button @click="handleReset">重置</el-button>
+      </el-form-item>
+    </el-form>
 
     <!-- 表格区域 -->
     <el-table :data="tableData" style="width: 100%" class="mb-4">
@@ -66,6 +90,7 @@
       <el-table-column prop="creater" label="创建人" width="120" />
       <el-table-column prop="money" label="合同金额(元)" width="120" />
       <el-table-column prop="status_name" label="合同状态" width="120" />
+      <el-table-column prop="counsellor_name" label="客户管理员" width="120" />
       <!-- 以逗号分隔换行显示每一个 -->
       <el-table-column prop="approve_user" label="审批人" width="120">
         <template #default="{ row }">
@@ -183,8 +208,30 @@ const tableData = ref([])
 const id = ref('')
 const formRef = ref<FormInstance>()
 
+const filters = ref({
+  customer_name: '',
+  counsellor_name: '',
+  creater: '',
+  status: '',
+  approve_user: ''
+})
+
+const contractStatusOptions = [
+  { label: '草稿', value: 0 },
+  { label: '审批中', value: 1 },
+  { label: '审批通过', value: 2 },
+  { label: '驳回', value: 3 },
+  { label: '撤回', value: 4 }
+]
+
 const fetchContractList = async () => {
-  const { data } = await getContractList({ type: activeTab.value, page: currentPage.value, pageSize: pageSize.value })
+  const params = {
+    type: activeTab.value,
+    page: currentPage.value,
+    pageSize: pageSize.value,
+    ...filters.value
+  }
+  const { data } = await getContractList(params)
   tableData.value = data.list
   total.value = data.total
   back_count.value = data.back_count
@@ -229,7 +276,7 @@ const handleApprovalSubmit = async () => {
   const p = approvalForm.value.type === 2 ? { comment: approvalForm.value.comment } : {}
   await approvalContract({
     id: Number(id.value),
-    type: Number(approvalForm.value.type),
+    type: String(approvalForm.value.type),
     ...p
   })
   showApprovalDialog.value = false
@@ -242,10 +289,9 @@ const handleApprovalSubmit = async () => {
 //   selectedRows.value = rows
 // }
 
-const handleShowDialog = contractId => {
-  console.log('%c [ id ]-222', 'font-size:13px; background:pink; color:#bf2c9f;', id)
+const handleShowDialog = (contractId: number) => {
   showApprovalDialog.value = true
-  id.value = contractId
+  id.value = String(contractId)
 }
 const handleCloseDialog = () => {
   formRef.value?.resetFields()
@@ -253,8 +299,25 @@ const handleCloseDialog = () => {
   id.value = ''
 }
 
-const handleClickTab = tab => {
+const handleClickTab = (tab: number) => {
   activeTab.value = tab
+  currentPage.value = 1
+  fetchContractList()
+}
+
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchContractList()
+}
+
+const handleReset = () => {
+  filters.value = {
+    customer_name: '',
+    counsellor_name: '',
+    creater: '',
+    status: '',
+    approve_user: ''
+  }
   currentPage.value = 1
   fetchContractList()
 }
