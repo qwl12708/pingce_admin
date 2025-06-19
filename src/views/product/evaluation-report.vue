@@ -2,14 +2,42 @@
   <div class="main-content min-h-screen bg-white p-6">
     <!-- 搜索区域 -->
     <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
-      <div class="flex items-center space-x-6">
-        <div class="flex items-center">
-          <div style="width: 120px" class="text-gray-600 mr-2">手机号码</div>
-          <el-input type="number" v-model="searchKeyword" placeholder="请输入" class="w-64 text-sm" />
-        </div>
-        <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleSearch">查询</el-button>
-        <el-button class="!rounded-button whitespace-nowrap" @click="handleReset">重置</el-button>
-      </div>
+      <el-form :inline="true" :model="searchForm" class="flex flex-wrap items-center gap-4">
+        <el-form-item label="手机号码">
+          <el-input v-model="searchForm.phone" placeholder="请输入" class="w-48" />
+        </el-form-item>
+        <el-form-item label="测评问卷">
+          <el-input v-model="searchForm.questionnaire_name" placeholder="请输入" class="w-48" />
+        </el-form-item>
+        <el-form-item label="客户名称">
+          <el-input v-model="searchForm.org_name" placeholder="请输入" class="w-48" />
+        </el-form-item>
+        <el-form-item label="项目名称">
+          <el-input v-model="searchForm.project_name" placeholder="请输入" class="w-48" />
+        </el-form-item>
+        <el-form-item label="答题结果">
+          <el-select v-model="searchForm.result" placeholder="请选择" class="w-40">
+            <el-option label="全部" value="" />
+            <el-option label="合格" value="合格" />
+            <el-option label="不合格" value="不合格" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="问卷提交日期">
+          <el-date-picker
+            v-model="searchForm.submit_time"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            value-format="YYYY-MM-DD"
+            class="w-64"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleSearch">查询</el-button>
+          <el-button class="!rounded-button whitespace-nowrap" @click="handleReset">重置</el-button>
+        </el-form-item>
+      </el-form>
     </div>
 
     <!-- 标签页区域 -->
@@ -77,11 +105,13 @@
               <el-button type="primary" link @click="handleEdit(row)">{{ row.name }}</el-button>
             </template>
           </el-table-column>
-          <el-table-column label="手机号码" prop="tel" sortable="" />
-          <el-table-column label="测评问卷" prop="paper" sortable />
-          <el-table-column label="问卷提交日期" prop="submitDate" sortable />
-          <el-table-column label="客户名称" prop="customerName" sortable />
-          <el-table-column label="项目名称" prop="productName" sortable />
+          <el-table-column label="手机号码" prop="phone" sortable="" />
+          <el-table-column label="测评问卷" prop="questionnaire_name" sortable />
+          <el-table-column label="问卷提交日期" prop="submit_time" sortable>
+            <template #default="{ row }"> {{ formatTime(row.submit_time) }} </template>
+          </el-table-column>
+          <el-table-column label="客户名称" prop="org_name" sortable />
+          <el-table-column label="项目名称" prop="project_name" sortable />
           <el-table-column label="答题结果" prop="result" sortable />
           <!-- <el-table-column v-if="activeTab === 'uploaded'" label="操作" width="200">
             <template #default="{ row }">
@@ -121,10 +151,18 @@ import {
 } from '@/api/product'
 import { ElMessage } from 'element-plus'
 import FileUploader from '@/components/FileUploader/index.vue'
+import { formatTime } from '@/utils/formatTime'
 
 const evaluationPath = ref('')
 const compareReportPath = ref('')
-const searchKeyword = ref('')
+const searchForm = ref({
+  phone: '',
+  questionnaire_name: '',
+  org_name: '',
+  project_name: '',
+  result: '',
+  submit_time: ''
+})
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -140,16 +178,25 @@ const tabs = [
 const tableData = ref([])
 
 const fetchTableData = async () => {
-  const actionMap = {
+  const actionMap: Record<string, Function> = {
     pending: getDoingReportList,
     waiting: getNoAnswerReportList,
     uploaded: getEvaluationReportList
   }
-  const { data } = await actionMap[activeTab.value]({
-    name: searchKeyword.value,
+  const params: any = {
+    phone: searchForm.value.phone,
+    questionnaire_name: searchForm.value.questionnaire_name,
+    org_name: searchForm.value.org_name,
+    project_name: searchForm.value.project_name,
+    result: searchForm.value.result,
     page: currentPage.value,
     pageSize: pageSize.value
-  })
+  }
+  if (searchForm.value.submit_time && searchForm.value.submit_time.length === 2) {
+    params.start_time = searchForm.value.submit_time[0]
+    params.end_time = searchForm.value.submit_time[1]
+  }
+  const { data } = await actionMap[activeTab.value](params)
   tableData.value = data.list
   total.value = data.total
 }
@@ -159,11 +206,20 @@ onMounted(() => {
 })
 
 const handleSearch = () => {
+  currentPage.value = 1
   fetchTableData()
 }
 
 const handleReset = () => {
-  searchKeyword.value = ''
+  Object.assign(searchForm.value, {
+    phone: '',
+    questionnaire_name: '',
+    org_name: '',
+    project_name: '',
+    result: '',
+    submit_time: ''
+  })
+  currentPage.value = 1
   fetchTableData()
 }
 

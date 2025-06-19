@@ -151,6 +151,8 @@ const questionnaireTypeOptions = [
   { value: 4, label: '定制问卷' }
 ]
 const questionnaireOptions = ref([])
+const industryOptions = ref([])
+
 onMounted(async () => {
   fetchAreas()
   const { id, readonly: ro } = route.query

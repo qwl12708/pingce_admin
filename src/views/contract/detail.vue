@@ -75,6 +75,37 @@
     </div>
     <!-- 合同套餐 -->
     <div class="bg-white rounded-lg p-6">
+      <!-- 筛选表单 -->
+      <el-form :inline="true" :model="filterForm" class="mb-4">
+        <el-form-item label="类别">
+          <el-input v-model="filterForm.type" placeholder="请输入类别" clearable />
+        </el-form-item>
+        <el-form-item label="产品套餐">
+          <el-input v-model="filterForm.name" placeholder="请输入产品套餐" clearable />
+        </el-form-item>
+        <el-form-item label="可使用问卷">
+          <el-input v-model="filterForm.evaluation_name" placeholder="请输入可使用问卷" clearable />
+        </el-form-item>
+        <!-- <el-form-item label="限售地区">
+          <el-select v-model="filterForm.limit_area" placeholder="请选择限售地区" clearable filterable>
+            <el-option v-for="(area, id) in originalDataMap" :key="id" :label="area.name" :value="id" />
+          </el-select>
+        </el-form-item> -->
+        <el-form-item label="限售地区">
+          <el-tree-select
+            v-model="filterForm.limit_area"
+            placeholder="请选择限售地区"
+            clearable
+            filterable
+            :data="regionData"
+            show-checkbox
+            multiple
+            node-key="id"
+            :props="defaultProps"
+            class="w-full"
+          />
+        </el-form-item>
+      </el-form>
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-lg font-medium flex items-center">
           <el-icon class="mr-2"><Tickets /></el-icon>
@@ -87,7 +118,7 @@
           <span class="text-red-500 text-lg">¥ {{ contractInfo.real_money }}</span>
         </div>
       </div>
-      <el-table :data="tableData" border>
+      <el-table :data="filteredTableData" border>
         <el-table-column type="selection" width="55" />
         <el-table-column label="类别" prop="type" />
         <el-table-column label="产品套餐" prop="name" />
@@ -161,7 +192,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getContractInfo, approvalContract, getContractApproveRecord } from '@/api/contract'
 import { Document, Tickets } from '@element-plus/icons-vue'
@@ -173,9 +204,10 @@ const router = useRouter()
 
 const contractId = ref(route.query.id)
 const contractInfo = ref<any>({})
-const tableData = ref([])
+const tableData = ref<any[]>([])
 const contractApproveRecord = ref([])
 const originalDataMap = ref({})
+const regionData = ref([])
 
 const statusMap = {
   4: '撤销', // 4
@@ -183,6 +215,10 @@ const statusMap = {
   2: '审批通过', // 2
   1: '未审批', // 1
   0: '草稿' // 0
+}
+const defaultProps = {
+  children: 'children',
+  label: 'label'
 }
 
 const fetchContractInfo = async () => {
@@ -210,6 +246,7 @@ const fetchAreas = async () => {
       acc[item.id] = item
       return acc
     }, {})
+    regionData.value = transformToTree(data)
   } catch (error) {
     console.error('获取地区列表失败', error)
   }
@@ -240,6 +277,48 @@ const handleApprovalSubmit = async () => {
 
 const goBack = () => {
   router.push('/contract/list')
+}
+
+const filterForm = ref({
+  type: '',
+  name: '',
+  evaluation_name: '',
+  limit_area: []
+})
+
+const filteredTableData = computed(() => {
+  return tableData.value.filter((item: any) => {
+    const typeMatch = !filterForm.value.type || (item.type && item.type == filterForm.value.type)
+    const nameMatch = !filterForm.value.name || (item.name && item.name.indexOf(filterForm.value.name) > -1)
+    const evaluationMatch =
+      !filterForm.value.evaluation_name ||
+      (item.evaluation_name && item.evaluation_name.indexOf(filterForm.value.evaluation_name)) > -1
+    const areaMatch =
+      !filterForm.value.limit_area.length ||
+      (item.limit_area && filterForm.value.limit_area.some(area => item.limit_area.flat().includes(area)))
+    return typeMatch && nameMatch && evaluationMatch && areaMatch
+  })
+})
+
+const transformToTree = data => {
+  const tree = []
+  const map = {}
+
+  data.forEach(item => {
+    map[item.id] = { ...item, label: item.name, children: [] }
+  })
+
+  data.forEach(item => {
+    if (item.pid === 0) {
+      tree.push(map[item.id])
+    } else {
+      if (map[item.pid]) {
+        map[item.pid].children.push(map[item.id])
+      }
+    }
+  })
+
+  return tree
 }
 </script>
 

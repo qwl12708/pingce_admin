@@ -286,15 +286,16 @@ const handleDelete = async (row: any) => {
 const handleSelectionChange = (rows: any[]) => {
   selectedRows.value = rows
 }
-
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  currentPage.value = 1 // 切换每页数量时回到第一页
+  fetchUserList()
 }
 
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
+  fetchUserList()
 }
-
 const onAdd = () => {
   dialogVisible.value = true
   formRef.value?.resetFields()

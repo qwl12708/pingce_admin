@@ -78,6 +78,8 @@
         :page-sizes="[10, 20, 30, 40]"
         layout="prev, pager, next, jumper, sizes"
         class="text-center"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
       />
     </div>
 
@@ -347,6 +349,16 @@ const form = ref({
 })
 
 const menuTree = ref()
+
+const handleSizeChange = (val: number) => {
+  pageSize.value = val
+  currentPage.value = 1
+  fetchRoleList({ page: currentPage.value, pageSize: pageSize.value, name: searchKeyword.value })
+}
+const handleCurrentChange = (val: number) => {
+  currentPage.value = val
+  fetchRoleList({ page: currentPage.value, pageSize: pageSize.value, name: searchKeyword.value })
+}
 
 const resetForm = () => {
   form.value = {

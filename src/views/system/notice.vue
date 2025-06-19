@@ -1,5 +1,41 @@
 <template>
   <div class="main-content min-h-screen bg-white p-6">
+    <!-- 搜索区域 -->
+    <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
+      <el-form :inline="true" :model="searchForm" class="flex flex-wrap items-center gap-4">
+        <el-form-item label="公告图片">
+          <el-input v-model="searchForm.img" placeholder="请输入图片名或链接" class="w-48" />
+        </el-form-item>
+        <el-form-item label="公告内容">
+          <el-input v-model="searchForm.content" placeholder="请输入公告内容" class="w-48" />
+        </el-form-item>
+        <el-form-item label="公告状态">
+          <el-select v-model="searchForm.status" placeholder="请选择公告状态" class="w-40">
+            <el-option label="全部" value="" />
+            <el-option label="启用" :value="1" />
+            <el-option label="停用" :value="2" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="发布时间">
+          <el-date-picker
+            v-model="searchForm.create_time"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            value-format="YYYY-MM-DD"
+            class="w-64"
+          />
+        </el-form-item>
+        <el-form-item label="发布人">
+          <el-input v-model="searchForm.creater" placeholder="请输入发布人" class="w-48" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleSearch">查询</el-button>
+          <el-button class="!rounded-button whitespace-nowrap" @click="handleReset">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
     <!-- 表格区域 -->
     <div class="bg-white rounded-lg shadow-sm">
       <div class="p-4 flex justify-between items-center border-b border-gray-100">
@@ -24,9 +60,19 @@
         <el-table-column label="公告图片" prop="img" />
         <el-table-column label="公告内容" prop="content" />
         <el-table-column label="排序" prop="sort" />
-        <el-table-column label="公告状态" prop="status" sortable />
-        <el-table-column label="发布时间" prop="publish_time" sortable />
-        <el-table-column label="发布人" prop="publisher" sortable />
+        <el-table-column label="公告状态" prop="status" sortable>
+          <template #default="{ row }">
+            <el-tag :type="row.status === 1 ? 'success' : 'danger'" class="!rounded-button">
+              {{ row.status === 1 ? '启用' : '停用' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="发布时间" prop="create_time" sortable>
+          <template #default="{ row }">
+            <span>{{ formatTime(row.create_time) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="发布人" prop="creater" sortable />
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -111,6 +157,7 @@ import { reactive, ref, onMounted } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import router from '@/router'
+import { formatTime } from '@/utils/formatTime'
 import { getNoticeList, deleteNotice } from '@/api/system/user'
 
 const searchKeyword = ref('')
@@ -145,8 +192,29 @@ const rules = reactive<FormRules>({
   department: [{ required: true, message: '请选择所在部门', trigger: 'change' }]
 })
 
+const searchForm = reactive({
+  img: '',
+  content: '',
+  status: '',
+  create_time: '',
+  creater: ''
+})
+
 const fetchNotices = async () => {
-  const { data } = await getNoticeList({ page: currentPage.value, pageSize: pageSize.value })
+  const params: any = {
+    page: currentPage.value,
+    pageSize: pageSize.value,
+    img: searchForm.img,
+    content: searchForm.content,
+    status: searchForm.status,
+    creater: searchForm.creater
+  }
+
+  if (searchForm.create_time && Array.isArray(searchForm.create_time) && searchForm.create_time.length === 2) {
+    params.start_time = new Date(searchForm.create_time[0]).getTime() / 1000
+    params.end_time = new Date(searchForm.create_time[1]).getTime() / 1000
+  }
+  const { data } = await getNoticeList(params)
   tableData.value = data.list
   total.value = data.total
 }
@@ -204,6 +272,23 @@ const handleCurrentChange = (val: number) => {
 
 const onAdd = () => {
   dialogVisible.value = true
+}
+
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchNotices()
+}
+
+const handleReset = () => {
+  Object.assign(searchForm, {
+    img: '',
+    content: '',
+    status: '',
+    create_time: '',
+    creater: ''
+  })
+  currentPage.value = 1
+  fetchNotices()
 }
 
 onMounted(() => {

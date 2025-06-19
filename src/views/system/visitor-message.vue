@@ -1,6 +1,37 @@
 <template>
   <div class="main-content min-h-screen bg-white p-6">
     <div class="bold mb-4">访客留言</div>
+    <!-- 搜索区域 -->
+    <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
+      <el-form :inline="true" :model="searchForm" class="flex flex-wrap items-center gap-4">
+        <el-form-item label="访客姓名">
+          <el-input v-model="searchForm.name" placeholder="请输入访客姓名" class="w-48" />
+        </el-form-item>
+        <el-form-item label="访客电话">
+          <el-input v-model="searchForm.phone" placeholder="请输入访客电话" class="w-48" />
+        </el-form-item>
+        <el-form-item label="留言内容">
+          <el-input v-model="searchForm.content" placeholder="请输入留言内容" class="w-48" />
+        </el-form-item>
+        <el-form-item label="回复状态">
+          <el-select v-model="searchForm.status" placeholder="请选择回复状态" class="w-40">
+            <el-option label="全部" value="" />
+            <el-option label="未回复" :value="0" />
+            <el-option label="已回复" :value="1" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="回复人">
+          <el-input v-model="searchForm.reply_user" placeholder="请输入回复人" class="w-48" />
+        </el-form-item>
+        <el-form-item label="回复记录">
+          <el-input v-model="searchForm.replay_content" placeholder="请输入回复记录" class="w-48" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleSearch">查询</el-button>
+          <el-button class="!rounded-button whitespace-nowrap" @click="handleReset">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
     <!-- 表格区域 -->
     <div class="bg-white rounded-lg shadow-sm">
       <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
@@ -109,6 +140,15 @@ const form = reactive({
   reply_time: ''
 })
 
+const searchForm = reactive({
+  name: '',
+  phone: '',
+  content: '',
+  status: '',
+  reply_user: '',
+  replay_content: ''
+})
+
 const rules: FormRules = {
   replay_content: [{ required: true, message: '请输入回复记录', trigger: 'blur' }],
   reply_time: [{ required: true, message: '请选择回复时间', trigger: 'change' }]
@@ -116,7 +156,17 @@ const rules: FormRules = {
 
 const fetchMessages = async () => {
   try {
-    const { data } = await getVisitorMessages({ page: currentPage.value, pageSize: pageSize.value })
+    const params: any = {
+      page: currentPage.value,
+      pageSize: pageSize.value,
+      name: searchForm.name,
+      phone: searchForm.phone,
+      content: searchForm.content,
+      status: searchForm.status,
+      reply_user: searchForm.reply_user,
+      replay_content: searchForm.replay_content
+    }
+    const { data } = await getVisitorMessages(params)
     tableData.value = data.list
     total.value = data.total
   } catch (error) {
@@ -168,6 +218,24 @@ const handleSizeChange = (val: number) => {
 
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
+  fetchMessages()
+}
+
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchMessages()
+}
+
+const handleReset = () => {
+  Object.assign(searchForm, {
+    name: '',
+    phone: '',
+    content: '',
+    status: '',
+    reply_user: '',
+    replay_content: ''
+  })
+  currentPage.value = 1
   fetchMessages()
 }
 

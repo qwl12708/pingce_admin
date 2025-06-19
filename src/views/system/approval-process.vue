@@ -69,8 +69,8 @@ import { deleteApprovalFlow, getApprovalFlowList } from '@/api/system/user'
 import { ElMessage } from 'element-plus'
 import { formatTime } from '@/utils/formatTime'
 
-const page = ref(1)
 const pageSize = ref(10)
+const currentPage = ref(1)
 const roleValue = ref('1')
 const total = ref(0)
 const tableData = ref<any[]>([])
@@ -91,7 +91,7 @@ const roleOptions = [
 ]
 
 const fetchApprovalTypeList = async () => {
-  const response = await getApprovalFlowList({ page: page.value, pageSize: pageSize.value })
+  const response = await getApprovalFlowList({ page: currentPage.value, pageSize: pageSize.value })
   tableData.value = response.data.list
 
   total.value = response.data.total
@@ -122,6 +122,7 @@ const handleStatus = (row: any) => {
 }
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  currentPage.value = 1
   fetchApprovalTypeList()
 }
 const handleCurrentChange = (val: number) => {

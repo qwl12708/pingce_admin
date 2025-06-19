@@ -218,6 +218,8 @@ const reportTypes = [
   { value: 2, label: '系统生成' }
 ]
 const problemTips = ref('请详细描述您遇到的问题，包含具体的操作步骤、错误提示等信息，以便我们更好地为您解决问题。')
+const industryOptions = ref([])
+const templateOptions = ref([])
 
 const inviteTemplateContent = computed(() => templateOptions.value.find(e => e.id === form.value.invite_id)?.content)
 
@@ -226,8 +228,7 @@ const guideTemplates = ref([])
 const selectedProblem = ref('')
 const contentLength = ref(0)
 const editorRef = ref<HTMLElement | null>(null)
-const industryOptions = ref([])
-const templateOptions = ref([])
+
 const readonly = ref(false)
 
 onMounted(async () => {
@@ -243,7 +244,7 @@ onMounted(async () => {
   industryOptions.value = data || []
 
   const res = await getInviteTemplateList({ page: 1, pageSize: 100 })
-  templateOptions.value = res.data || []
+  templateOptions.value = res.data.list || []
 
   const guideOptionsRes = await getAnswerTemplateList({ page: 1, pageSize: 100 })
   guideTemplates.value = guideOptionsRes.data.list || []

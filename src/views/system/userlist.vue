@@ -230,10 +230,13 @@ const handleSelectionChange = (rows: any[]) => {
 
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  currentPage.value = 1 // 切换每页数量时回到第一页
+  fetchUserList()
 }
 
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
+  fetchUserList()
 }
 
 const onAdd = () => {

@@ -1,5 +1,37 @@
 <template>
   <div class="main-content min-h-screen bg-white p-6">
+    <div class="mb-4">
+      <el-form :inline="true" :model="filterForm" class="flex flex-wrap gap-x-6 gap-y-2">
+        <el-form-item label="问卷名称">
+          <el-input v-model="filterForm.name" placeholder="请输入问卷名称" clearable style="width: 160px" />
+        </el-form-item>
+        <el-form-item label="类别">
+          <el-select v-model="filterForm.type" placeholder="请选择类别" clearable style="width: 120px">
+            <el-option v-for="(label, value) in typeMap" :key="value" :label="label" :value="value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="岗位类别">
+          <el-select v-model="filterForm.post_type" placeholder="请选择岗位类别" clearable style="width: 120px">
+            <el-option v-for="item in postTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="filterForm.status" placeholder="全部" clearable style="width: 120px">
+            <el-option label="正常" :value="1" />
+            <el-option label="冻结" :value="2" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="报告生成类别">
+          <el-select v-model="filterForm.report_type" placeholder="请选择" clearable style="width: 120px">
+            <el-option v-for="(label, value) in reportTypeMap" :key="value" :label="label" :value="value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" class="!rounded-button" @click="handleFilter">查询</el-button>
+          <el-button class="!rounded-button ml-2" @click="handleReset">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
     <div class="flex justify-between items-center p-4 border-b">
       <h2 class="text-lg font-medium">测评问卷管理</h2>
       <div class="space-x-3">
@@ -54,9 +86,11 @@
           {{ is_switching_screensMap[row.is_switching_screens] }}
         </template>
       </el-table-column>
-      <el-table-column label="状态" prop="status" width="120" sortable>
+      <el-table-column label="状态" prop="status" sortable>
         <template #default="{ row }">
-          {{ statusMap[row.status] }}
+          <span :class="row.status === 1 ? 'text-green-500' : 'text-red-500'">
+            {{ statusMap[row.status] }}
+          </span>
         </template>
       </el-table-column>
       <el-table-column label="报告生成类别" prop="report_type" width="150" sortable>
@@ -103,7 +137,8 @@ import {
   updateQuestionnaireStatus,
   getInviteTemplateList,
   getAnswerTemplateList,
-  deleteQuestionnaire
+  deleteQuestionnaire,
+  getJobTypeList
 } from '@/api/product'
 
 interface TableItem {
@@ -157,15 +192,26 @@ const tableData = ref<TableItem[]>([])
 const inviteTemplates = ref<{ id: number; name: string; intro: string }[]>([])
 const answerTemplates = ref<{ id: number; name: string; intro: string }[]>([])
 
-const fetchQuestionnaireList = async () => {
-  const { data } = await getQuestionnaireList({ page: currentPage.value, pageSize: pageSize.value })
-  console.log('%c [ data ]-162', 'font-size:13px; background:pink; color:#bf2c9f;', data)
-  tableData.value = data.list.map((item: any) => ({
-    ...item,
-    inviteTemplateName: inviteTemplates.value.find(template => template.id === item.invite_id)?.name || '',
-    answerTemplateName: answerTemplates.value.find(template => template.id === item.answer_id)?.name || ''
-  }))
-  total.value = data.total
+const filterForm = ref({
+  name: '',
+  type: '',
+  post_type: '',
+  status: '',
+  report_type: ''
+})
+
+const postTypeOptions = ref<{ label: string; value: string }[]>([])
+
+const fetchPostTypeOptions = async () => {
+  const { data } = await getJobTypeList()
+  postTypeOptions.value = (data || []).filter(_ => _).map((item: any) => ({ label: item, value: item }))
+}
+
+const fetchTemplates = async () => {
+  const inviteData = await getInviteTemplateList({ page: 1, pageSize: 100 })
+  inviteTemplates.value = inviteData.data.list
+  const answerData = await getAnswerTemplateList({ page: 1, pageSize: 100 })
+  answerTemplates.value = answerData.data.list
 }
 
 function extractTextFromHTML(html) {
@@ -177,14 +223,30 @@ function extractTextFromHTML(html) {
   return temp.textContent || temp.innerText || ''
 }
 
-const fetchTemplates = async () => {
-  const inviteData = await getInviteTemplateList({ page: 1, pageSize: 100 })
-  inviteTemplates.value = inviteData.data.list
-  const answerData = await getAnswerTemplateList({ page: 1, pageSize: 100 })
-  answerTemplates.value = answerData.data.list
+const fetchQuestionnaireList = async () => {
+  const params: any = {
+    page: currentPage.value,
+    pageSize: pageSize.value,
+    name: filterForm.value.name,
+    type: filterForm.value.type,
+    post_type: filterForm.value.post_type,
+    status: filterForm.value.status,
+    report_type: filterForm.value.report_type
+  }
+  Object.keys(params).forEach(key => {
+    if (params[key] === '' || params[key] === undefined) delete params[key]
+  })
+  const { data } = await getQuestionnaireList(params)
+  tableData.value = data.list.map((item: any) => ({
+    ...item,
+    inviteTemplateName: inviteTemplates.value.find(template => template.id === item.invite_id)?.name || '',
+    answerTemplateName: answerTemplates.value.find(template => template.id === item.answer_id)?.name || ''
+  }))
+  total.value = data.total
 }
 
 onMounted(async () => {
+  await fetchPostTypeOptions()
   await fetchTemplates()
   fetchQuestionnaireList()
 })
@@ -200,10 +262,12 @@ const handleSelectionChange = (val: TableItem[]) => {
 
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  fetchQuestionnaireList()
 }
 
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
+  fetchQuestionnaireList()
 }
 
 const handleAdd = () => {
@@ -230,7 +294,24 @@ const handleOnlineEdit = (row: TableItem) => {
 }
 
 const handleFreeze = async (row: TableItem) => {
-  await updateQuestionnaireStatus({ id: row.id })
+  await updateQuestionnaireStatus({ id: String(row.id) })
+  fetchQuestionnaireList()
+}
+
+const handleFilter = () => {
+  currentPage.value = 1
+  fetchQuestionnaireList()
+}
+
+const handleReset = () => {
+  filterForm.value = {
+    name: '',
+    type: '',
+    post_type: '',
+    status: '',
+    report_type: ''
+  }
+  currentPage.value = 1
   fetchQuestionnaireList()
 }
 </script>

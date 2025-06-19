@@ -115,11 +115,48 @@
 
     <!-- 选择套餐弹窗 -->
     <el-dialog title="选择套餐" v-model.value:visible="showPackageDialog" style="width: 1000px">
+      <!-- 套餐筛选表单 -->
+      <el-form :model="packageFilterForm" class="flex flex-wrap gap-x-6 gap-y-2 mb-4">
+        <el-form-item label="类别">
+          <el-input v-model="packageFilterForm.type" placeholder="请输入类别" clearable style="width: 120px" />
+        </el-form-item>
+        <el-form-item label="产品套餐">
+          <el-input v-model="packageFilterForm.name" placeholder="请输入产品套餐" clearable style="width: 180px" />
+        </el-form-item>
+        <el-form-item label="可使用问卷">
+          <el-input
+            v-model="packageFilterForm.evaluation_name"
+            placeholder="请输入可使用问卷"
+            clearable
+            style="width: 180px"
+          />
+        </el-form-item>
+        <el-form-item label="限售地区">
+          <el-tree-select
+            v-model="packageFilterForm.limit_area"
+            placeholder="请选择限售地区"
+            clearable
+            filterable
+            :data="regionData"
+            show-checkbox
+            multiple
+            node-key="id"
+            :props="defaultProps"
+            class="w-full"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handlePackageFilter">
+            查询
+          </el-button>
+          <el-button class="!rounded-button whitespace-nowrap ml-2" @click="handlePackageReset">重置</el-button>
+        </el-form-item>
+      </el-form>
       <el-table
         ref="tableRef"
         :data="packageData"
         row-key="id"
-        @selection-change="handlePackageSelectionChange"
+        @selection-change="handleSelectionChange"
         :default-selection="selectedPackages"
       >
         <el-table-column type="selection" width="55" />
@@ -135,6 +172,16 @@
         </el-table-column>
         <el-table-column label="备注" prop="remark" />
       </el-table>
+      <el-pagination
+        class="mt-4 flex justify-end"
+        v-model:current-page="packagePage"
+        v-model:page-size="packagePageSize"
+        :total="packageTotal"
+        :page-sizes="[10, 20, 30, 40]"
+        layout="sizes, prev, pager, next"
+        @current-change="handlePackagePageChange"
+        @size-change="handlePackageSizeChange"
+      />
       <div class="flex justify-center pt-4">
         <el-button @click="showPackageDialog = false">取消</el-button>
         <el-button type="primary" @click="handlePackageConfirm">确认</el-button>
@@ -163,6 +210,11 @@ const rules = ref({
   approve_id: [{ required: true, message: '审批流名称必填', trigger: 'blur' }],
   buy_time: [{ required: true, message: '购买日期', trigger: 'change' }]
 })
+const regionData = ref([])
+const defaultProps = {
+  children: 'children',
+  label: 'label'
+}
 
 const form = ref({
   name: '',
@@ -183,6 +235,16 @@ const packageData = ref([])
 const showPackageDialog = ref(false)
 const selectedPackages = ref([])
 const selectedTableRows = ref([])
+
+const packageFilterForm = ref({
+  type: '',
+  name: '',
+  evaluation_name: '',
+  limit_area: ''
+})
+const packagePage = ref(1)
+const packagePageSize = ref(10)
+const packageTotal = ref(0)
 
 const fetchCustomerOptions = async () => {
   const { data } = await getSegmenteList({ page: 1, pageSize: 100 })
@@ -208,9 +270,31 @@ const fetchAreas = async () => {
       acc[item.id] = item
       return acc
     }, {})
+    regionData.value = transformToTree(data)
   } catch (error) {
     console.error('获取地区列表失败', error)
   }
+}
+
+const transformToTree = data => {
+  const tree = []
+  const map = {}
+
+  data.forEach(item => {
+    map[item.id] = { ...item, label: item.name, children: [] }
+  })
+
+  data.forEach(item => {
+    if (item.pid === 0) {
+      tree.push(map[item.id])
+    } else {
+      if (map[item.pid]) {
+        map[item.pid].children.push(map[item.id])
+      }
+    }
+  })
+
+  return tree
 }
 
 const getAreaName = areaArr => {
@@ -332,21 +416,43 @@ const fetchPackageData = async () => {
       reject('请先选择客户编号')
     })
   }
-
-  const { data } = await getProductList({ customer_id: form.value.customer_id, page: 1, pageSize: 100 })
+  const params = {
+    customer_id: form.value.customer_id,
+    page: packagePage.value,
+    pageSize: packagePageSize.value,
+    ...packageFilterForm.value
+  }
+  const { data } = await getProductList(params)
   packageData.value = data.list
+  packageTotal.value = data.total
 }
 
-const handlePackageSelectionChange = (val: any) => {
-  selectedPackages.value = val
+const handlePackageFilter = () => {
+  packagePage.value = 1
+  fetchPackageData()
 }
-
-const handlePackageConfirm = () => {
-  tableData.value = [...tableData.value, ...selectedPackages.value]
-  showPackageDialog.value = false
+const handlePackageReset = () => {
+  packageFilterForm.value = {
+    type: '',
+    name: '',
+    evaluation_name: '',
+    limit_area: ''
+  }
+  packagePage.value = 1
+  fetchPackageData()
+}
+const handlePackagePageChange = (page: number) => {
+  packagePage.value = page
+  fetchPackageData()
+}
+const handlePackageSizeChange = (size: number) => {
+  packagePageSize.value = size
+  packagePage.value = 1
+  fetchPackageData()
 }
 
 const handleShowPackageDialog = async () => {
+  packagePage.value = 1
   fetchPackageData().then(() => {
     selectedPackages.value = tableData.value
     showPackageDialog.value = true
