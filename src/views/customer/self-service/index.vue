@@ -2,6 +2,17 @@
   <div class="main-content min-h-screen bg-gray-50 p-6">
     <!-- 搜索区域 -->
     <div class="flex items-center gap-0 mb-4">
+      <el-tree-select
+        v-model="selectedRegions"
+        :data="regionData"
+        show-checkbox
+        multiple
+        node-key="id"
+        placeholder="请选择省市"
+        class="mr-2"
+        style="min-width: 180px; max-width: 220px"
+        :props="{ label: 'label', value: 'id', children: 'children' }"
+      />
       <el-input v-model="searchValue" placeholder="请输入搜索内容" style="width: 380px" clearable>
         <template #prepend>
           <el-select v-model="searchField" placeholder="选择字段" style="width: 140px">
@@ -122,7 +133,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { Plus, Search } from '@element-plus/icons-vue'
 import router from '@/router'
 import { getInstitutionList, updateInstitutionStatus, getAreas, getConsultantList, getIndustries } from '@/api/customer'
@@ -166,38 +177,37 @@ const searchValue = ref('')
 
 const searchParams = ref<{ [key: string]: any }>({})
 
+const areaMap = ref<Map<number, string>>(new Map())
+const consultantsMap = ref<Map<number, string>>(new Map())
+const industryMap = ref<Map<number, string>>(new Map())
+
+const fetchBaseData = async () => {
+  const [areaRes, industriesRes, consultantsRes] = await Promise.all([getAreas(), getIndustries(), getConsultantList()])
+  areaMap.value = new Map(areaRes.data.map((item: { id: number; name: string }) => [item.id, item.name]))
+  consultantsMap.value = new Map(consultantsRes.data.map((item: { id: number; name: string }) => [item.id, item.name]))
+  industryMap.value = new Map(industriesRes.data.map((item: { id: number; name: string }) => [item.id, item.name]))
+  regionData.value = transformToTree(areaRes.data)
+}
+
 const fetchTableData = async () => {
   try {
-    const [institutionRes, areaRes, industriesRes, consultantsRes] = await Promise.all([
-      getInstitutionList({
-        type: activeTab.value === 'one' ? 1 : 0,
-        page: currentPage.value,
-        pageSize: pageSize.value,
-        ...searchParams.value
-      }),
-      getAreas(),
-      getIndustries(),
-      getConsultantList()
-    ])
-
-    const areaMap = new Map(areaRes.data.map((industry: { id: number; name: string }) => [industry.id, industry.name]))
-
-    const consultantsMap = new Map(
-      consultantsRes.data.map((consultant: { id: number; name: string }) => [consultant.id, consultant.name])
-    )
-
-    const industryMap = new Map(
-      industriesRes.data.map((industry: { id: number; name: string }) => [industry.id, industry.name])
-    )
-
+    const params: any = {
+      type: activeTab.value === 'one' ? 1 : 0,
+      page: currentPage.value,
+      pageSize: pageSize.value,
+      ...searchParams.value
+    }
+    if (selectedRegions.value && selectedRegions.value.length > 0) {
+      params.city_ids = selectedRegions.value.join(',')
+    }
+    const institutionRes = await getInstitutionList(params)
     tableData.value = institutionRes.data.list.map((item: TableItem) => ({
       ...item,
-      industry_name: industryMap.get(item.industry_id) || '未知行业',
-      province_name: areaMap.get(item.province_id) || '未知省份',
-      city_name: areaMap.get(item.city_id) || '未知城市',
-      counsellor_name: consultantsMap.get(item.counsellor_id) || '未知顾问'
+      industry_name: industryMap.value.get(item.industry_id) || '未知行业',
+      province_name: areaMap.value.get(item.province_id) || '未知省份',
+      city_name: areaMap.value.get(item.city_id) || '未知城市',
+      counsellor_name: consultantsMap.value.get(item.counsellor_id) || '未知顾问'
     }))
-
     total.value = institutionRes.data.total
     week_total.value = institutionRes.data.week_total
   } catch (error) {
@@ -207,11 +217,33 @@ const fetchTableData = async () => {
 
 const route = useRoute()
 
-onMounted(() => {
+const selectedRegions = ref<any[]>([])
+const regionData = ref<any[]>([])
+
+const transformToTree = (data: any[]): any[] => {
+  const tree: any[] = []
+  const map: Record<string, any> = {}
+  data.forEach((item: any) => {
+    map[item.id] = { ...item, label: item.name, children: [] }
+  })
+  data.forEach((item: any) => {
+    if (item.pid === 0) {
+      tree.push(map[item.id])
+    } else {
+      if (map[item.pid]) {
+        map[item.pid].children.push(map[item.id])
+      }
+    }
+  })
+  return tree
+}
+
+onMounted(async () => {
   const tab = route.query.tab as string
   if (tab) {
     activeTab.value = tab
   }
+  await fetchBaseData()
   fetchTableData()
 })
 
@@ -283,6 +315,11 @@ const onReset = () => {
   currentPage.value = 1
   fetchTableData()
 }
+
+watch(selectedRegions, () => {
+  currentPage.value = 1
+  fetchTableData()
+})
 </script>
 
 <style scoped>

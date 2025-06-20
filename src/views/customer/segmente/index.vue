@@ -8,7 +8,10 @@
             <el-input v-model="filterForm.org_name" placeholder="请输入客户名称" clearable style="width: 180px" />
           </el-form-item>
           <el-form-item label="类别">
-            <el-input v-model="filterForm.type" placeholder="请输入类别" clearable style="width: 120px" />
+            <el-select v-model="filterForm.type" placeholder="请选择类别" style="width: 120px" clearable>
+              <el-option label="自助客户" :value="1" />
+              <el-option label="测评客户" :value="2" />
+            </el-select>
           </el-form-item>
           <el-form-item label="联系人">
             <el-input v-model="filterForm.contacts" placeholder="请输入联系人" clearable style="width: 120px" />
@@ -83,7 +86,12 @@
         </el-table-column>
         <el-table-column prop="project_num" label="累计项目数" sortable min-width="120" />
         <el-table-column prop="contract_moey" label="累计合同金额（元）" sortable min-width="150" />
-        <el-table-column prop="type" label="类别" sortable min-width="100" />
+        <el-table-column prop="type" label="类别" sortable min-width="100">
+          <template #default="{ row }">
+            <span v-if="row.type === 1">自助客户</span>
+            <span v-if="row.type === 2">测评客户</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="contacts" label="联系人" sortable min-width="100" />
         <el-table-column prop="phone" label="联系人手机号码" sortable min-width="140" />
         <el-table-column prop="employees_num" label="员工人数" sortable min-width="120" />
