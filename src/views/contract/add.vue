@@ -118,24 +118,21 @@
       <!-- 套餐筛选表单 -->
       <el-form :model="packageFilterForm" class="flex flex-wrap gap-x-6 gap-y-2 mb-4">
         <el-form-item label="类别">
-          <el-input v-model="packageFilterForm.type" placeholder="请输入类别" clearable style="width: 120px" />
+          <el-select v-model="packageFilterForm.type" placeholder="请选择类别" style="width: 120px">
+            <el-option label="包年/月" :value="1" />
+            <el-option label="点数" :value="2" />
+          </el-select>
         </el-form-item>
         <el-form-item label="产品套餐">
-          <el-input v-model="packageFilterForm.name" placeholder="请输入产品套餐" clearable style="width: 180px" />
+          <el-input v-model="packageFilterForm.name" placeholder="请输入产品套餐" style="width: 180px" />
         </el-form-item>
         <el-form-item label="可使用问卷">
-          <el-input
-            v-model="packageFilterForm.evaluation_name"
-            placeholder="请输入可使用问卷"
-            clearable
-            style="width: 180px"
-          />
+          <el-input v-model="packageFilterForm.evaluation_name" placeholder="请输入可使用问卷" style="width: 180px" />
         </el-form-item>
         <el-form-item label="限售地区">
           <el-tree-select
             v-model="packageFilterForm.limit_area"
             placeholder="请选择限售地区"
-            clearable
             filterable
             :data="regionData"
             show-checkbox
@@ -152,15 +149,20 @@
           <el-button class="!rounded-button whitespace-nowrap ml-2" @click="handlePackageReset">重置</el-button>
         </el-form-item>
       </el-form>
+
       <el-table
         ref="tableRef"
         :data="packageData"
         row-key="id"
-        @selection-change="handleSelectionChange"
+        @selection-change="handlePackageSelectionChange"
         :default-selection="selectedPackages"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column label="类别" prop="type" width="120" />
+        <el-table-column prop="type" label="类别" width="120" sortable>
+          <template #default="{ row }">
+            <span>{{ row.type === 1 ? '包年/月' : '点数' }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="产品套餐" prop="name" width="180" />
         <el-table-column label="可使用问卷" prop="evaluation_name" />
         <el-table-column label="金额(元)" prop="price" width="120" />
@@ -191,7 +193,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getAreas, getSegmenteList } from '@/api/customer'
 import { addContract, editContract, getContractInfo } from '@/api/contract'
@@ -210,11 +212,6 @@ const rules = ref({
   approve_id: [{ required: true, message: '审批流名称必填', trigger: 'blur' }],
   buy_time: [{ required: true, message: '购买日期', trigger: 'change' }]
 })
-const regionData = ref([])
-const defaultProps = {
-  children: 'children',
-  label: 'label'
-}
 
 const form = ref({
   name: '',
@@ -225,26 +222,39 @@ const form = ref({
   buy_time: 0
 })
 
-const customerOptions = ref([])
-const managerOptions = ref([])
-const approvalFlowOptions = ref([])
-const originalDataMap = ref({})
-
-const tableData = ref([])
-const packageData = ref([])
-const showPackageDialog = ref(false)
-const selectedPackages = ref([])
-const selectedTableRows = ref([])
-
 const packageFilterForm = ref({
   type: '',
   name: '',
   evaluation_name: '',
   limit_area: ''
 })
+
+const customerOptions = ref([])
+const managerOptions = ref([])
+const approvalFlowOptions = ref([])
+const originalDataMap = ref({})
+
+// 在 tableData 定义处添加类型注解，假设套餐项为 { id: number|string, ... }
+interface PackageItem {
+  id: number | string
+  [key: string]: any
+}
+const tableData = ref<PackageItem[]>([])
+const packageData = ref<PackageItem[]>([])
 const packagePage = ref(1)
 const packagePageSize = ref(10)
 const packageTotal = ref(0)
+const regionData = ref([])
+const defaultProps = {
+  children: 'children',
+  label: 'label',
+  value: 'id'
+}
+const _savePackageData = ref<PackageItem[]>([])
+
+const showPackageDialog = ref(false)
+const selectedPackages = ref<PackageItem[]>([])
+const selectedTableRows = ref<PackageItem[]>([])
 
 const fetchCustomerOptions = async () => {
   const { data } = await getSegmenteList({ page: 1, pageSize: 100 })
@@ -416,18 +426,99 @@ const fetchPackageData = async () => {
       reject('请先选择客户编号')
     })
   }
+
+  const { limit_area, ...rest } = packageFilterForm.value
+
+  // limit_area 转二维数组 [[省id,市id]]
+  let limitAreaArr: number[][] = []
+  if (Array.isArray(limit_area) && limit_area.length > 0) {
+    // regionData为树结构，遍历所有选中id，找到其省市
+    const idToNode: Record<string, any> = {}
+    const walk = (nodes: any[], parentId?: number) => {
+      nodes.forEach(node => {
+        idToNode[node.id] = { ...node, pid: parentId }
+        if (node.children && node.children.length) {
+          walk(node.children, node.id)
+        }
+      })
+    }
+    walk(regionData.value)
+    limitAreaArr = limit_area
+      .map((id: number) => {
+        const node = idToNode[id]
+        if (!node) return []
+        if (node.pid) {
+          // 市级节点
+          return [node.pid, node.id]
+        } else {
+          // 省级节点
+          return [node.id]
+        }
+      })
+      .filter(arr => arr.length === 2) // 只要省市对
+  }
+
   const params = {
     customer_id: form.value.customer_id,
     page: packagePage.value,
     pageSize: packagePageSize.value,
-    ...packageFilterForm.value
+    ...rest,
+    limit_area: JSON.stringify(limitAreaArr)
   }
+
   const { data } = await getProductList(params)
   packageData.value = data.list
   packageTotal.value = data.total
 }
 
+const handlePackageSelectionChange = (val: any) => {
+  selectedPackages.value = val
+}
+
+const handlePackageConfirm = () => {
+  // 将selectedPackages与_savePackageData进行去重合并
+  const result = mergeUniqueArrays(selectedPackages.value, _savePackageData.value, 'id')
+
+  const addedData = result.filter(item => !tableData.value.some(existingItem => existingItem.id === item.id))
+  const removedData = tableData.value.filter(item => !result.some(existingItem => existingItem.id === item.id))
+
+  tableData.value = [...tableData.value, ...addedData].filter(
+    item => !removedData.some(removedItem => removedItem.id === item.id)
+  )
+  showPackageDialog.value = false
+}
+
+function mergeUniqueArrays(arr1, arr2, key = 'id') {
+  const merged = [...arr1, ...arr2]
+  const uniqueMap = new Map()
+
+  merged.forEach(item => {
+    if (!uniqueMap.has(item[key])) {
+      uniqueMap.set(item[key], item)
+    }
+  })
+
+  return Array.from(uniqueMap.values())
+}
+
+const handleShowPackageDialog = async () => {
+  fetchPackageData().then(() => {
+    selectedPackages.value = tableData.value
+    showPackageDialog.value = true
+    // 修复回显：弹窗打开后主动勾选已选套餐
+    nextTick(() => {
+      if (tableRef.value && packageData.value.length) {
+        packageData.value.forEach(row => {
+          const checked = tableData.value.some(item => item.id === row.id)
+          tableRef.value.toggleRowSelection(row, checked)
+        })
+      }
+    })
+  })
+}
+
 const handlePackageFilter = () => {
+  _savePackageData.value = JSON.parse(JSON.stringify(selectedPackages.value))
   packagePage.value = 1
   fetchPackageData()
 }
@@ -439,7 +530,16 @@ const handlePackageReset = () => {
     limit_area: ''
   }
   packagePage.value = 1
-  fetchPackageData()
+  fetchPackageData().then(() => {
+    nextTick(() => {
+      if (tableRef.value && packageData.value.length) {
+        packageData.value.forEach(row => {
+          const checked = tableData.value.some(item => item.id === row.id)
+          tableRef.value.toggleRowSelection(row, checked)
+        })
+      }
+    })
+  })
 }
 const handlePackagePageChange = (page: number) => {
   packagePage.value = page
@@ -449,14 +549,6 @@ const handlePackageSizeChange = (size: number) => {
   packagePageSize.value = size
   packagePage.value = 1
   fetchPackageData()
-}
-
-const handleShowPackageDialog = async () => {
-  packagePage.value = 1
-  fetchPackageData().then(() => {
-    selectedPackages.value = tableData.value
-    showPackageDialog.value = true
-  })
 }
 </script>
 

@@ -19,11 +19,11 @@
             <el-option label="客户名称" value="org_name" />
             <el-option label="联系人" value="contacts" />
             <el-option label="联系人手机号码" value="phone" />
-            <el-option label="所属行业" value="industry_id" />
+            <el-option label="所属行业" value="industry_name" />
             <el-option label="预留电子邮箱" value="email" />
-            <el-option label="测评顾问" value="counsellor_id" />
+            <el-option label="测评顾问" value="counsellor_name" />
             <el-option label="审批状态" value="status" />
-            <el-option label="客户状态" value="isFreezed" />
+            <el-option label="客户状态" value="approval_atatus" />
           </el-select>
         </template>
         <template #append>
@@ -84,6 +84,15 @@
         <el-table-column prop="province_name" label="单位所在省" width="200" />
         <el-table-column prop="city_name" label="单位所在市" width="200" />
         <el-table-column prop="counsellor_name" label="测评顾问" width="200" />
+        <el-table-column prop="approval_status" label="审批状态" width="200" />
+        <el-table-column prop="status" label="客户状态" width="200">
+          <template #default="{ row }">
+            <span :class="row.status === 2 ? 'text-red-500' : 'text-green-500'">
+              {{ row.status === 2 ? '冻结' : '正常' }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="reason" label="驳回原因" width="200" />
         <el-table-column label="操作" fixed="right" width="300" align="center">
           <template #default="scope">
             <div class="flex gap-2">
