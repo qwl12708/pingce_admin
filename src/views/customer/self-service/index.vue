@@ -13,6 +13,12 @@
         style="min-width: 180px; max-width: 220px"
         :props="{ label: 'label', value: 'id', children: 'children' }"
       />
+      <!-- 新增客户状态筛选 -->
+      <el-select v-model="status" placeholder="客户状态" class="mr-2" style="width: 120px">
+        <el-option label="全部" :value="''" />
+        <el-option label="正常" :value="1" />
+        <el-option label="冻结" :value="2" />
+      </el-select>
       <el-input v-model="searchValue" placeholder="请输入搜索内容" style="width: 380px" clearable>
         <template #prepend>
           <el-select v-model="searchField" placeholder="选择字段" style="width: 140px">
@@ -22,8 +28,6 @@
             <el-option label="所属行业" value="industry_name" />
             <el-option label="预留电子邮箱" value="email" />
             <el-option label="测评顾问" value="counsellor_name" />
-            <el-option label="审批状态" value="status" />
-            <el-option label="客户状态" value="approval_atatus" />
           </el-select>
         </template>
         <template #append>
@@ -84,7 +88,6 @@
         <el-table-column prop="province_name" label="单位所在省" width="200" />
         <el-table-column prop="city_name" label="单位所在市" width="200" />
         <el-table-column prop="counsellor_name" label="测评顾问" width="200" />
-        <el-table-column prop="approval_status" label="审批状态" width="200" />
         <el-table-column prop="status" label="客户状态" width="200">
           <template #default="{ row }">
             <span :class="row.status === 2 ? 'text-red-500' : 'text-green-500'">
@@ -92,7 +95,6 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="reason" label="驳回原因" width="200" />
         <el-table-column label="操作" fixed="right" width="300" align="center">
           <template #default="scope">
             <div class="flex gap-2">
@@ -198,6 +200,8 @@ const fetchBaseData = async () => {
   regionData.value = transformToTree(areaRes.data)
 }
 
+const status = ref<string | number>('')
+
 const fetchTableData = async () => {
   try {
     const params: any = {
@@ -208,6 +212,10 @@ const fetchTableData = async () => {
     }
     if (selectedRegions.value && selectedRegions.value.length > 0) {
       params.city_ids = selectedRegions.value.join(',')
+    }
+    // 客户状态筛选
+    if (status.value !== '') {
+      params.status = status.value
     }
     const institutionRes = await getInstitutionList(params)
     tableData.value = institutionRes.data.list.map((item: TableItem) => ({
@@ -321,11 +329,17 @@ const onReset = () => {
   searchField.value = 'org_name'
   searchValue.value = ''
   searchParams.value = {}
+  status.value = ''
   currentPage.value = 1
   fetchTableData()
 }
 
 watch(selectedRegions, () => {
+  currentPage.value = 1
+  fetchTableData()
+})
+// 客户状态筛选变化时刷新表格
+watch(status, () => {
   currentPage.value = 1
   fetchTableData()
 })
