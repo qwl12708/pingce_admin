@@ -193,8 +193,8 @@ const fetchTableData = async () => {
     pageSize: pageSize.value
   }
   if (searchForm.value.submit_time && searchForm.value.submit_time.length === 2) {
-    params.start_time = searchForm.value.submit_time[0]
-    params.end_time = searchForm.value.submit_time[1]
+    params.submit_start_time = new Date(searchForm.value.submit_time[0]).getTime() / 1000
+    params.submit_end_time = new Date(searchForm.value.submit_time[1]).getTime() / 1000
   }
   const { data } = await actionMap[activeTab.value](params)
   tableData.value = data.list

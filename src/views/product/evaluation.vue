@@ -248,7 +248,22 @@ const fetchQuestionnaireList = async () => {
 onMounted(async () => {
   await fetchPostTypeOptions()
   await fetchTemplates()
-  fetchQuestionnaireList()
+  // 读取路由参数并填充筛选表单
+  const query = router.currentRoute.value.query
+  let hasQuery = false
+  Object.keys(filterForm.value).forEach(key => {
+    const k = key as keyof typeof filterForm.value
+    if (query[k] !== undefined && query[k] !== '') {
+      filterForm.value[k] = query[k] as string
+      hasQuery = true
+    }
+  })
+  if (hasQuery) {
+    currentPage.value = 1
+    await fetchQuestionnaireList()
+  } else {
+    fetchQuestionnaireList()
+  }
 })
 
 const currentPage = ref(1)

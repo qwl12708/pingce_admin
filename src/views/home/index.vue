@@ -92,7 +92,7 @@
                   v-for="(item, index) in surveyStats"
                   :key="index"
                   class="text-center cursor-pointer"
-                  @click="handleSurveyStatsClick(index)"
+                  @click="handleSurveyStatsClick(index, item.papelName)"
                 >
                   <div class="text-xl font-bold text-blue-500">
                     {{ item.count }}<span class="ml-1 text-sm text-black">{{ item.danwei }}</span>
@@ -264,10 +264,10 @@ const handleCustomerStatsClick = (index: number) => {
   router.push({ path: pathMap[index], query: { tab: tabMap[index] } })
 }
 
-const handleSurveyStatsClick = (index: number) => {
+const handleSurveyStatsClick = (index: number, name: string) => {
   const tabMap = ['all', 'all', 'all', 'all']
-  const pathMap = ['/product/evaluation', '/system/stats', '/questionnaire/list', '/questionnaire/list']
-  router.push({ path: pathMap[index], query: { tab: tabMap[index] } })
+  const pathMap = ['/product/evaluation', '/system/stats', '/product/evaluation', '/product/evaluation']
+  router.push({ path: pathMap[index], query: { tab: tabMap[index], name } })
 }
 
 const handleProductItemClick = (item: any, type: number) => {
