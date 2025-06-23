@@ -21,7 +21,7 @@
           </el-form-item>
           <!-- 首页"微信咨询"链接二维码上传 -->
           <el-form-item label="首页微信咨询二维码">
-            <FileUploader v-model:value="form.wechat_file" />
+            <ImageUploader v-model:value="form.wechat_file" />
           </el-form-item>
           <!-- 客服电话 -->
           <el-form-item label="客服电话">
@@ -60,6 +60,7 @@ import { ref, onMounted } from 'vue'
 import { getOtherConfig, setOtherConfig } from '@/api/system/user'
 import WangEditor from '@/components/WangEditor/index.vue'
 import FileUploader from '@/components/FileUploader/index.vue'
+import ImageUploader from '@/components/ImageUploader/index.vue'
 
 const form = ref({
   service_protocol_file: '',

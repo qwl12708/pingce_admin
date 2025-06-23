@@ -15,6 +15,7 @@
         <el-icon><Plus /></el-icon>
         <div class="text-xs mt-1">上传</div>
       </div>
+      <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
       <p class="text-gray-400 text-xs mt-2 text-center" v-if="tip">{{ tip }}</p>
     </div>
   </el-upload>
