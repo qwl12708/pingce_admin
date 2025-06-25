@@ -191,12 +191,12 @@ const productSections = ref([
 
 onMounted(async () => {
   const {
-    data: { money_num, week_num }
+    data: { money_num, week_num, no_report_num }
   } = await getTaskStats()
   todoTasks.value = [
     { count: money_num, label: '三个月内服务期满客户', tab: 'three' },
     { count: week_num, label: '新客户一周内首次建立测评项目', tab: 'one' },
-    { count: 0, label: '待人工编制报告数', tab: 'all' }
+    { count: no_report_num, label: '待人工编制报告数', path: '/product/evaluation-report' }
   ]
 
   const {
@@ -250,7 +250,7 @@ onMounted(async () => {
 
 const handleCustomerTaskClick = (item: any) => {
   console.log(item)
-  router.push({ path: `/customer/evaluate`, query: { tab: item.tab } })
+  router.push({ path: item.path || `/customer/evaluate`, query: { tab: item.tab } })
 }
 
 const handleCustomerContractsClick = (item: any) => {

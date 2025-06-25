@@ -6,7 +6,6 @@
           <div class="p-6" style="width: 548px">
             <div class="bg-gradient-to-r from-blue-900 to-blue-800 rounded-lg p-6 mb-8">
               <h2 class="text-xl text-white font-medium mb-3">校园招聘通用测评包年套餐</h2>
-              <p class="text-blue-100 text-sm mb-4">2024 年 7 月 30 日到期</p>
               <div class="flex gap-8">
                 <span class="text-blue-100">剩余点数：{{ scoreInfo.score_num }}</span>
                 <span class="text-blue-100">冻结点数之和：{{ scoreInfo.freeze_score_num }}</span>
@@ -66,6 +65,15 @@
               <el-table-column prop="creater" label="操作者" />
               <el-table-column prop="create_time" label="创建时间" />
             </el-table>
+            <el-pagination
+              class="mt-4"
+              background
+              layout="prev, pager, next, jumper, ->, total"
+              :current-page="usagePage"
+              :page-size="usagePageSize"
+              :total="usageTotal"
+              @current-change="handleUsagePageChange"
+            />
           </div>
         </el-tab-pane>
 
@@ -98,6 +106,15 @@
               </el-table-column>
               <el-table-column prop="remark" label="备注" />
             </el-table>
+            <el-pagination
+              class="mt-4"
+              background
+              layout="prev, pager, next, jumper, ->, total"
+              :current-page="purchasePage"
+              :page-size="purchasePageSize"
+              :total="purchaseTotal"
+              @current-change="handlePurchasePageChange"
+            />
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -122,6 +139,14 @@ const usedProductData = ref([])
 const scoreProductData = ref([])
 const allProductData = ref([])
 
+// 分页相关变量
+const usagePage = ref(1)
+const usagePageSize = ref(10)
+const usageTotal = ref(0)
+const purchasePage = ref(1)
+const purchasePageSize = ref(10)
+const purchaseTotal = ref(0)
+
 const fetchScoreInfo = async () => {
   const { data } = await getScoreInfo({ id: customerId.value })
   scoreInfo.value = data
@@ -138,13 +163,23 @@ const fetchUsedProduct = async () => {
 }
 
 const fetchScoreProduct = async () => {
-  const { data } = await getScoreProduct({ id: Number(customerId.value), page: 1, pageSize: 100 })
+  const { data } = await getScoreProduct({
+    id: Number(customerId.value),
+    page: usagePage.value,
+    pageSize: usagePageSize.value
+  })
   scoreProductData.value = data.list
+  usageTotal.value = data.total || 0
 }
 
 const fetchAllProduct = async () => {
-  const { data } = await getAllProduct({ id: Number(customerId.value), page: 1, pageSize: 100 })
+  const { data } = await getAllProduct({
+    id: Number(customerId.value),
+    page: purchasePage.value,
+    pageSize: purchasePageSize.value
+  })
   allProductData.value = data.list
+  purchaseTotal.value = data.total || 0
 }
 
 onMounted(() => {
@@ -159,6 +194,15 @@ const handleTabClick = (tab: any) => {
   } else if (tab.props.name === 'usage') {
     fetchScoreProduct()
   }
+}
+
+const handleUsagePageChange = (page: number) => {
+  usagePage.value = page
+  fetchScoreProduct()
+}
+const handlePurchasePageChange = (page: number) => {
+  purchasePage.value = page
+  fetchAllProduct()
 }
 </script>
 
