@@ -169,6 +169,14 @@ export const uploadComparison = (data: { report_file: string }) =>
     data
   })
 
+// 获取上传轮询结果
+export const getReportPollStatus = (data: { id: string }) =>
+  request({
+    url: '/platformApi/people/report/status',
+    method: 'POST',
+    data
+  })
+
 // ------end
 
 // 添加作答指引模板

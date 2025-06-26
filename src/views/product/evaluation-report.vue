@@ -1,4 +1,16 @@
 <template>
+  <BatchUploadDialog
+    v-model="batchUploadVisible"
+    :accept="'.pdf,.doc,.docx,.xls,.xlsx'"
+    upload-type="report"
+    @uploaded="onBatchUploaded"
+  />
+  <BatchUploadDialog
+    v-model="batchCompareUploadVisible"
+    :accept="'.xls,.xlsx,.csv,.pdf,.doc,.docx'"
+    upload-type="comparison"
+    @uploaded="onBatchCompareUploaded"
+  />
   <div class="main-content min-h-screen bg-white p-6">
     <!-- 搜索区域 -->
     <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
@@ -74,8 +86,15 @@
               <el-button class="mr-4" :disabled="selectedRows.length === 0" @click="handleDownloadResult">
                 测评结果批量下载
               </el-button>
-              <FileUploader class="mr-4" text="线上测评报告批量上传" v-model:value="evaluationPath" />
-              <FileUploader text="横向对比上传表批量上传" v-model:value="compareReportPath" />
+              <FileUploader
+                class="mr-4"
+                text="线上测评报告批量上传"
+                v-model:value="evaluationPath"
+                style="display: none"
+              />
+              <el-button class="mr-4" @click="batchUploadVisible = true">线上测评报告批量上传</el-button>
+              <FileUploader text="横向对比上传表批量上传" v-model:value="compareReportPath" style="display: none" />
+              <el-button @click="batchCompareUploadVisible = true">横向对比上传表批量上传</el-button>
             </div>
           </template>
 
@@ -151,6 +170,7 @@ import {
 } from '@/api/product'
 import { ElMessage } from 'element-plus'
 import FileUploader from '@/components/FileUploader/index.vue'
+import BatchUploadDialog from '@/components/FileUploader/BatchUploadDialog.vue'
 import { formatTime } from '@/utils/formatTime'
 
 const evaluationPath = ref('')
@@ -168,6 +188,8 @@ const pageSize = ref(10)
 const total = ref(0)
 const selectedRows = ref<any[]>([])
 const activeTab = ref('pending')
+const batchUploadVisible = ref(false)
+const batchCompareUploadVisible = ref(false)
 
 const tabs = [
   { key: 'pending', name: '待编制报告汇总' },
@@ -354,6 +376,16 @@ watch(compareReportPath, async newVal => {
     }
   }
 })
+
+const onBatchUploaded = () => {
+  batchUploadVisible.value = false
+  fetchTableData()
+}
+
+const onBatchCompareUploaded = () => {
+  batchCompareUploadVisible.value = false
+  fetchTableData()
+}
 </script>
 
 <style scoped>
