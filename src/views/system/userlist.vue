@@ -38,7 +38,7 @@
         <el-table-column label="手机号码" prop="phone" sortable />
         <el-table-column label="用户角色" prop="role_name" />
         <el-table-column label="所在部门" prop="dept_name" />
-        <el-table-column label="负责区域" prop="undertakeArea">
+        <el-table-column label="负责区域" prop="undertakeArea" show-overflow-tooltip>
           <template #default="{ row }">
             {{
               row.undertakeArea.reduce((acc, cur) => acc + '，' + cur.province_name + cur.city_name + cur.area_name, '')

@@ -53,12 +53,16 @@
     <!-- 表格区域 -->
     <el-table :data="tableData" class="mb-4 bg-white">
       <el-table-column type="selection" />
-      <el-table-column label="序号" type="index" />
-      <el-table-column prop="user_no" label="客户编号" sortable />
-      <el-table-column prop="org_name" label="客户名称" sortable />
-      <el-table-column label="剩余点数" prop="remainingCount" sortable />
-      <el-table-column label="点数最后截止日期" prop="pointsEndDate" />
-      <el-table-column label="套餐最后截止日期" prop="packageEndDate" />
+      <el-table-column label="序号" type="index" width="60" />
+      <el-table-column prop="user_no" label="客户编号" sortable width="200" />
+      <el-table-column prop="org_name" label="客户名称" sortable width="200" />
+      <el-table-column label="剩余点数" prop="remainingCount" sortable width="200" />
+      <el-table-column label="点数最后截止日期" prop="pointsEndDate" width="200" />
+      <el-table-column label="套餐最后截止日期" prop="end_time" width="200">
+        <template #default="scope">
+          {{ formatTime(scope.row.end_time) }}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" fixed="right" width="500">
         <template #default="scope">
           <div class="flex items-center gap-2">
@@ -91,6 +95,7 @@ import { Plus, Search } from '@element-plus/icons-vue'
 import router from '@/router'
 import { ElMessage } from 'element-plus'
 import { getEvaluationList, updateInstitutionStatus } from '@/api/customer'
+import { formatTime } from '@/utils/formatTime'
 
 const activeTab = ref('three') // one: 一周内, three: 三个月内, all: 全部
 const tabMap = {

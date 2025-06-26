@@ -14,8 +14,8 @@
     <div class="p-6">
       <el-table :data="tableData" style="width: 100%">
         <el-table-column label="名称" prop="name" />
-        <el-table-column label="适用范围" prop="scope" />
-        <el-table-column label="描述" prop="description" />
+        <el-table-column label="适用范围" prop="scope" show-overflow-tooltip />
+        <el-table-column label="描述" prop="description" show-overflow-tooltip />
         <el-table-column label="创建时间" prop="create_time" width="200">
           <template #default="{ row }">
             <div class="text-gray-600">{{ formatTime(row.create_time) }}</div>

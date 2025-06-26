@@ -74,7 +74,7 @@
       <el-table :data="tableData" stripe @selection-change="handleSelectionChange">
         <el-table-column type="selection" fixed="left" width="55" />
         <el-table-column label="序号" type="index" fixed="left" width="60" />
-        <el-table-column prop="user_no" label="客户编号" fixed="left" min-width="120" />
+        <el-table-column prop="user_no" label="客户编号" fixed="left" min-width="200" />
         <el-table-column prop="org_name" label="客户名称" sortable min-width="150" />
         <el-table-column prop="province_name" label="单位所在省" sortable min-width="120" />
         <el-table-column prop="city_name" label="单位所在市" sortable min-width="120" />
@@ -85,7 +85,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="project_num" label="累计项目数" sortable min-width="120" />
-        <el-table-column prop="contract_moey" label="累计合同金额（元）" sortable min-width="150" />
+        <el-table-column prop="contract_moey" label="累计合同金额（元）" sortable min-width="200" />
         <el-table-column prop="type" label="类别" sortable min-width="100">
           <template #default="{ row }">
             <span v-if="row.type === 1">自助客户</span>
@@ -93,10 +93,10 @@
           </template>
         </el-table-column>
         <el-table-column prop="contacts" label="联系人" sortable min-width="100" />
-        <el-table-column prop="phone" label="联系人手机号码" sortable min-width="140" />
+        <el-table-column prop="phone" label="联系人手机号码" sortable min-width="160" />
         <el-table-column prop="employees_num" label="员工人数" sortable min-width="120" />
         <el-table-column prop="industry_name" label="所属行业" min-width="120" />
-        <el-table-column prop="email" label="预留电子邮箱" sortable min-width="150" show-overflow-tooltip />
+        <el-table-column prop="email" label="预留电子邮箱" sortable width="200" show-overflow-tooltip />
         <el-table-column prop="counsellor_name" label="测评顾问" sortable min-width="120" />
         <el-table-column prop="counsellor_phone" label="测评顾问手机号码" sortable min-width="160" />
       </el-table>

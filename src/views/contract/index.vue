@@ -92,13 +92,7 @@
       <el-table-column prop="status_name" label="合同状态" width="120" />
       <el-table-column prop="counsellor_name" label="客户管理员" width="120" />
       <!-- 以逗号分隔换行显示每一个 -->
-      <el-table-column prop="approve_user" label="审批人" width="120">
-        <template #default="{ row }">
-          <div v-for="(user, index) in row.approve_user" :key="index">
-            {{ user }}
-          </div>
-        </template>
-      </el-table-column>
+      <el-table-column prop="approve_user" label="审批人" width="200" show-overflow-tooltip />
 
       <el-table-column prop="approve_time" label="审批时间" width="180">
         <template #default="{ row }">

@@ -29,23 +29,23 @@
     <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
       <el-table-column type="selection" width="55" />
       <el-table-column label="序号" prop="id" width="80" />
-      <el-table-column label="角色类型" prop="role_type" sortable width="120">
+      <el-table-column label="角色类型" prop="role_type" sortable>
         <template #default="{ row }">
           <el-tag :type="row.role_type === 1 ? 'success' : 'info'">
             {{ row.role_type }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="角色名称" prop="name" sortable width="120" />
-      <el-table-column label="显示顺序" prop="sort" width="100" />
-      <el-table-column label="状态" width="100">
+      <el-table-column label="角色名称" prop="name" sortable />
+      <el-table-column label="显示顺序" prop="sort" />
+      <el-table-column label="状态">
         <template #default="{ row }">
           <el-tag :type="row.status ? 'success' : 'danger'" class="whitespace-nowrap">
             {{ row.status === 1 ? '开启' : '关闭' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建人" prop="creator" width="120" />
+      <el-table-column label="创建人" prop="creator" />
       <el-table-column label="创建时间" prop="create_time" sortable width="180">
         <template #default="{ row }">
           {{ formatTime(row.create_time) }}

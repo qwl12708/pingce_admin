@@ -29,12 +29,12 @@
       <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
         <el-table-column type="selection" width="55" />
         <el-table-column label="模板编号" prop="id" width="100" />
-        <el-table-column label="模板名称" prop="name">
+        <el-table-column label="模板名称" prop="name" width="300">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">{{ row.name }}</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="模板内容" prop="content">
+        <el-table-column label="模板内容" prop="content" show-overflow-tooltip>
           <template #default="{ row }">
             <div v-html="row.content" class="text-gray-500 text-sm"></div>
           </template>

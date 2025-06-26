@@ -33,12 +33,12 @@
       <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
         <el-table-column type="selection" width="55" />
         <el-table-column label="模板编号" prop="id" width="100" />
-        <el-table-column label="模板名称" prop="name">
+        <el-table-column label="模板名称" prop="name" width="300">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">{{ row.name }}</el-button>
           </template>
         </el-table-column>
-        <el-table-column label="备注" prop="remark" />
+        <el-table-column label="备注" prop="remark" show-overflow-tooltip />
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>

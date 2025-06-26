@@ -60,7 +60,7 @@
 
       <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="product_no" label="套餐编号" width="120" />
+        <el-table-column prop="product_no" label="套餐编号" width="200" />
         <el-table-column prop="name" label="套餐名称" width="150" sortable />
         <el-table-column prop="type" label="类别" width="100" sortable>
           <template #default="{ row }">
@@ -68,15 +68,15 @@
           </template>
         </el-table-column>
         <el-table-column prop="evaluation_name" label="可使用问卷" width="180" sortable />
-        <el-table-column prop="limit_area" label="限售区域" width="120" sortable>
-          <template #default="scope">
-            {{ getAreaName(scope.row.limit_area) }}
+        <el-table-column prop="limit_area" label="限售区域" width="120" sortable show-overflow-tooltip>
+          <template #default="{ row }">
+            <span>{{ getAreaName(row.limit_area) }}</span>
           </template>
         </el-table-column>
         <el-table-column
           prop="price"
           label="产品价格(元)"
-          width="120"
+          width="200"
           sortable
           :sort-method="(a: TableItem, b: TableItem) => a.price - b.price"
         />
@@ -89,13 +89,13 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" width="160" sortable>
+        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
           <template #default="{ row }">
             {{ formatTime(row.create_time) }}
           </template>
         </el-table-column>
-        <el-table-column prop="creater" label="创建人" width="100" />
-        <el-table-column prop="status_time" label="状态时间" width="160" sortable>
+        <el-table-column prop="creater" label="创建人" width="200" />
+        <el-table-column prop="status_time" label="状态时间" width="180" sortable>
           <template #default="{ row }">
             {{ formatTime(row.status_time) }}
           </template>

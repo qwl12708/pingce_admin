@@ -3,9 +3,6 @@
     <!-- 搜索区域 -->
     <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
       <el-form :inline="true" :model="searchForm" class="flex flex-wrap items-center gap-4">
-        <el-form-item label="公告图片">
-          <el-input v-model="searchForm.img" placeholder="请输入图片名或链接" class="w-48" />
-        </el-form-item>
         <el-form-item label="公告内容">
           <el-input v-model="searchForm.content" placeholder="请输入公告内容" class="w-48" />
         </el-form-item>
@@ -57,8 +54,17 @@
       <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
         <el-table-column type="selection" width="55" />
         <el-table-column label="序号" prop="id" width="100" />
-        <el-table-column label="公告图片" prop="img" />
-        <el-table-column label="公告内容" prop="content" />
+        <el-table-column label="公告图片" prop="img">
+          <template #default="{ row }">
+            <img v-if="row.img" :src="row.img" class="w-12 h-12 object-cover rounded" />
+            <span v-else class="text-gray-400">无图片</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="公告内容" prop="content" show-overflow-tooltip>
+          <template #default="{ row }">
+            <div v-html="row.content" class="text-gray-700" />
+          </template>
+        </el-table-column>
         <el-table-column label="排序" prop="sort" />
         <el-table-column label="公告状态" prop="status" sortable>
           <template #default="{ row }">
@@ -193,7 +199,6 @@ const rules = reactive<FormRules>({
 })
 
 const searchForm = reactive({
-  img: '',
   content: '',
   status: '',
   create_time: '',
@@ -204,7 +209,6 @@ const fetchNotices = async () => {
   const params: any = {
     page: currentPage.value,
     pageSize: pageSize.value,
-    img: searchForm.img,
     content: searchForm.content,
     status: searchForm.status,
     creater: searchForm.creater
@@ -281,7 +285,6 @@ const handleSearch = () => {
 
 const handleReset = () => {
   Object.assign(searchForm, {
-    img: '',
     content: '',
     status: '',
     create_time: '',
