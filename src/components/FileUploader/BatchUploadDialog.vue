@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="visible" title="批量上传测评报告" width="500px" @close="handleClose">
+  <el-dialog v-model="visible" :title="title" width="500px" @close="handleClose">
     <el-upload
       class="upload-demo"
       drag
@@ -38,6 +38,10 @@ const props = defineProps({
   accept: {
     type: String,
     default: ''
+  },
+  title: {
+    type: String,
+    default: '批量上传文件'
   },
   uploadType: {
     type: String,

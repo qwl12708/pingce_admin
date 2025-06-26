@@ -1,11 +1,13 @@
 <template>
   <BatchUploadDialog
+    title="线上测评报告批量上传"
     v-model="batchUploadVisible"
     :accept="'.pdf,.doc,.docx,.xls,.xlsx'"
     upload-type="report"
     @uploaded="onBatchUploaded"
   />
   <BatchUploadDialog
+    title="横向对比上传表批量上传"
     v-model="batchCompareUploadVisible"
     :accept="'.xls,.xlsx,.csv,.pdf,.doc,.docx'"
     upload-type="comparison"
@@ -83,17 +85,10 @@
           </el-button>
           <template v-if="activeTab === 'pending'">
             <div class="flex">
-              <el-button class="mr-4" :disabled="selectedRows.length === 0" @click="handleDownloadResult">
+              <el-button class="mr-2" :disabled="selectedRows.length === 0" @click="handleDownloadResult">
                 测评结果批量下载
               </el-button>
-              <FileUploader
-                class="mr-4"
-                text="线上测评报告批量上传"
-                v-model:value="evaluationPath"
-                style="display: none"
-              />
-              <el-button class="mr-4" @click="batchUploadVisible = true">线上测评报告批量上传</el-button>
-              <FileUploader text="横向对比上传表批量上传" v-model:value="compareReportPath" style="display: none" />
+              <el-button class="mr-2" @click="batchUploadVisible = true">线上测评报告批量上传</el-button>
               <el-button @click="batchCompareUploadVisible = true">横向对比上传表批量上传</el-button>
             </div>
           </template>
@@ -119,11 +114,7 @@
         <el-table :data="tableData" @selection-change="handleSelectionChange" class="w-full">
           <el-table-column type="selection" width="55" />
           <el-table-column label="序号" prop="id" width="100" />
-          <el-table-column label="姓名" prop="name">
-            <template #default="{ row }">
-              <el-button type="primary" link @click="handleEdit(row)">{{ row.name }}</el-button>
-            </template>
-          </el-table-column>
+          <el-table-column label="姓名" prop="name" />
           <el-table-column label="手机号码" prop="phone" sortable="" />
           <el-table-column label="测评问卷" prop="questionnaire_name" sortable />
           <el-table-column label="问卷提交日期" prop="submit_time" sortable>
@@ -132,12 +123,6 @@
           <el-table-column label="客户名称" prop="org_name" sortable />
           <el-table-column label="项目名称" prop="project_name" sortable />
           <el-table-column label="答题结果" prop="result" sortable />
-          <!-- <el-table-column v-if="activeTab === 'uploaded'" label="操作" width="200">
-            <template #default="{ row }">
-              <el-button type="primary" link @click="handleEdit(row)">测评报告下载</el-button>
-              <el-button type="primary" link @click="handleEdit(row)">测评结果下载</el-button>
-            </template>
-          </el-table-column> -->
         </el-table>
 
         <div class="flex justify-between items-center p-4">
@@ -169,7 +154,6 @@ import {
   getNoAnswerReportList
 } from '@/api/product'
 import { ElMessage } from 'element-plus'
-import FileUploader from '@/components/FileUploader/index.vue'
 import BatchUploadDialog from '@/components/FileUploader/BatchUploadDialog.vue'
 import { formatTime } from '@/utils/formatTime'
 
@@ -245,22 +229,6 @@ const handleReset = () => {
   fetchTableData()
 }
 
-const handleAdd = () => {
-  // 实现新增逻辑
-}
-
-const handleEdit = (row: any) => {
-  // 实现编辑逻辑
-}
-
-const handleDelete = (row: any) => {
-  // 实现删除逻辑
-}
-
-const handleBatchDelete = () => {
-  // 实现批量删除逻辑
-}
-
 const handleSelectionChange = (rows: any[]) => {
   selectedRows.value = rows
 }
@@ -320,35 +288,6 @@ const handleDownloadReportResult = async () => {
 const onTabClick = (key: string) => {
   activeTab.value = key
   fetchTableData()
-}
-
-// const handleDownloadResult = async () => {
-//   if (selectedRows.value.length === 0) return
-//   const ids = selectedRows.value.map(row => row.id).join(',')
-//   await downloadResult({ ids }).catch(err => {
-//     console.log('下载失败', err.message)
-//     ElMessage.error(err.message)
-//   })
-// }
-
-const handleUploadReport = async () => {
-  if (selectedRows.value.length === 0) return
-  const names = selectedRows.value.map(row => row.questionnaire_name)
-  await uploadReport({ report_file: JSON.stringify(names) }).catch(err => {
-    console.log('上传失败', err.message)
-    ElMessage.error(err.message)
-  })
-  ElMessage.success('上传成功')
-}
-
-const handleUploadComparison = async () => {
-  if (selectedRows.value.length === 0) return
-  const names = selectedRows.value.map(row => row.questionnaire_name)
-  await uploadComparison({ report_file: JSON.stringify(names) }).catch(err => {
-    console.log('上传失败', err.message)
-    ElMessage.error(err.message)
-  })
-  ElMessage.success('上传成功')
 }
 
 watch(evaluationPath, async newVal => {
