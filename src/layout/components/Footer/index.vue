@@ -8,7 +8,7 @@
 import { reactive, toRefs } from 'vue'
 const initData = reactive({
   target: '_blank',
-  context: 'Vue ElementPlus Admin'
+  context: 'ADMIN'
 })
 const { href, target, context } = toRefs(initData)
 </script>

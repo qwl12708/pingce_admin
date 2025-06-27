@@ -501,18 +501,23 @@ const convertScoringType = scoringType => {
 
 <style scoped>
 .questionnaire-editor {
-  max-width: 1200px;
   min-height: 100vh;
   margin: 20px auto;
   padding: 0 20px;
 }
 
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
   display: flex;
   gap: 15px;
   flex-wrap: wrap;
   margin-bottom: 20px;
   align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 20px;
 }
 
 .pagination {
