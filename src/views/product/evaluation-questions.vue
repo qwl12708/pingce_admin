@@ -86,7 +86,17 @@
                   </template>
                   <span class="text-gray-600 ml-4">分值：</span>
                   <el-input-number v-model="q.score" :min="0" :max="100" class="w-24" />
-                  <span>分</span>
+
+                  <!-- 仅简答题和论述题显示评判标准单选框 -->
+                  <template v-if="['short', 'essay'].includes(q.type)">
+                    <span class="ml-4 text-gray-500">评判标准:</span>
+
+                    <el-radio-group v-model="q.check_content.check_standard" class="ml-2">
+                      <el-radio v-for="item in scoreStandard" :key="item.value" :label="item.value">
+                        {{ item.label }}
+                      </el-radio>
+                    </el-radio-group>
+                  </template>
                 </div>
 
                 <!-- 选项类题目 -->
@@ -124,11 +134,7 @@
                     <div class="fill-container">
                       <el-button @click="addFillOption(q)"> 添加填空项 </el-button>
                       <div v-for="(opt, idx) in q.options" :key="idx" class="fill-item">
-                        <el-input
-                          v-model="opt.title"
-                          placeholder="如有多个标准答案，请用分号隔开"
-                          style="width: 200px"
-                        />
+                        <el-input v-model="opt.title" placeholder="请填入答案" style="width: 200px" />
                         <el-input-number v-model="opt.score" :min="0" :step="1" controls-position="right" />
                         <el-button type="danger" icon="Delete" @click="removeOption(q, idx)" />
                       </div>
@@ -146,7 +152,7 @@
                       v-model="q._content"
                       :rows="q.type === 'short' ? 3 : 5"
                       type="textarea"
-                      placeholder="多个关键词之间请用分号隔开。 "
+                      placeholder="多个关键词之间请用中文分号；隔开。 "
                     />
                   </el-form-item>
                 </template>
@@ -188,17 +194,6 @@ const formRef = ref()
 const currentPage = ref(1)
 const pageSize = ref(10)
 const rules = []
-const allOptions = [
-  { value: 1, label: '唯一正确答案得分' },
-  { value: 2, label: '人工判分' },
-  { value: 3, label: '每个选项对应不同分值' },
-
-  { value: 4, label: '全部答对得分' },
-  { value: 5, label: '答对__个得几分，答错不得分' },
-
-  { value: 6, label: '答出全部关键词才得分' },
-  { value: 7, label: '答对x个关键词得几分' }
-]
 
 const radioOptions = [
   { value: 1, label: '唯一正确答案得分' },
@@ -231,8 +226,8 @@ const shortOptions = [
 ]
 
 const scoreStandard = [
-  { value: 'same', label: '与答案完全相同' },
-  { value: 'include', label: '包含关键词即可' }
+  { value: 1, label: '与答案完全相同' },
+  { value: 2, label: '包含关键词即可' }
 ]
 const optionsMap = {
   radio: radioOptions,
@@ -280,42 +275,6 @@ onMounted(async () => {
   }
 })
 
-const getOptions = type => {
-  switch (type) {
-    case 'radio':
-      return [
-        { label: '选项A', score: 1, answer: 1 },
-        { label: '选项B', score: 0, answer: 0 },
-        { label: '选项C', score: 0, answer: 0 },
-        { label: '选项D', score: 0, answer: 0 }
-      ]
-    case 'checkbox':
-      return [
-        { label: '选项A', score: 1, answer: 1 },
-        { label: '选项B', score: 0, answer: 1 },
-        { label: '选项C', score: 0, answer: 0 },
-        { label: '选项D', score: 0, answer: 0 }
-      ]
-    case 'judge':
-      return [
-        { label: '正确', score: 1, answer: 1 },
-        { label: '错误', score: 0, answer: 0 }
-      ]
-    case 'fill':
-      return [
-        { label: '空一答案', score: 1, answer: '' },
-        { label: '空二答案', score: 2, answer: '' },
-        { label: '空三答案', score: 2, answer: '' }
-      ]
-    case 'short':
-      return shortOptions
-    case 'essay':
-      return shortOptions
-    default:
-      return []
-  }
-}
-
 // 初始化题目模板
 const createQuestion = (type = 'radio') => ({
   id: generateId(),
@@ -325,7 +284,7 @@ const createQuestion = (type = 'radio') => ({
   check_content: {
     scoring_type: 2, // 计分方式
     num: 1, // 答出多少个关键词，得num分
-    check_standard: 1 // 评判标准
+    check_standard: 1 // 评判标准  1: 与答案完全相同，2：包含答案即可
   },
   _content: '',
   options:
@@ -459,22 +418,6 @@ const validateFillOptions = (_, value, callback) => {
   }
 }
 
-// 文件上传处理
-const beforeUpload = file => {
-  const isAllowedType = ['image', 'audio', 'video'].some(type => file.type.startsWith(type))
-  const isLt100M = file.size / 1024 / 1024 < 100
-
-  if (!isAllowedType) {
-    ElMessage.error('仅支持图片、音频、视频文件')
-    return false
-  }
-  if (!isLt100M) {
-    ElMessage.error('文件大小不能超过100MB')
-    return false
-  }
-  return true
-}
-
 const getParams = () => {
   const params = { questionnaire_id: questionnaire_id.value, del_id: del_id.value }
   const _questions = questions.value.map(item => {
@@ -489,7 +432,7 @@ const getParams = () => {
       _rest = { ...rest, id: null }
     }
 
-    if (['fill', 'short', 'essay'].includes(type) && typeof _content === 'string') {
+    if (['short', 'essay'].includes(type) && typeof _content === 'string') {
       content = _content.split('；')
     } // fill type => { title, answer, score }
 

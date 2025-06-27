@@ -322,7 +322,7 @@ const handleBatchDelete = async () => {
       type: 'warning'
     })
     const ids = selectedRows.value.map(row => row.id).join(',')
-    await deleteRoleType({ id: ids })
+    await deleteRoleType({ ids })
     ElMessage.success('删除成功')
     fetchRoleList()
   } catch (error) {

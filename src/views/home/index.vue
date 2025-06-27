@@ -158,32 +158,32 @@ const surveyStats = ref([])
 
 const productSections = ref([
   {
-    title: '最近15天新上线产品套餐',
+    title: '',
     icon: taocan1,
     list: []
   },
   {
-    title: '最近15天新屏蔽产品套餐',
+    title: '',
     icon: taocan2,
     list: []
   },
   {
-    title: '最近15天新解除屏蔽产品套餐',
+    title: '',
     icon: taocan3,
     list: []
   },
   {
-    title: '客户购买数量最多的产品套餐',
+    title: '',
     icon: taocan4,
     list: []
   },
   {
-    title: '最近30天客户购买数量最多的产品套餐',
+    title: '',
     icon: taocan5,
     list: []
   },
   {
-    title: '最近15天新交付问卷',
+    title: '',
     icon: taocan6,
     list: []
   }

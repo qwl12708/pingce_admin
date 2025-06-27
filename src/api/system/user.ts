@@ -51,7 +51,7 @@ export const editRoleType = (data: { id: number; name: string }) =>
   })
 
 // 平台/用户角色 - 删除角色类型
-export const deleteRoleType = (data: { id: string }) =>
+export const deleteRoleType = (data: { ids: string }) =>
   request({
     url: '/platformApi/role/type/del',
     method: 'POST',
