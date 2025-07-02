@@ -236,7 +236,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance } from 'element-plus'
 import {
   getRoleList,
-  deleteRoleType,
+  deleteRole,
   createRole,
   editRole,
   getRoleInfo,
@@ -322,7 +322,7 @@ const handleBatchDelete = async () => {
       type: 'warning'
     })
     const ids = selectedRows.value.map(row => row.id).join(',')
-    await deleteRoleType({ ids })
+    await deleteRole({ ids })
     ElMessage.success('删除成功')
     fetchRoleList()
   } catch (error) {

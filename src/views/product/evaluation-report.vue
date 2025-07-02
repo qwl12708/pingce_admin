@@ -47,6 +47,13 @@
             class="w-64"
           />
         </el-form-item>
+        <el-form-item v-if="activeTab === 'waiting'" label="是否过期">
+          <el-select v-model="searchForm.is_expire" placeholder="请选择" class="w-40">
+            <el-option label="全部" value="" />
+            <el-option label="是" :value="1" />
+            <el-option label="否" :value="0" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="handleSearch">查询</el-button>
           <el-button class="!rounded-button whitespace-nowrap" @click="handleReset">重置</el-button>
@@ -123,6 +130,12 @@
           <el-table-column label="客户名称" prop="org_name" sortable />
           <el-table-column label="项目名称" prop="project_name" sortable />
           <el-table-column label="答题结果" prop="result" sortable />
+          <el-table-column v-if="activeTab === 'waiting'" label="是否过期" prop="is_expire" sortable>
+            <template #default="{ row }">
+              <span v-if="row.is_expire === 1" class="text-red-500">是</span>
+              <span v-else class="text-green-500">否</span>
+            </template>
+          </el-table-column>
         </el-table>
 
         <div class="flex justify-between items-center p-4">
@@ -165,7 +178,8 @@ const searchForm = ref({
   org_name: '',
   project_name: '',
   result: '',
-  submit_time: ''
+  submit_time: '',
+  is_expire: ''
 })
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -195,6 +209,7 @@ const fetchTableData = async () => {
     org_name: searchForm.value.org_name,
     project_name: searchForm.value.project_name,
     result: searchForm.value.result,
+    is_expire: searchForm.value.is_expire,
     page: currentPage.value,
     pageSize: pageSize.value
   }
