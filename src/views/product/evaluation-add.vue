@@ -4,84 +4,75 @@
       <div class="space-y-6">
         <!-- 问题类型选择 -->
         <div class="space-y-6">
-          <div class="grid grid-cols-2 gap-6">
-            <!-- 左列 -->
-            <div class="space-y-4">
-              <div class="flex items-center space-x-4">
-                <span class="w-32 text-gray-600">问卷类别：</span>
-                <el-radio-group v-model="form.type" class="flex">
-                  <el-radio :label="1">通用测评问问卷</el-radio>
-                  <el-radio :label="2">岗位胜任力测评问卷</el-radio>
-                  <el-radio :label="3">订制问卷</el-radio>
-                  <el-radio :label="4">公益测评问卷</el-radio>
-                </el-radio-group>
-              </div>
-
-              <div v-if="form.type == 2" class="flex items-center space-x-4">
-                <span class="w-32 text-gray-600">岗位类别：</span>
-                <el-select v-model="form.post_type" allow-create filterable placeholder="选择岗位类别">
-                  <el-option v-for="item in industryOptions" :key="item" :label="item" :value="item" />
-                </el-select>
-              </div>
-
-              <div class="flex items-center space-x-4">
-                <span class="w-32 text-gray-600">岗位名称：</span>
-                <el-input v-model="form.job" placeholder="请输入岗位名称" class="flex-1" />
-              </div>
-
-              <div class="flex items-center space-x-4">
-                <span class="w-32 text-gray-600">问卷名称：</span>
-                <el-input v-model="form.name" placeholder="请输入问卷名称" class="flex-1" />
-              </div>
-
-              <div class="flex items-center space-x-4">
-                <span class="w-32 text-gray-600">标准作答时间：</span>
-                <el-input-number
-                  v-model="form.answer_time"
-                  :min="1"
-                  :max="999"
-                  controls-position="right"
-                  class="w-40"
-                />
-                <span class="ml-2 text-gray-600">分钟</span>
-              </div>
-              <div class="flex items-center space-x-4">
-                <span class="w-32 text-gray-600">标准点数：</span>
-                <el-input-number v-model="form.score" :min="0" :max="100" controls-position="right" class="w-40" />
-                <span class="ml-2 text-gray-600">分</span>
-              </div>
+          <!-- 单列布局，原左列内容 -->
+          <div class="space-y-4">
+            <div class="flex items-center space-x-4">
+              <span class="w-32 text-gray-600">问卷类别：</span>
+              <el-radio-group v-model="form.type" class="flex">
+                <el-radio :label="1">通用测评问问卷</el-radio>
+                <el-radio :label="2">岗位胜任力测评问卷</el-radio>
+                <el-radio :label="3">订制问卷</el-radio>
+                <el-radio :label="4">公益测评问卷</el-radio>
+              </el-radio-group>
             </div>
-            <!-- 右列 -->
-            <div class="space-y-4">
-              <div class="flex items-center space-x-4">
-                <span class="w-32 text-gray-600">试题顺序：</span>
-                <el-radio-group v-model="form.is_rand" class="flex items-center space-x-4">
-                  <el-radio :label="1">固定顺序</el-radio>
-                  <el-radio :label="2">随机顺序</el-radio>
-                </el-radio-group>
-              </div>
-              <div class="flex items-center space-x-4">
-                <span class="w-32 text-gray-600">切换屏幕：</span>
-                <el-radio-group v-model="form.is_switching_screens" class="flex items-center space-x-4">
-                  <el-radio :label="1">允许</el-radio>
-                  <el-radio :label="2">禁止</el-radio>
-                </el-radio-group>
-                <el-input-number
-                  v-if="form.is_switching_screens === 1"
-                  v-model="form.switching_screens_num"
-                  :min="1"
-                  :max="999"
-                  placeholder="请输入限制切屏次数"
-                  class="ml-8"
-                  style="width: 220px"
-                />
-              </div>
-              <div class="flex items-center space-x-4">
-                <span class="w-32 text-gray-600">测评报告类别：</span>
-                <el-select v-model="form.report_type" placeholder="请选择报告生成类别" class="flex-1">
-                  <el-option v-for="item in reportTypes" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-              </div>
+
+            <div v-if="form.type == 2" class="flex items-center space-x-4">
+              <span class="w-32 text-gray-600">岗位类别：</span>
+              <el-select v-model="form.post_type" allow-create filterable placeholder="选择岗位类别">
+                <el-option v-for="item in industryOptions" :key="item" :label="item" :value="item" />
+              </el-select>
+            </div>
+
+            <div class="flex items-center space-x-4">
+              <span class="w-32 text-gray-600">岗位名称：</span>
+              <el-input v-model="form.job" placeholder="请输入岗位名称" class="!w-[300px]" />
+            </div>
+
+            <div class="flex items-center space-x-4">
+              <span class="w-32 text-gray-600">问卷名称：</span>
+              <el-input v-model="form.name" placeholder="请输入问卷名称" class="!w-[300px]" />
+            </div>
+
+            <div class="flex items-center space-x-4">
+              <span class="w-32 text-gray-600">标准作答时间：</span>
+              <el-input-number v-model="form.answer_time" :min="1" :max="999" controls-position="right" class="w-40" />
+              <span class="ml-2 text-gray-600">分钟</span>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="w-32 text-gray-600">标准点数：</span>
+              <el-input-number v-model="form.score" :min="0" :max="100" controls-position="right" class="w-40" />
+              <span class="ml-2 text-gray-600">分</span>
+            </div>
+
+            <!-- 原右列内容，移动到左列下方 -->
+            <div class="flex items-center space-x-4">
+              <span class="w-32 text-gray-600">试题顺序：</span>
+              <el-radio-group v-model="form.is_rand" class="flex items-center space-x-4">
+                <el-radio :label="1">固定顺序</el-radio>
+                <el-radio :label="2">随机顺序</el-radio>
+              </el-radio-group>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="w-32 text-gray-600">切换屏幕：</span>
+              <el-radio-group v-model="form.is_switching_screens" class="flex items-center space-x-4">
+                <el-radio :label="1">允许</el-radio>
+                <el-radio :label="2">禁止</el-radio>
+              </el-radio-group>
+              <el-input-number
+                v-if="form.is_switching_screens === 1"
+                v-model="form.switching_screens_num"
+                :min="1"
+                :max="999"
+                placeholder="请输入限制切屏次数"
+                class="ml-8"
+                style="width: 220px"
+              />
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="w-32 text-gray-600">测评报告类别：</span>
+              <el-select v-model="form.report_type" placeholder="请选择报告生成类别" class="!w-[300px]">
+                <el-option v-for="item in reportTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
             </div>
           </div>
         </div>

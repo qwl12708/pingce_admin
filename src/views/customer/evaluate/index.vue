@@ -55,7 +55,7 @@
       <el-table-column type="selection" />
       <el-table-column label="序号" type="index" width="60" />
       <el-table-column prop="user_no" label="客户编号" sortable width="200" />
-      <el-table-column prop="org_name" label="客户名称" sortable width="200" />
+      <el-table-column prop="org_name" label="客户名称" sortable width="200" show-overflow-tooltip />
       <el-table-column label="剩余点数" prop="remainingCount" sortable width="200" />
       <el-table-column label="点数最后截止日期" prop="pointsEndDate" width="200" />
       <el-table-column label="套餐最后截止日期" prop="end_time" width="200">

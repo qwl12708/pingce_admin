@@ -75,11 +75,11 @@
         <el-table-column type="selection" fixed="left" width="55" />
         <el-table-column label="序号" type="index" fixed="left" width="60" />
         <el-table-column prop="user_no" label="客户编号" fixed="left" min-width="200" />
-        <el-table-column prop="org_name" label="客户名称" sortable min-width="150" />
+        <el-table-column prop="org_name" label="客户名称" sortable min-width="200" show-overflow-tooltip />
         <el-table-column prop="province_name" label="单位所在省" sortable min-width="120" />
         <el-table-column prop="city_name" label="单位所在市" sortable min-width="120" />
         <el-table-column prop="address" label="详细地址" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="create_time" label="创建时间" sortable min-width="150">
+        <el-table-column prop="create_time" label="创建时间" sortable min-width="200">
           <template #default="{ row }">
             {{ formatTime(row.create_time) }}
           </template>

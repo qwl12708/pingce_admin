@@ -72,7 +72,7 @@
         <el-table-column type="selection" />
         <el-table-column label="序号" type="index" width="60" />
         <el-table-column prop="user_no" label="客户编号" width="200" />
-        <el-table-column prop="org_name" label="客户名称" width="200" />
+        <el-table-column prop="org_name" label="客户名称" width="200" show-overflow-tooltip />
         <el-table-column prop="create_time" label="注册日期" width="200">
           <template #default="{ row }">
             {{ formatTime(row.create_time) }}
