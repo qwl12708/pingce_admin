@@ -1,18 +1,4 @@
 <template>
-  <BatchUploadDialog
-    title="线上测评报告批量上传"
-    v-model="batchUploadVisible"
-    :accept="'.pdf,.doc,.docx,.xls,.xlsx'"
-    upload-type="report"
-    @uploaded="onBatchUploaded"
-  />
-  <BatchUploadDialog
-    title="横向对比上传表批量上传"
-    v-model="batchCompareUploadVisible"
-    :accept="'.xls,.xlsx,.csv,.pdf,.doc,.docx'"
-    upload-type="comparison"
-    @uploaded="onBatchCompareUploaded"
-  />
   <div class="main-content min-h-screen bg-white p-6">
     <!-- 搜索区域 -->
     <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
@@ -60,6 +46,21 @@
         </el-form-item>
       </el-form>
     </div>
+
+    <BatchUploadDialog
+      title="线上测评报告批量上传"
+      v-model="batchUploadVisible"
+      :accept="'.pdf,.doc,.docx,.xls,.xlsx'"
+      upload-type="report"
+      @uploaded="onBatchUploaded"
+    />
+    <BatchUploadDialog
+      title="横向对比上传表批量上传"
+      v-model="batchCompareUploadVisible"
+      :accept="'.xls,.xlsx,.csv,.pdf,.doc,.docx'"
+      upload-type="comparison"
+      @uploaded="onBatchCompareUploaded"
+    />
 
     <!-- 标签页区域 -->
     <div class="bg-white rounded-lg shadow-sm">
