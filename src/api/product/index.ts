@@ -313,7 +313,6 @@ export const addQuestionnaire = (data: {
   invite_id?: number
   answer_id?: number
   questionnaire_path?: string
-  result_path?: string
   report_path?: string
   info_path?: string
 }) =>
@@ -339,7 +338,6 @@ export const editQuestionnaire = (data: {
   invite_id?: number
   answer_id?: number
   questionnaire_path?: string
-  result_path?: string
   report_path?: string
   info_path?: string
   id?: number

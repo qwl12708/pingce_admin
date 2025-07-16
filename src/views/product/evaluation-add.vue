@@ -111,16 +111,6 @@
               </div>
             </div>
           </div>
-
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-gray-700">测评结果横向对比汇总表模板</span>
-              <div class="flex items-center">
-                <FileUploader v-model:value="form.result_path" />
-                <div class="text-gray-400 text-sm mt-2 ml-2">支持.excel.word格式格式，不超过5MB</div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- 作答指引模板 -->
@@ -139,7 +129,10 @@
         <div class="space-y-4">
           <div class="space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-gray-700">测评报告模板文件</span>
+              <div>
+                <span class="text-gray-700">测评模板文件</span>
+                <span class="text-orange-500 text-sm">（提示：系统生成报告需要4张表，人工编制报告需要1张表）</span>
+              </div>
               <div class="flex items-center">
                 <FileUploader v-model:value="form.report_path" />
                 <div class="text-gray-400 text-sm mt-2 ml-2">支持.excel.word格式，不超过5MB</div>
@@ -199,7 +192,6 @@ const form = ref({
   invite_id: '',
   answer_id: '',
   questionnaire_path: '',
-  result_path: '',
   report_path: '',
   info_path: ''
 })
