@@ -154,15 +154,15 @@ export const downloadReportResult = (params: { ids: string }) =>
     params
   })
 // 上传报告
-export const uploadReport = (data: { report_file: string }) =>
+export const uploadReport = (data: { report_file: string; id: string }) =>
   request({
-    url: '/platformApi/people/result/import',
+    url: '/platformApi/people/result/import/single',
     method: 'POST',
     data
   })
 
 // 上传对比表
-export const uploadComparison = (data: { report_file: string }) =>
+export const uploadComparison = (data: { report_file: string; id: string }) =>
   request({
     url: '/platformApi/people/contrast/import',
     method: 'POST',

@@ -17,7 +17,7 @@
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
       <template #tip>
-        <div class="el-upload__tip">支持批量拖拽</div>
+        <div class="el-upload__tip">支持拖拽上传</div>
       </template>
     </el-upload>
     <template #footer>
@@ -31,10 +31,14 @@
 import { ref, watch, defineProps, defineEmits } from 'vue'
 import { ElMessage } from 'element-plus'
 import { uploadFile } from '@/api/modules/UploadApi'
-import { uploadReport, uploadComparison, getReportPollStatus } from '@/api/product'
+import { uploadReport, uploadComparison } from '@/api/product'
 
 const props = defineProps({
   modelValue: Boolean,
+  ids: {
+    type: Array,
+    default: () => []
+  },
   accept: {
     type: String,
     default: ''
@@ -75,22 +79,14 @@ const handleRemove = (file: any, files: any[]) => {
 const beforeUpload = () => {
   return true
 }
-const getPollStatus = async id => {
-  try {
-    const res = await getReportPollStatus({ id })
-    if (res?.data?.status === 'success') {
-      return true
-    } else {
-      throw new Error('上传结果校验失败')
-    }
-  } catch (error) {
-    console.error('轮询状态获取失败:', error)
-    return false
-  }
-}
+
 const handleUpload = async () => {
   if (!fileList.value.length) {
     ElMessage.warning('请先选择文件')
+    return
+  }
+  if (props.ids && props.ids.length === 0) {
+    ElMessage.warning('请先勾选需要上传的报告')
     return
   }
   uploading.value = true
@@ -115,21 +111,21 @@ const handleUpload = async () => {
       }
     }
     let res = { data: { id: '' } }
-    if (props.uploadType === 'comparison') {
-      res = await uploadComparison({ report_file: JSON.stringify(uploadedUrls.value) })
-    } else {
-      res = await uploadReport({ report_file: JSON.stringify(uploadedUrls.value) })
+    if (!props.ids || props.ids.length === 0) {
+      throw new Error('请先选择需要上传对比表的产品')
     }
-    // 轮询判断是否真正上传成功
-    ElMessage.info('正在校验上传结果...')
-    const pollResult = await getPollStatus(res.data.id)
-    if (pollResult) {
-      ElMessage.success('上传成功')
-      emit('uploaded')
-      visible.value = false
-    } else {
-      throw new Error('上传未完成，请稍后重试')
+    const action = props.uploadType === 'comparison' ? uploadComparison : uploadReport
+    // 循环发送请求
+    for (const id of props.ids) {
+      const comparisonData = { report_file: uploadedUrls.value[0], id }
+      res = await action(comparisonData)
+      if (!res?.data?.id) {
+        throw new Error(`${id} 上传失败`)
+      }
     }
+    ElMessage.success('上传成功')
+    emit('uploaded')
+    visible.value = false
   } catch (e: any) {
     ElMessage.error(e.message || '上传失败')
   } finally {

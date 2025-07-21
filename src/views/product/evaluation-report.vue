@@ -50,6 +50,7 @@
     <BatchUploadDialog
       title="线上测评报告批量上传"
       v-model="batchUploadVisible"
+      :ids="selectedRows.map(row => row.id)"
       :accept="'.pdf,.doc,.docx,.xls,.xlsx'"
       upload-type="report"
       @uploaded="onBatchUploaded"
@@ -57,6 +58,7 @@
     <BatchUploadDialog
       title="横向对比上传表批量上传"
       v-model="batchCompareUploadVisible"
+      :ids="selectedRows.map(row => row.id)"
       :accept="'.xls,.xlsx,.csv,.pdf,.doc,.docx'"
       upload-type="comparison"
       @uploaded="onBatchCompareUploaded"
@@ -332,12 +334,24 @@ watch(compareReportPath, async newVal => {
   }
 })
 
+const onBtnClick = () => {
+  console.log('selectedRows.value', selectedRows.value)
+  if (!selectedRows.value.length) {
+    ElMessage.warning('请先勾选上传的报告')
+    return
+  }
+}
+
 const onBatchUploaded = () => {
   batchUploadVisible.value = false
   fetchTableData()
 }
 
 const onBatchCompareUploaded = () => {
+  if (!selectedRows.value.length) {
+    ElMessage.warning('请先勾选上传的报告')
+    return
+  }
   batchCompareUploadVisible.value = false
   fetchTableData()
 }

@@ -11,7 +11,7 @@
             <img src="../../assets/image/icons/tui.png" />
           </el-icon>
           <span
-            >您有 <span class="text-blue-500 font-medium">{{ back_count }}</span> 个合同验退回</span
+            >您有 <span class="text-blue-500 font-medium">{{ back_count }}</span> 个合同被退回</span
           >
         </div>
         <div
