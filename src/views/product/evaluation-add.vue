@@ -131,7 +131,9 @@
             <div class="flex items-center justify-between">
               <div>
                 <span class="text-gray-700">测评模板文件</span>
-                <span class="text-orange-500 text-sm">（提示：系统生成报告需要4张表，人工编制报告需要1张表）</span>
+                <span class="text-orange-500 text-sm"
+                  >（提示：系统生成报告需要4张表，人工编制报告需要“测评问卷”、“横向对比汇总表模板”、“答题结果”三张表。）</span
+                >
               </div>
               <div class="flex items-center">
                 <FileUploader v-model:value="form.report_path" />
