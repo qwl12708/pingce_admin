@@ -133,9 +133,7 @@ export const exportReport = (params: { ids: string }) =>
     url: '/platformApi/people/export',
     method: 'GET',
     params,
-    _headers: {
-      responseType: 'blob' // 设置响应类型为 blob
-    }
+    responseType: 'blob'
   })
 
 // 下载结果
@@ -143,7 +141,8 @@ export const downloadResult = (params: { ids: string }) =>
   request({
     url: '/platformApi/people/result/export',
     method: 'GET',
-    params
+    params,
+    responseType: 'blob'
   })
 
 // 导出报告结果
@@ -151,7 +150,8 @@ export const downloadReportResult = (params: { ids: string }) =>
   request({
     url: '/platformApi/people/report/export',
     method: 'GET',
-    params
+    params,
+    responseType: 'blob'
   })
 // 上传报告
 export const uploadReport = (data: { report_file: string; id: string }) =>
