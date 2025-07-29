@@ -5,10 +5,10 @@
         <h1 class="text-xl font-medium">其它配置</h1>
         <el-button type="primary" class="!rounded-button whitespace-nowrap" @click="saveConfig">保存</el-button>
       </div>
-      <el-form :model="form" label-width="120px">
+      <el-form :model="form" label-width="200px">
         <div class="space-y-8">
           <!-- 服务协议 -->
-          <el-form-item label="服务协议" class="!w-[400px]">
+          <el-form-item label="服务协议" class="w-[400px]">
             <FileUploader v-model:value="form.service_protocol_file" />
           </el-form-item>
           <!-- 隐私政策 -->
@@ -21,7 +21,10 @@
           </el-form-item>
           <!-- 首页"微信咨询"链接二维码上传 -->
           <el-form-item label="首页微信咨询二维码">
-            <ImageUploader v-model:value="form.wechat_file" />
+            <div>
+              <ImageUploader v-model:value="form.wechat_file" />
+              <p class="text-gray-400 text-xs mt-2 text-center">推荐图片格式为jpg、jpeg、png，图片大小不能超过 10MB</p>
+            </div>
           </el-form-item>
           <!-- 客服电话 -->
           <el-form-item label="客服电话">
