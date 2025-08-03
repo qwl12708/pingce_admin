@@ -119,7 +119,7 @@
 
           <el-form-item label="菜单权限">
             <el-tree
-              ref="menuTree"
+              :ref="menuTree"
               class="mt-2 permission-tree"
               :data="menuData"
               show-checkbox
@@ -348,7 +348,7 @@ const form = ref({
   // isAdmin: false
 })
 
-const menuTree = ref()
+const menuTree = ref(null)
 
 const handleSizeChange = (val: number) => {
   pageSize.value = val

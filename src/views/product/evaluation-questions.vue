@@ -109,6 +109,7 @@
                       <el-button v-if="q.type !== 'judge'" @click="addOption(q)"> 添加选项 </el-button>
 
                       <div v-for="(opt, idx) in q.options" :key="idx" class="option-item">
+                        <span class="option-label">{{ String.fromCharCode(65 + idx) }}</span>
                         <el-input v-model="opt.title" :disabled="q.type === 'judge'" class="option-input" />
                         <el-input-number v-model="opt.score" :min="0" :step="1" controls-position="right" />
                         <div style="cursor: pointer" @click="onChangeRadio(q, idx)">
@@ -295,16 +296,16 @@ const createQuestion = (type = 'radio') => ({
         ]
       : type === 'radio'
       ? [
-          { title: '选项A', score: 1, answer: 1 },
-          { title: '选项B', score: 0, answer: 0 },
-          { title: '选项C', score: 0, answer: 0 },
-          { title: '选项D', score: 0, answer: 0 }
+          { title: '', score: 1, answer: 1 },
+          { title: '', score: 0, answer: 0 },
+          { title: '', score: 0, answer: 0 },
+          { title: '', score: 0, answer: 0 }
         ]
       : [
-          { title: '选项A', score: 1, answer: 1 },
-          { title: '选项B', score: 0, answer: 1 },
-          { title: '选项C', score: 0, answer: 0 },
-          { title: '选项D', score: 0, answer: 0 }
+          { title: '', score: 1, answer: 1 },
+          { title: '', score: 0, answer: 1 },
+          { title: '', score: 0, answer: 0 },
+          { title: '', score: 0, answer: 0 }
         ], // 题目选项
   attachments: [] // 附件
 })
