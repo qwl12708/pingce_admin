@@ -585,7 +585,8 @@ export const setBackupConfig = (data: { content: string }) =>
   request({
     url: '/platformApi/backup/config/set',
     method: 'POST',
-    data
+    data,
+    responseType: 'blob'
   })
 
 // 获取当前登录用户的信息
