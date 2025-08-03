@@ -43,7 +43,7 @@ export const useUserStore = defineStore('user', () => {
       try {
         const { data } = await getCurrentUserInfo()
         console.log('%c [ data ]-50', 'font-size:13px; background:pink; color:#bf2c9f;', data)
-        const { role_type = ['admin'], nickname, name, avatar } = data
+        const { role_type, nickname, name, avatar } = data
         setName(nickname)
         setAvatar(avatar)
         setIntroduction(name)
