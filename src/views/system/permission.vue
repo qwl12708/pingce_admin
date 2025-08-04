@@ -119,7 +119,7 @@
 
           <el-form-item label="菜单权限">
             <el-tree
-              :ref="menuTree"
+              ref="menuTree"
               class="mt-2 permission-tree"
               :data="menuData"
               show-checkbox
@@ -373,6 +373,8 @@ const resetForm = () => {
 }
 
 const handleEdit = async (row: any) => {
+  roleDialogVisible.value = true
+
   const res = await getRoleInfo({ id: row.id })
   form.value = {
     id: row.id,
@@ -405,8 +407,6 @@ const handleEdit = async (row: any) => {
   } else {
     menuTree.value?.setCheckedKeys([])
   }
-
-  roleDialogVisible.value = true
 }
 
 const handleToggleStatus = async (row: any) => {
@@ -430,12 +430,17 @@ const handleSubmit = async () => {
       const allSelectedKeys = [...new Set([...checkedKeys, ...halfCheckedKeys])]
 
       const { status, name, sort, role_type } = form.value
+
+      // rules 处理成以逗号隔开且开头和结尾的逗号要去除
+      const rules = allSelectedKeys.join(',').replace(/^,|,$/g, '')
+
       const data = {
         status,
         name,
         role_type,
         sort,
-        rules: allSelectedKeys.join(',')
+        rules
+        // rules: allSelectedKeys.join(',')
       }
 
       try {
