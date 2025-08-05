@@ -49,7 +49,7 @@ export const useUserStore = defineStore('user', () => {
         setIntroduction(name)
         setRoles(role_type)
         // 通过map方法将rules中的值转换为数字类型, 且值都为真
-        const rules = Object.values(data.rules)
+        const rules = (Array.isArray(data.rules) ? data.rules : Object.values(data.rules))
           .map(e => Number(e))
           .filter(Boolean)
         console.log('%c [ rules ]-53', 'font-size:13px; background:pink; color:#bf2c9f;', rules)

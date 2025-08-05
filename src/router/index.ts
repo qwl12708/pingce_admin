@@ -63,9 +63,13 @@ router.beforeEach(async (to, from, next) => {
           })
           authStore.addAllRoutes(router.options.routes) // 保存授权路由，便于菜单展示
 
-          // 路由的重定向
-          // 设置replace:true，这样导航就不会留下历史记录，登录后回退不会回到登录页面
-          next({ ...to, replace: true })
+          // 如果动态路由未配置首页，重定向到动态路由的第一个菜单
+          const noHome = accessRoutes.every(item => item.path !== '/')
+          if (noHome && to.path === '/') {
+            next({ path: accessRoutes[0].path + '/' + accessRoutes[0].children[0]?.path })
+          } else {
+            next({ ...to, replace: true })
+          }
         } catch (error) {
           // 删除令牌并转到登录页面重新登录
           localStorage.clear()
