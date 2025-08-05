@@ -1,5 +1,4 @@
 import { RouteRecordRaw } from 'vue-router'
-const Layout = () => import('@/layout/index.vue')
 const comp401 = () => import('@/views/error-page/401.vue')
 const comp404 = () => import('@/views/error-page/404.vue')
 const comp500 = () => import('@/views/error-page/500.vue')
@@ -8,22 +7,6 @@ const comp500 = () => import('@/views/error-page/500.vue')
  * staticRouter (静态路由)
  */
 export const staticRouter: RouteRecordRaw[] = [
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/home',
-    children: [
-      {
-        path: 'home',
-        component: () => import('@/views/home/index.vue'),
-        name: 'Home',
-        meta: {
-          title: '首页',
-          icon: 'menu-home'
-        }
-      }
-    ]
-  },
   {
     path: '/login',
     name: 'login',

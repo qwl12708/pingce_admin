@@ -9,12 +9,12 @@
         <img class="pic-404__child right" src="@/assets/image/error_images/404_cloud.png" alt="404" />
       </div>
       <div class="bullshit">
-        <div class="bullshit__oops">OOPS!</div>
+        <div class="bullshit__oops">404 NOT FOUND</div>
         <div class="bullshit__headline">
           {{ message }}
         </div>
         <div class="bullshit__info">请检查您输入的网址是否正确、是否有权限，或点击下方按钮返回首页。</div>
-        <a href="" class="bullshit__return-home">跟我回家</a>
+        <a href="/" class="bullshit__return-home">跟我回家</a>
       </div>
     </div>
   </div>

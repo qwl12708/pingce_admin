@@ -17,6 +17,23 @@ function processRoutes(routes: MenuType.MenuOptions[]) {
 }
 
 const baseRoutes: MenuType.MenuOptions[] = [
+  {
+    path: '/',
+    name: 'Home',
+    component: Layout,
+    redirect: '/home',
+    children: [
+      {
+        path: 'home',
+        component: () => import('@/views/home/index.vue'),
+        name: 'Home',
+        meta: {
+          title: '首页',
+          icon: 'menu-home'
+        }
+      }
+    ]
+  },
   // 客户管理
   {
     path: '/customer',
