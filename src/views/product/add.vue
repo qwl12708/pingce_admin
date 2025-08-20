@@ -71,20 +71,20 @@
 
       <!-- 测评问卷配置 -->
       <el-form-item label="问卷类别" prop="evaluation_type" required>
-        <el-radio-group v-model="form.evaluation_type" :disabled="readonly">
+        <el-radio-group v-model="form.evaluation_type" :disabled="readonly" @change="handleTypeChange">
           <el-radio v-for="item in questionnaireTypeOptions" :key="item.value" :label="item.value">{{
             item.label
           }}</el-radio>
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item v-if="form.evaluation_type !== 1" label="问卷名称" prop="evaluation_id" required>
-        <el-select v-model="form.evaluation_id" placeholder="选择测评问卷" :disabled="readonly">
+      <el-form-item v-if="form.evaluation_type !== 0" label="问卷名称" prop="evaluation_id" required>
+        <el-select v-model="form.evaluation_id" filterable placeholder="请选择问卷" :disabled="readonly">
           <el-option v-for="item in questionnaireOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
 
-      <el-form-item v-if="form.evaluation_type === 3" label="选择岗位类别" prop="job_type" required>
+      <el-form-item v-if="form.evaluation_type === 2" label="选择岗位类别" prop="job_type" required>
         <el-select v-model="form.job_type" placeholder="选择岗位类别" :disabled="readonly">
           <el-option v-for="item in industryOptions" :key="item" :label="item" :value="item" />
         </el-select>
@@ -118,7 +118,7 @@ const form = reactive({
   limit_area: [],
   day: '',
   price: '',
-  evaluation_type: 1,
+  evaluation_type: 0,
   evaluation_id: 0,
   job_type: '',
   score: '' // 新增字段
@@ -145,10 +145,11 @@ const durationOptions = [
 ]
 
 const questionnaireTypeOptions = [
-  { value: 1, label: '所有问卷（不含定制）' },
-  { value: 2, label: '通用测评问卷' },
-  { value: 3, label: '岗位胜任力测评问卷' },
-  { value: 4, label: '定制问卷' }
+  { value: 0, label: '所有问卷（不含定制）' },
+  { value: 1, label: '通用测评问卷' },
+  { value: 2, label: '岗位胜任力测评问卷' },
+  { value: 3, label: '定制问卷' },
+  { value: 4, label: '公益测评问卷' }
 ]
 const questionnaireOptions = ref([])
 const industryOptions = ref([])
@@ -170,12 +171,22 @@ onMounted(async () => {
   const { data } = await getJobTypeList()
   industryOptions.value = data || []
 
-  const res = await getQuestionnaireList({ page: 1, pageSize: 100 })
+  handleTypeChange()
+})
+
+const handleTypeChange = async e => {
+  typeof e === 'number' && (form.evaluation_id = 0) // 重置问卷ID
+  questionnaireOptions.value = []
+  const res = await getQuestionnaireList({
+    type: form.evaluation_type,
+    page: 1,
+    pageSize: 2000
+  })
   questionnaireOptions.value = res.data.list.map(({ name, id }) => ({
     label: name,
     value: id
   }))
-})
+}
 
 const handleSubmit = async () => {
   await formRef.value.validate(async (valid: boolean) => {

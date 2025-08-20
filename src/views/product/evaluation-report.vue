@@ -48,7 +48,7 @@
     </div>
 
     <BatchUploadDialog
-      title="线上测评报告批量上传"
+      title="线上测评报告上传"
       v-model="batchUploadVisible"
       :ids="selectedRows.map(row => row.id)"
       :accept="'.pdf,.doc,.docx,.xls,.xlsx'"
@@ -98,7 +98,7 @@
               <el-button class="mr-2" :disabled="selectedRows.length === 0" @click="handleDownloadResult">
                 测评结果批量下载
               </el-button>
-              <el-button class="mr-2" @click="batchUploadVisible = true">线上测评报告批量上传</el-button>
+              <el-button class="mr-2" @click="batchUploadVisible = true">线上测评报告上传</el-button>
               <el-button @click="batchCompareUploadVisible = true">横向对比上传表批量上传</el-button>
             </div>
           </template>

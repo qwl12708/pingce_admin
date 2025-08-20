@@ -119,7 +119,7 @@ const handleUpload = async () => {
     for (const id of props.ids) {
       const comparisonData = { report_file: uploadedUrls.value[0], id }
       res = await action(comparisonData)
-      if (!res?.data?.id) {
+      if (!res?.code || res?.code !== 200) {
         throw new Error(`${id} 上传失败`)
       }
     }

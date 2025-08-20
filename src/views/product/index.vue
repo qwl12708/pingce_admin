@@ -161,7 +161,7 @@ const filterForm = ref({
   type: '',
   evaluation_name: '',
   limit_area: [],
-  status: null
+  status: 0
 })
 
 const regionData = ref<any[]>([])
@@ -218,7 +218,7 @@ const handleReset = () => {
     type: '',
     evaluation_name: '',
     limit_area: [],
-    status: null
+    status: 0
   }
   currentPage.value = 1
   fetchProductList()
@@ -229,14 +229,7 @@ const fetchProductList = async () => {
     page: currentPage.value,
     pageSize: pageSize.value,
     ...filterForm.value,
-    limit_area: null,
-    city_ids: filterForm.value.limit_area.join(',') || ''
-  }
-  if (!params.limit_area || params.limit_area.length === 0) {
-    delete params.limit_area
-  }
-  if (!params.status) {
-    delete params.status
+    limit_area: JSON.stringify(filterForm.value.limit_area || [])
   }
   const { data } = await getProductList(params)
   tableData.value = data.list
@@ -259,9 +252,9 @@ const handleEdit = (row: TableItem) => {
 const handleFreeze = async (row: TableItem) => {
   const res = await updateProductStatus({ id: row.id, status: row.status === 1 ? 0 : 1 })
   // 兼容 res.data.code 取值
-  if (res && res.data && res.data.code === 200) {
+  if (res && res.code === 200) {
     fetchProductList()
-    ElMessage.success('操作成功')
+    ElMessage.success(`${row.status === 1 ? '冻结' : '解冻'}成功`)
   }
 }
 

@@ -281,7 +281,8 @@ const pageSize = ref(10)
 const total = ref(0)
 const tableData = ref<any[]>([])
 const roleTypeOptions = ref<any[]>([
-  { value: 'admin', label: '管理员' },
+  { value: 'admin', label: '超级管理员' },
+  { value: 'mini_admin', label: '管理员' },
   { value: 'consultant', label: '客服顾问' },
   { value: 'user', label: '普通角色' }
 ])
@@ -422,14 +423,18 @@ const handleToggleStatus = async (row: any) => {
 const handleSubmit = async () => {
   if (!formRef.value) return
 
+  const { status, name, sort, role_type } = form.value
+  if (!name || name.trim() === '') {
+    ElMessage.error('角色名称不能为空')
+    return
+  }
+
   await formRef.value.validate(async valid => {
     if (valid) {
       const checkedKeys = menuTree.value.getCheckedKeys()
       const halfCheckedKeys = menuTree.value.getHalfCheckedKeys()
       // 合并完全选中和半选中的节点
       const allSelectedKeys = [...new Set([...checkedKeys, ...halfCheckedKeys])]
-
-      const { status, name, sort, role_type } = form.value
 
       // rules 处理成以逗号隔开且开头和结尾的逗号要去除
       const rules = allSelectedKeys.join(',').replace(/^,|,$/g, '')
